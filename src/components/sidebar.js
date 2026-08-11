@@ -61,6 +61,7 @@ export function SidebarDemo({ children }) {
   };
 
   const profileHref = PROFILE_ROUTES[role] || "/profile";
+  const logoSrc = role === ROLES.SELF_LEARNER ? "/pics/logo70.jpeg" : "/pics/Logo7.png";
 
   const links = getSidebarLinks(role, user, t);
 
@@ -110,7 +111,7 @@ export function SidebarDemo({ children }) {
         <Sidebar open={open} setOpen={setOpen}>
           <SidebarBody className="bg-white flex flex-col h-full overflow-visible">
             <div className="flex-shrink-0">
-              <Logo open={open} toggleSidebar={() => setOpen(!open)} />
+              <Logo open={open} toggleSidebar={() => setOpen(!open)} logoSrc={logoSrc} />
             </div>
 
             <div className="flex-1 overflow-y-auto px-2 mt-4">
@@ -297,14 +298,14 @@ export function SidebarDemo({ children }) {
   );
 }
 
-export const Logo = ({ toggleSidebar, open }) => (
+export const Logo = ({ toggleSidebar, open, logoSrc = "/pics/Logo7.png" }) => (
   <div className="w-full flex justify-center">
     <button onClick={toggleSidebar} className="w-full py-2">
       {!open ? (
-        <img src="/pics/Logo7.png" className="h-8 w-20 object-contain" />
+        <img src={logoSrc} className="h-8 w-20 object-contain" />
       ) : (
         <div className="w-full px-2">
-          <img src="/pics/Logo7.png" className="w-full object-cover" />
+          <img src={logoSrc} className="w-full object-cover" />
         </div>
       )}
     </button>
