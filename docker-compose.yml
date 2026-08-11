@@ -1,0 +1,18 @@
+services:
+  lms-frontend:
+    build:
+      context: .
+      args:
+        API_URL: ${API_URL}
+    container_name: lms-frontend
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    restart: unless-stopped
+    networks:
+      - lms-shared
+
+networks:
+  lms-shared:
+    external: true

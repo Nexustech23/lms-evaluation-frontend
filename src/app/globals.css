@@ -1,0 +1,94 @@
+/* @import url('https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap'); */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =========================
+   ROOT VARIABLES
+========================= */
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  font-family: "Urbanist", sans-serif;
+}
+
+
+/* =========================
+   BASE STYLES
+========================= */
+body {
+  color: var(--foreground);
+  background: var(--background);
+  /* background: var(--background); */
+  font-family: "Urbanist", sans-serif;
+}
+
+/* =========================
+   ANIMATION
+========================= */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* =========================
+   GLOBAL ORANGE SCROLLBAR
+========================= */
+
+/* Firefox */
+html {
+  scrollbar-width: thin; /* already correct */
+  scrollbar-color: var(--theme-color) var(--theme-color-light);
+    scroll-behavior: smooth;
+}
+
+/* Chrome, Edge, Safari */
+::-webkit-scrollbar {
+  width: 6px;   /* 🔥 thinner (was 6px) */
+  height: 8px;  /* for horizontal scroll */
+}
+
+::-webkit-scrollbar-track {
+  background: transparent; /* cleaner thin look */
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--theme-color);
+  border-radius: 999px; /* fully rounded */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--theme-color);
+}
+
+/* Generated grades table: keep a clearly visible, dedicated scroll bar. */
+.grades-scrollbar {
+  scrollbar-width: auto;
+  scrollbar-color: var(--grades-scrollbar-color) #f3f4f6;
+  scrollbar-gutter: stable;
+}
+
+.grades-scrollbar::-webkit-scrollbar {
+  width: 14px;
+}
+
+.grades-scrollbar::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 999px;
+}
+
+.grades-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--grades-scrollbar-color);
+  border: 3px solid #f3f4f6;
+  border-radius: 999px;
+  min-height: 48px;
+}
