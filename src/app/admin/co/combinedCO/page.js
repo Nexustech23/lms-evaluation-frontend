@@ -110,6 +110,26 @@ const GLOBAL_STYLE = `
 
   /* Tooltip hint */
   .hint { font-size: 14px; color: #8b90b5; font-weight: 400; }
+
+  /* Exam tab bar */
+  .exam-tabs {
+    display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px;
+    scrollbar-width: thin; scrollbar-color: #c7d2fe #f0f2ff;
+  }
+  .exam-tabs::-webkit-scrollbar { height: 5px; }
+  .exam-tabs::-webkit-scrollbar-track { background: #f0f2ff; border-radius: 99px; }
+  .exam-tabs::-webkit-scrollbar-thumb { background: #a5b4fc; border-radius: 99px; }
+  .exam-tab {
+    flex-shrink: 0; padding: 8px 16px; border-radius: 10px;
+    font-size: 14px; font-weight: 600; cursor: pointer; border: 1px solid transparent;
+    background: #f4f5fb; color: #4a4e6a; transition: all .15s ease;
+    white-space: nowrap;
+  }
+  .exam-tab:hover { background: #eef0fb; color: #4f46e5; }
+  .exam-tab.active {
+    background: #4f46e5; color: #fff;
+    box-shadow: 0 2px 8px rgba(79,70,229,.28);
+  }
 `;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -180,6 +200,25 @@ function corrStyle(val) {
   if (val === 3) return { background: "#ede9fe", color: "#5b21b6", border: "1px solid #c4b5fd" };
   if (val === 2) return { background: "#dbeafe", color: "#1e40af", border: "1px solid #93c5fd" };
   return { background: "#f1f5f9", color: "#475569", border: "1px solid #cbd5e1" };
+}
+
+// Strips the shared course-name prefix off a set of exam folder names, so tab
+// labels read "CT-1"/"Quiz-3"/"MSA" instead of repeating the full
+// "<Subject Name>-CT-1" on every single tab.
+function commonFolderNamePrefix(folderNames) {
+  const names = folderNames.filter(Boolean);
+  if (names.length < 2) return "";
+  let prefix = names[0];
+  for (const name of names.slice(1)) {
+    while (prefix && !name.startsWith(prefix)) prefix = prefix.slice(0, -1);
+    if (!prefix) break;
+  }
+  return prefix;
+}
+function shortExamLabel(folderName, prefix) {
+  if (!folderName) return "Exam";
+  const rest = prefix && folderName.startsWith(prefix) ? folderName.slice(prefix.length) : folderName;
+  return rest.replace(/^[\s\-–—:_]+/, "") || folderName;
 }
 
 // ─── Shared Section Wrapper ────────────────────────────────────────────────────
@@ -267,9 +306,10 @@ function buildDirectAttainment(exams, targets, coAttainmentTarget = 2) {
       });
       const info = getCOLevelInfo(studentPcts, targets);
       const level = info?.level ?? 0;
+      const hasData = (info?.total ?? 0) > 0;
       const weightage = exam.weightage ?? 0;
       const weighted = level * (weightage / 100);
-      levelMatrix[co][exam.exam_id] = { level, weighted, achievementPct: info?.achievementPct ?? null };
+      levelMatrix[co][exam.exam_id] = { level, weighted, achievementPct: info?.achievementPct ?? null, hasData };
       finalAttainment[co] += weighted;
     }
     finalAttainment[co] = Math.round(finalAttainment[co] * 100) / 100;
@@ -373,14 +413,15 @@ function DirectAttainmentTable({ exams, targets, coAttainmentTarget }) {
                     const level = cell?.level ?? 0;
                     const weighted = cell?.weighted ?? 0;
                     const achPct = cell?.achievementPct;
+                    const hasData = cell?.hasData ?? false;
                     return (
                       <React.Fragment key={exam.examId}>
                         <td style={{ textAlign: "center", borderLeft: "2px solid #eceef6" }}>
                           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
                             <span className="level-pill" style={levelStyle(level)}>
-                              {level === 0 ? "—" : `${level}`}
+                              {hasData ? `${level}` : "—"}
                             </span>
-                            {achPct !== null && (
+                            {hasData && achPct !== null && (
                               <span style={{ fontSize: 12, color: "#8b90b5" }}>{achPct}%</span>
                             )}
                           </div>
@@ -390,7 +431,7 @@ function DirectAttainmentTable({ exams, targets, coAttainmentTarget }) {
                             fontFamily: " monospace", fontSize: 16, fontWeight: 500,
                             color: weighted >= 2 ? "#059669" : weighted >= 1 ? "#d97706" : "#5c5c5c"
                           }}>
-                            {weighted > 0 ? weighted.toFixed(2) : "—"}
+                            {hasData ? weighted.toFixed(2) : "—"}
                           </span>
                         </td>
                       </React.Fragment>
@@ -932,6 +973,7 @@ const Page = () => {
   const subjectId = searchParams.get("subjectId");
   const [cOAttainementTarget, setCOAttainmentTarget] = useState(0);
   const [coReport, setCoReport] = useState([]);
+  const [activeExamId, setActiveExamId] = useState(null);
   const [targets, setTargets] = useState([]);
   const [coPOMatrix, setCoPOMatrix] = useState({});
   const [coList, setCoList] = useState([]);
@@ -975,7 +1017,9 @@ const Page = () => {
       if (!subjectId) return;
       setLoading(true);
       const res = await axios.get(`/api/combinedCO/${subjectId}`, { withCredentials: true });
-      setCoReport(res.data.exams || []);
+      const exams = res.data.exams || [];
+      setCoReport(exams);
+      setActiveExamId(exams[0]?.exam_id ?? null);
     } catch { toast.error("Failed to load CO report"); }
     finally { setLoading(false); }
   };
@@ -1058,10 +1102,29 @@ const Page = () => {
             </div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
-              {/* Per-exam tables */}
-              {coReport.map((exam) => (
-                <ExamTable key={exam.exam_id} exam={exam} />
-              ))}
+              {/* Per-exam tabs — one table on screen at a time instead of all stacked */}
+              {(() => {
+                const prefix = commonFolderNamePrefix(coReport.map((e) => e.folder_name));
+                const activeExam = coReport.find((e) => e.exam_id === activeExamId) || coReport[0];
+                return (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                    <div className="exam-tabs">
+                      {coReport.map((exam) => (
+                        <button
+                          key={exam.exam_id}
+                          type="button"
+                          className={`exam-tab${exam.exam_id === activeExam?.exam_id ? " active" : ""}`}
+                          onClick={() => setActiveExamId(exam.exam_id)}
+                        >
+                          {shortExamLabel(exam.folder_name, prefix)}
+                          {exam.is_course_exit_summary ? " (CES)" : ""}
+                        </button>
+                      ))}
+                    </div>
+                    {activeExam && <ExamTable exam={activeExam} />}
+                  </div>
+                );
+              })()}
 
               <SectionDivider label={t("attainmentAnalysis")} />
 
