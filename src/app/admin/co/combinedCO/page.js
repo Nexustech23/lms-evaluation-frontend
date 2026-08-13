@@ -416,23 +416,30 @@ function DirectAttainmentTable({ exams, targets, coAttainmentTarget }) {
                     const hasData = cell?.hasData ?? false;
                     return (
                       <React.Fragment key={exam.examId}>
-                        <td style={{ textAlign: "center", borderLeft: "2px solid #eceef6" }}>
-                          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
-                            <span className="level-pill" style={levelStyle(level)}>
-                              {hasData ? `${level}` : "—"}
-                            </span>
-                            {hasData && achPct !== null && (
-                              <span style={{ fontSize: 12, color: "#8b90b5" }}>{achPct}%</span>
-                            )}
-                          </div>
+                        <td
+                          style={{
+                            textAlign: "center", borderLeft: "2px solid #eceef6",
+                            background: hasData ? undefined : "#fafbfe",
+                          }}
+                        >
+                          {hasData ? (
+                            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+                              <span className="level-pill" style={levelStyle(level)}>{level}</span>
+                              {achPct !== null && (
+                                <span style={{ fontSize: 12, color: "#8b90b5" }}>{achPct}%</span>
+                              )}
+                            </div>
+                          ) : null}
                         </td>
-                        <td style={{ textAlign: "center" }}>
-                          <span style={{
-                            fontFamily: " monospace", fontSize: 16, fontWeight: 500,
-                            color: weighted >= 2 ? "#059669" : weighted >= 1 ? "#d97706" : "#5c5c5c"
-                          }}>
-                            {hasData ? weighted.toFixed(2) : "—"}
-                          </span>
+                        <td style={{ textAlign: "center", background: hasData ? undefined : "#fafbfe" }}>
+                          {hasData ? (
+                            <span style={{
+                              fontFamily: " monospace", fontSize: 16, fontWeight: 500,
+                              color: weighted >= 2 ? "#059669" : weighted >= 1 ? "#d97706" : "#5c5c5c"
+                            }}>
+                              {weighted.toFixed(2)}
+                            </span>
+                          ) : null}
                         </td>
                       </React.Fragment>
                     );
@@ -605,9 +612,7 @@ function COAttainmentSummary({ exams, targets, coList, coPOMatrix, coAttainmentT
                       <td key={po} style={{ textAlign: "center" }}>
                         {corr && corr > 0 ? (
                           <span className="level-pill" style={style}>{corr}</span>
-                        ) : (
-                          <span style={{ color: "#d1d5db", fontSize: 16 }}>—</span>
-                        )}
+                        ) : null}
                       </td>
                     );
                   })}
@@ -621,7 +626,7 @@ function COAttainmentSummary({ exams, targets, coList, coPOMatrix, coAttainmentT
                 <td className="sticky-col" colSpan={4} style={{ color: "#021ace" }}>{t("poOverview")}</td>
                 {poCodes.map((po) => {
                   const info = poAttainment[po];
-                  if (!info) return <td key={po} style={{ textAlign: "center", color: "#9ca3af" }}>—</td>;
+                  if (!info) return <td key={po} style={{ textAlign: "center", background: "#fafbfe" }} />;
                   const { pct: p, attained: att, total } = info;
                   const s = badgeStyle(p);
                   return (
@@ -720,9 +725,7 @@ function COPOMatrixTable({ coPOMatrix, exams, targets, coList, coAttainmentTarge
                     <td key={po} style={{ textAlign: "center" }}>
                       {corr && corr > 0 ? (
                         <span className="level-pill" style={corrStyle(corr)}>{corr}</span>
-                      ) : (
-                        <span style={{ color: "#d1d5db", fontSize: 16 }}>—</span>
-                      )}
+                      ) : null}
                     </td>
                   );
                 })}
