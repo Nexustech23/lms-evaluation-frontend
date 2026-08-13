@@ -7,8 +7,9 @@ export default function RoadmapStats({ stats, progress }) {
     estimatedDays,
     estimatedWeeks,
     totalTopics,
-    totalQuizzes = 4,
+    totalQuizzes = 0,
   } = stats;
+  const displayDays = estimatedDays ?? (estimatedWeeks ? estimatedWeeks * 7 : 0);
 
   const {
     overallProgress = 0,
@@ -19,7 +20,7 @@ export default function RoadmapStats({ stats, progress }) {
   const cards = [
     {
       label: "Estimated Completion",
-      value: `${estimatedWeeks} Wks (${estimatedDays} Days)`,
+      value: `${estimatedWeeks} Wks (${displayDays} Days)`,
       icon: Calendar,
       color: "text-[#6C63FF]",
       bg: "bg-[#F0EEFF]",
@@ -77,7 +78,7 @@ export default function RoadmapStats({ stats, progress }) {
               Learning Progress Tracker
             </h3>
             <p className="text-xs text-gray-500 font-semibold mt-0.5">
-              Complete notes and pass quizzes to unlock higher levels.
+              Complete notes and pass quizzes to unlock upcoming weeks.
             </p>
           </div>
           <div className="text-right">

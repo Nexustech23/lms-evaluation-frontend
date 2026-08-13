@@ -25,8 +25,8 @@ export default function RoadmapsListPage() {
     load();
   }, []);
 
-  const getUnlockedLevelsCount = (r) => {
-    return (r.unlockedLevels || [1]).length;
+  const getUnlockedWeeksCount = (r) => {
+    return (r.unlockedWeeks || [1]).length;
   };
 
   const getCompletedSubtopicsCount = (r) => {
@@ -120,7 +120,7 @@ export default function RoadmapsListPage() {
                     <div className="grid grid-cols-2 gap-4 mt-4">
                       <div className="flex items-center gap-2 text-xs font-semibold text-gray-500">
                         <Activity size={14} className="text-[#43C6AC] shrink-0" />
-                        <span>Stage {getUnlockedLevelsCount(r)}/4 Unlocked</span>
+                        <span>Week {getUnlockedWeeksCount(r)}/{r.weeks?.length || 1} Unlocked</span>
                       </div>
                       <div className="flex items-center gap-2 text-xs font-semibold text-gray-500">
                         <Clock size={14} className="text-[#FF6584] shrink-0" />

@@ -11,10 +11,10 @@ export default function RevisionPlanner({ initialFrequency = "Every Week" }) {
   const plannerData = {
     daily: [
       { id: 1, time: "08:30 AM", topic: "Quick review of yesterday's notes", done: true },
-      { id: 2, time: "09:00 PM", topic: "Flashcard review for active level concepts", done: false },
+      { id: 2, time: "09:00 PM", topic: "Flashcard review for this week's concepts", done: false },
     ],
     weekly: [
-      { id: 3, day: "Saturday", topic: "Re-run practice questions for Level 1", done: false },
+      { id: 3, day: "Saturday", topic: "Re-run practice questions for Week 1", done: false },
       { id: 4, day: "Sunday", topic: "Solve weak topic notes and review calculations", done: false },
     ],
     topicWise: [

@@ -2,16 +2,19 @@
 
 import { Flame, Award, Calendar, Check } from "lucide-react";
 
-export default function StreakCard({ streakDays = 7, completedLevelsCount = 0 }) {
-  const weekDays = [
-    { name: "Mon", active: true },
-    { name: "Tue", active: true },
-    { name: "Wed", active: true },
-    { name: "Thu", active: true },
-    { name: "Fri", active: true },
-    { name: "Sat", active: false },
-    { name: "Sun", active: false },
-  ];
+const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+export default function StreakCard({ streakDays = 0, completedLevelsCount = 0, activityDates = [] }) {
+  // Rolling 7-day window (oldest -> today), driven by progress.activityDates
+  // (real per-day roadmap activity), not a hardcoded Mon-Fri pattern.
+  const activitySet = new Set(activityDates);
+  const today = new Date();
+  const weekDays = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(today);
+    d.setDate(d.getDate() - (6 - i));
+    const iso = d.toISOString().slice(0, 10);
+    return { name: DAY_LABELS[d.getDay()], active: activitySet.has(iso) };
+  });
 
   const badges = [
     {
@@ -21,8 +24,8 @@ export default function StreakCard({ streakDays = 7, completedLevelsCount = 0 })
       icon: "🔥",
     },
     {
-      title: "Stage 1 Conqueror",
-      desc: "Complete level 1 curriculum.",
+      title: "Week 1 Conqueror",
+      desc: "Complete week 1's curriculum.",
       unlocked: completedLevelsCount >= 1,
       icon: "🏆",
     },

@@ -1,19 +1,16 @@
-import ReactMarkdown from "react-markdown";
-
-const API_BASE = "http://103.192.198.186:5051/";
-
 export default function OutputPreview({
   title,
   result,
   emptyMessage
 }) {
 
-  const generatedContent = result?.data?.generated_content;
-
-  // pdf_url from backend: "uploads/generated_pdfs/homework_abc.pdf"
-  const pdfUrl = result?.data?.pdf_url
-    ? `${API_BASE}/${result.data.pdf_url}`
-    : null;
+  // app/api/routers/ai_tutor.py's job-status response is flat (success,
+  // status, step, solution_url, html_content, ...) — not nested under a
+  // "data" key, and html_content is a complete standalone HTML document
+  // (its own <style>/<head>), not markdown — rendered via a sandboxed
+  // iframe rather than ReactMarkdown, which would just show the raw tags.
+  const htmlContent = result?.html_content;
+  const pdfUrl = result?.solution_url || null;
 
   return (
     <div className="mt-8 rounded-3xl border border-gray-200 bg-[#FAFBFF] p-6">
@@ -22,41 +19,25 @@ export default function OutputPreview({
         {title}
       </h2>
 
-      {generatedContent ? (
+      {htmlContent ? (
 
         <div className="space-y-4">
 
           {/* STATUS BADGE */}
           <div>
             <span className="inline-block px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-semibold capitalize">
-              ✓ {result?.data?.status || "completed"}
+              ✓ {result?.status || "completed"}
             </span>
           </div>
 
           {/* CONTENT */}
-          <div
-            className="
-    text-base
-    leading-8
-    text-gray-700
-    bg-violet-50
-    border
-    border-violet-100
-    rounded-3xl
-    p-8
-    font-normal
-    min-h-[400px]
-    overflow-auto
-    max-h-[700px]
-    overflow-y-auto
-    pr-3
-  "
-            style={{ lineHeight: "2.1", fontSize: "16px" }}
-          >
-            <ReactMarkdown>
-              {generatedContent}
-            </ReactMarkdown>
-          </div>
+          <iframe
+            srcDoc={htmlContent}
+            sandbox=""
+            title={title}
+            className="w-full rounded-3xl border border-violet-100 bg-white"
+            style={{ minHeight: 500, height: "70vh" }}
+          />
 
           {/* PDF ACTIONS */}
           {pdfUrl && (
