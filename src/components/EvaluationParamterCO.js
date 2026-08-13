@@ -19,12 +19,36 @@ const MARK_PARAMETERS = [
   "Logical arguments and conclusion",
 ];
 
-const EMPTY_QUESTION = () => ({
-  minMarks: "",
-  maxMarks: "",
+const EMPTY_QUESTION = (maxMarks = "", cos = []) => ({
+  minMarks: 0,
+  maxMarks,
   parameters: [],
-  cos: [], // [{ co_code, description, marks }]
+  cos, // [{ co_code, description, marks }]
 });
+
+// Pulls each question's marks (e.g. "Q1. ... [5 Marks] [CO1]") from the raw
+// question-paper text, in order, so maxMarks can be prefilled instead of
+// left blank — teacher can still edit it, this is just a starting value.
+const parseQuestionMarksFromPaperText = (text) => {
+  if (!text || typeof text !== "string") return [];
+  const blocks = text.split(/(?=^Q\d+[.)])/m).filter((b) => /^Q\d+[.)]/.test(b));
+  return blocks.map((block) => {
+    const match = block.match(/\[(\d+)\s*Marks?\]/i);
+    return match ? Number(match[1]) : "";
+  });
+};
+
+// Pulls each question's CO tag(s) (e.g. "[CO1]" or "[CO2, CO3]") from the
+// raw question-paper text, in order — mirrors the marks parser above.
+const parseQuestionCOsFromPaperText = (text) => {
+  if (!text || typeof text !== "string") return [];
+  const blocks = text.split(/(?=^Q\d+[.)])/m).filter((b) => /^Q\d+[.)]/.test(b));
+  return blocks.map((block) => {
+    const match = block.match(/\[\s*(CO\d+(?:\s*,\s*CO\d+)*)\s*\]/i);
+    if (!match) return [];
+    return match[1].split(",").map((c) => c.trim().toUpperCase());
+  });
+};
 
 // ─── Per-question CO section ──────────────────────────────────────────────────
 function QuestionCOSection({ qIndex, input, coveredCOs, onAdd, onRemove, onMarksChange }) {
@@ -32,9 +56,13 @@ function QuestionCOSection({ qIndex, input, coveredCOs, onAdd, onRemove, onMarks
   const addedCodes = input.cos.map((c) => c.co_code);
   const unselected = coveredCOs.filter((c) => !addedCodes.includes(c.co_code));
 
-  const coMarksTotal = input.cos.reduce((s, c) => s + Number(c.marks || 0), 0);
+  // Each CO's marks are an independent cap on that question (matches the AI
+  // grading rubric: "cap each CO's awarded marks at that CO's max marks") —
+  // not a shared pool that has to sum to the question's total. A question
+  // worth 10 marks tagged with both CO3 and CO4 can validly award up to 10
+  // for each, since they're graded as separate outcomes on the same answer.
   const maxMarks = Number(input.maxMarks) || 0;
-  const coExceedsMax = maxMarks > 0 && coMarksTotal > maxMarks;
+  const coExceedsMax = maxMarks > 0 && input.cos.some((c) => Number(c.marks || 0) > maxMarks);
 
   const handleAdd = () => {
     if (!selectedCode) return;
@@ -56,7 +84,7 @@ function QuestionCOSection({ qIndex, input, coveredCOs, onAdd, onRemove, onMarks
               : "bg-green-100 text-green-600"
               }`}
           >
-            CO Marks: {coMarksTotal} / {maxMarks || "—"}
+            {coExceedsMax ? "Some CO marks exceed max" : `Max marks per CO: ${maxMarks || "—"}`}
           </span>
         )}
       </div>
@@ -100,7 +128,9 @@ function QuestionCOSection({ qIndex, input, coveredCOs, onAdd, onRemove, onMarks
                 <div className="col-span-1 p-2" />
               </div>
 
-              {input.cos.map((co, cIdx) => (
+              {input.cos.map((co, cIdx) => {
+                const thisExceedsMax = maxMarks > 0 && Number(co.marks || 0) > maxMarks;
+                return (
                 <div key={co.co_code} className="grid grid-cols-12 border-t items-center">
                   <div className="col-span-2 p-2">
                     <span className="inline-block bg-orange-100 text-orange-700 text-xs font-bold px-2 py-0.5 rounded">
@@ -118,7 +148,7 @@ function QuestionCOSection({ qIndex, input, coveredCOs, onAdd, onRemove, onMarks
                       value={co.marks}
                       onChange={(e) => onMarksChange(qIndex, cIdx, e.target.value)}
                       placeholder="0"
-                      className={`w-16 p-1 border rounded text-center text-sm focus:outline-none focus:ring-2 focus:ring-[#ff7f10] ${coExceedsMax ? "border-red-400" : ""
+                      className={`w-16 p-1 border rounded text-center text-sm focus:outline-none focus:ring-2 focus:ring-[#ff7f10] ${thisExceedsMax ? "border-red-400" : ""
                         }`}
                     />
                   </div>
@@ -133,13 +163,14 @@ function QuestionCOSection({ qIndex, input, coveredCOs, onAdd, onRemove, onMarks
                     </button>
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           )}
 
           {coExceedsMax && (
             <p className="text-xs text-red-500 mt-1">
-              ⚠ CO marks total ({coMarksTotal}) exceeds max marks ({maxMarks}) for this question.
+              ⚠ One or more COs have marks exceeding this question&apos;s max marks ({maxMarks}).
             </p>
           )}
 
@@ -274,7 +305,7 @@ export default function EvaluationParameterCO() {
           setHasExistingEval(true);
           setQuestionInputs(
             evalResult.map((q) => ({
-              minMarks: q.minMarks ?? "",
+              minMarks: q.minMarks ?? 0,
               maxMarks: q.maxMarks ?? "",
               parameters: Array.isArray(q.parameters) ? q.parameters : [],
               cos: Array.isArray(q.cos) ? q.cos : [],
@@ -290,7 +321,36 @@ export default function EvaluationParameterCO() {
             0;
 
           if (!count) toast.error("Could not determine number of questions from folder");
-          setQuestionInputs(Array.from({ length: Number(count) }, EMPTY_QUESTION));
+
+          const paperText = folder?.question_paper?.text;
+          const parsedMarks = parseQuestionMarksFromPaperText(paperText);
+          const parsedCOs = parseQuestionCOsFromPaperText(paperText);
+          const droppedTags = []; // { qNo, code } — paper-tagged COs not in this exam's covered_cos
+          setQuestionInputs(
+            Array.from({ length: Number(count) }, (_, i) => {
+              const qMaxMarks = parsedMarks[i] ?? "";
+              // Each tagged CO gets the question's full marks, not a split —
+              // e.g. a 10-mark question tagged [CO3, CO4] prefills both at 10.
+              const prefilledCOs = (parsedCOs[i] || [])
+                .map((code) => {
+                  const co = filteredCOs.find((c) => c.co_code === code);
+                  if (!co) droppedTags.push({ qNo: i + 1, code });
+                  return co;
+                })
+                .filter(Boolean)
+                .map((co) => ({ co_code: co.co_code, description: co.description, marks: qMaxMarks }));
+              return EMPTY_QUESTION(qMaxMarks, prefilledCOs);
+            })
+          );
+
+          if (droppedTags.length > 0) {
+            const summary = droppedTags.map((d) => `Q${d.qNo}: ${d.code}`).join(", ");
+            toast.error(
+              `Question paper tags COs not declared for this exam (${summary}). ` +
+              `Edit the exam's covered COs to include them, or these questions won't count toward those COs.`,
+              { duration: 8000 }
+            );
+          }
         }
       } catch (err) {
         toast.error("An unexpected error occurred while loading data");
@@ -418,9 +478,13 @@ export default function EvaluationParameterCO() {
       const n = i + 1;
       const maxMarks = Number(q.maxMarks);
 
+      // NOTE: minMarks defaults to 0, a valid value — `== null` (not a plain
+      // falsy check) correctly treats 0 as present. Empty string is checked
+      // separately since maxMarks can be prefilled as "" when marks
+      // couldn't be parsed from the question paper text.
       if (
-        q.minMarks == null ||  // catches null + undefined
-        q.maxMarks == null
+        q.minMarks == null || q.minMarks === "" ||
+        q.maxMarks == null || q.maxMarks === "" || Number(q.maxMarks) <= 0
       ) {
         errors.push(`Question ${n}: Min / Max marks are required`);
       }
@@ -445,9 +509,15 @@ export default function EvaluationParameterCO() {
             errors.push(`Question ${n}: Marks required for ${co.co_code}`);
         });
 
-        const coTotal = q.cos.reduce((s, c) => s + Number(c.marks || 0), 0);
-        if (maxMarks > 0 && coTotal > maxMarks)
-          errors.push(`Question ${n}: CO marks total (${coTotal}) exceeds max marks (${maxMarks})`);
+        // Each CO's marks are an independent cap on the question, not a
+        // shared pool — a 10-mark question tagged with 2 COs can validly
+        // award up to 10 for each, so this checks each CO on its own rather
+        // than summing them against the question's max.
+        const maxMarks = Number(q.maxMarks) || 0;
+        q.cos.forEach((co) => {
+          if (maxMarks > 0 && Number(co.marks) > maxMarks)
+            errors.push(`Question ${n}: ${co.co_code} marks (${co.marks}) exceed the question's max marks (${maxMarks})`);
+        });
       }
     });
     return errors.length ? errors : null;
