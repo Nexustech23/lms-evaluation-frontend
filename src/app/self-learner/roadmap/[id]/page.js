@@ -334,9 +334,20 @@ export default function RoadmapDetailsPage() {
                           )}
 
                           {status === "Completed" && (
-                            <span className="text-[10px] font-bold text-gray-400">
-                              Passed ({roadmap.progress?.passedQuizzes?.[wk.week]}%)
-                            </span>
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleSelectWeek(wk);
+                                }}
+                                className="flex items-center gap-1 px-4 py-2 rounded-xl text-[10px] font-extrabold shadow-2xs transition-all duration-200 hover:scale-102 bg-indigo-50 text-[#6C63FF] hover:bg-indigo-100"
+                              >
+                                Review Notes
+                              </button>
+                              <span className="text-[10px] font-bold text-gray-400">
+                                Passed ({roadmap.progress?.passedQuizzes?.[wk.week]}%)
+                              </span>
+                            </div>
                           )}
                         </div>
                       </div>
