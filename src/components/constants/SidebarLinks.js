@@ -402,67 +402,56 @@ export const getSidebarLinks = (role, user, t) => {
         },
 
         {
-          label: "Pomodoro",
+          label: "Learning Lounge",
+          href: "/self-learner/learning-lounge",
           icon: <IconClock />,
-          defaultHref: "/self-learner/pomodoro",
-          children: [
-            {
-              label: "AI-Driven",
-              href: "/self-learner/pomodoro/ai-driven",
-              icon: <IconBrain />,
-            },
-            {
-              label: "AI-Assisted",
-              href: "/self-learner/pomodoro/ai-assisted",
-              icon: <IconRobot />,
-            },
-            {
-              label: "Custom",
-              href: "/self-learner/pomodoro/custom",
-              icon: <IconSettings />,
-            },
-          ],
         },
 
         {
-          label: "AI Tutor",
+          label: "Self-Review",
           icon: <IconMessageChatbot />,
-          defaultHref: "/self-learner/ai-tutor",
+          defaultHref: "/self-learner/self-review",
           children: [
             {
               label: "Notes Generate",
-              href: "/self-learner/ai-tutor/notes-generate",
+              href: "/self-learner/self-review/notes-generate",
               icon: <IconNotebook />,
             },
             {
               label: "Homework Help",
-              href: "/self-learner/ai-tutor/homework-help",
+              href: "/self-learner/self-review/homework-help",
               icon: <IconBulb />,
+            },
+            {
+              label: "Weekly Quiz",
+              href: "/self-learner/self-review/week-quiz",
+              icon: <IconClipboardCheck />,
             },
           ],
         },
 
         {
-          label: "Mock Test",
+          label: "Test Engine",
           icon: <IconChecklist />,
-          defaultHref: "/self-learner/mocktest",
+          defaultHref: "/self-learner/test-engine",
           children: [
             {
               label: "Create Test",
-              href: "/self-learner/mocktest/create-test",
+              href: "/self-learner/test-engine/create-test",
               icon: <IconPlus />,
             },
             {
-              label: "Test Yourself",
-              href: "/self-learner/mocktest/test-yourself",
+              label: "Evaluate Yourself",
+              href: "/self-learner/test-engine/test-yourself",
               icon: <IconClipboardCheck />,
             },
-            {
-              label: "Analytics",
-              href: "/self-learner/mocktest/analytics",
-              icon: <IconChartBar />,
-            },
           ],
+        },
+
+        {
+          label: "Analytics",
+          href: "/self-learner/analytics",
+          icon: <IconChartBar />,
         },
 
       ]

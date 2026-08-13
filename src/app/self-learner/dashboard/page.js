@@ -104,27 +104,28 @@ export default function Page() {
   const priorityBg = { high: "#FFF0F3", medium: "#FFF8EE", low: "#EDFAF5" };
   const priorityLabel = { high: "HIGH", medium: "MEDIUM", low: "LOW" };
 
-  // ── Stage cards: live roadmap data or locked placeholders ──────────────────
-  const STAGE_COLORS = { Completed: "#43C6AC", "In Progress": "#6C63FF", Locked: "#CBD5E0" };
-  const stageCards = activeRoadmap
-    ? (activeRoadmap.levels || []).map((lvl) => {
-        const isUnlocked = (activeRoadmap.unlockedLevels || [1]).includes(lvl.level);
-        const isPassed   = !!(activeRoadmap.progress?.passedQuizzes?.[String(lvl.level)]);
-        const status     = isPassed ? "Completed" : isUnlocked ? "In Progress" : "Locked";
-        return {
-          stage:  `Stage ${lvl.level}`,
-          title:  lvl.title,
-          topics: (lvl.topics || []).slice(0, 3).map((t) => t.title || ""),
-          color:  STAGE_COLORS[status],
-          status,
-        };
-      })
-    : [
-        { stage: "Stage 1", title: "Foundations",   topics: ["Create a learning path to see topics"], color: "#CBD5E0", status: "Locked" },
-        { stage: "Stage 2", title: "Intermediate",  topics: ["Create a learning path to see topics"], color: "#CBD5E0", status: "Locked" },
-        { stage: "Stage 3", title: "Advanced",      topics: ["Create a learning path to see topics"], color: "#CBD5E0", status: "Locked" },
-        { stage: "Stage 4", title: "Expert Mastery",topics: ["Create a learning path to see topics"], color: "#CBD5E0", status: "Locked" },
-      ];
+  // ── Current-week widget: live roadmap data or a locked placeholder ─────────
+  // Shows only the ONE in-progress week (the highest unlocked week — every
+  // week below it is already passed, by construction of the unlock
+  // mechanism) rather than every week — the full week-by-week board lives
+  // on the roadmap detail page instead.
+  const STATUS_COLORS = { Completed: "#43C6AC", "In Progress": "#6C63FF", Locked: "#CBD5E0" };
+  const currentWeekCard = (() => {
+    if (!activeRoadmap?.weeks?.length) {
+      return { week: null, title: "Create a learning path", subtopics: [{ title: "Create a learning path to see topics", done: false }], color: "#CBD5E0", status: "Locked" };
+    }
+    const unlocked = activeRoadmap.unlockedWeeks?.length ? activeRoadmap.unlockedWeeks : [1];
+    const currentWeekNum = Math.max(...unlocked);
+    const wk = activeRoadmap.weeks.find((w) => w.week === currentWeekNum) || activeRoadmap.weeks[0];
+    const isPassed = !!(activeRoadmap.progress?.passedQuizzes?.[String(currentWeekNum)]);
+    const status = isPassed ? "Completed" : "In Progress";
+    const completedSet = new Set(activeRoadmap.progress?.completedSubtopics || []);
+    const subtopics = (wk.subtopics || []).slice(0, 5).map((s, idx) => ({
+      title: s.title || "",
+      done: completedSet.has(`${currentWeekNum}-${idx}-${s.title}`),
+    }));
+    return { week: currentWeekNum, title: wk.title, subtopics, color: STATUS_COLORS[status], status };
+  })();
 
   return (
     <div style={{
@@ -340,7 +341,7 @@ export default function Page() {
               </div>
             </div>
 
-          {/* Roadmap Grid */}
+          {/* Current Week Widget */}
           {/* Header row */}
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
             <div>
@@ -367,118 +368,53 @@ export default function Page() {
               </button>
             )}
           </div>
-<div
-  style={{
-    display: "grid",
-   gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-    gap: 16,
-  }}
->
-  {stageCards.map((item, index) => (
-    <div
-      key={index}
-      style={{
-        background: "#FAFBFF",
-        border: "1.5px solid #E8ECF4",
-        borderRadius: 18,
-        padding: 18,
-        position: "relative",
-        overflow: "hidden",
-        transition: "0.2s ease",
-      }}
-    >
-      {/* Top Gradient */}
-      <div
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: 5,
-          background: item.color,
-        }}
-      />
 
-      {/* Stage */}
-      <div
-        style={{
-          fontSize: 11,
-          fontWeight: 800,
-          color: item.color,
-          marginBottom: 6,
-        }}
-      >
-        {item.stage}
-      </div>
+          {/* Single current-in-progress-week card (full week-by-week board lives on the roadmap detail page) */}
+          <div style={{ background: "#FAFBFF", border: "1.5px solid #E8ECF4", borderRadius: 18, padding: 20, position: "relative", overflow: "hidden" }}>
+            <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: 5, background: currentWeekCard.color }} />
 
-      {/* Title */}
-      <h4
-        style={{
-          margin: 0,
-          fontSize: 17,
-          fontWeight: 900,
-          color: "#1E1B4B",
-          marginBottom: 14,
-        }}
-      >
-        {item.title}
-      </h4>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
+              <div>
+                <div style={{ fontSize: 11, fontWeight: 800, color: currentWeekCard.color, marginBottom: 6 }}>
+                  {currentWeekCard.week ? `Week ${currentWeekCard.week}` : "No Active Week"}
+                </div>
+                <h4 style={{ margin: 0, fontSize: 17, fontWeight: 900, color: "#1E1B4B" }}>{currentWeekCard.title}</h4>
+              </div>
+              <div
+                style={{
+                  display: "inline-flex", alignItems: "center", padding: "6px 12px", borderRadius: 30,
+                  fontSize: 10, fontWeight: 800, whiteSpace: "nowrap",
+                  background: currentWeekCard.status === "Completed" ? "#EDFAF5" : currentWeekCard.status === "In Progress" ? "#F0EEFF" : "#FFF4F4",
+                  color: currentWeekCard.status === "Completed" ? "#43C6AC" : currentWeekCard.status === "In Progress" ? "#6C63FF" : "#FF6584",
+                }}
+              >
+                {currentWeekCard.status}
+              </div>
+            </div>
 
-      {/* Topics */}
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 8,
-          marginBottom: 16,
-        }}
-      >
-        {item.topics.map((topic, i) => (
-          <div
-            key={i}
-            style={{
-              background: "#fff",
-              border: "1px solid #E8ECF4",
-              borderRadius: 10,
-              padding: "8px 10px",
-              fontSize: 11,
-              fontWeight: 700,
-              color: "#4A5678",
-            }}
-          >
-            • {topic}
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 16, marginBottom: 16 }}>
+              {currentWeekCard.subtopics.map((sub, i) => (
+                <div
+                  key={i}
+                  style={{
+                    background: "#fff", border: "1px solid #E8ECF4", borderRadius: 10, padding: "8px 10px",
+                    fontSize: 11, fontWeight: 700, color: sub.done ? "#43C6AC" : "#4A5678",
+                  }}
+                >
+                  {sub.done ? "✓" : "•"} {sub.title}
+                </div>
+              ))}
+            </div>
+
+            {activeRoadmap && currentWeekCard.week && (
+              <button
+                onClick={() => router.push(`/self-learner/learning-lounge?roadmapId=${activeRoadmap._id}&week=${currentWeekCard.week}`)}
+                style={{ background: "#1E1B4B", border: "none", borderRadius: 10, padding: "10px 16px", fontSize: 11, fontWeight: 800, color: "#fff", cursor: "pointer" }}
+              >
+                Go to Learning Lounge →
+              </button>
+            )}
           </div>
-        ))}
-      </div>
-
-      {/* Status */}
-      <div
-        style={{
-          display: "inline-flex",
-          alignItems: "center",
-          padding: "6px 12px",
-          borderRadius: 30,
-          fontSize: 10,
-          fontWeight: 800,
-          background:
-            item.status === "Completed"
-              ? "#EDFAF5"
-              : item.status === "In Progress"
-              ? "#F0EEFF"
-              : "#FFF4F4",
-          color:
-            item.status === "Completed"
-              ? "#43C6AC"
-              : item.status === "In Progress"
-              ? "#6C63FF"
-              : "#FF6584",
-        }}
-      >
-        {item.status}
-      </div>
-    </div>
-  ))}
-</div>
           </div>
 
          {/* ─── RIGHT COLUMN ─── */}

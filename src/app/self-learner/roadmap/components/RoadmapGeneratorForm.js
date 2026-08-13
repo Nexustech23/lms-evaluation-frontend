@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { Sparkles, Calendar, BookOpen, Clock, BarChart, FileQuestion } from "lucide-react";
+import { useState, useRef } from "react";
+import { Sparkles, Calendar, BookOpen, Clock, BarChart, FileQuestion, FileUp, X, MessageSquarePlus } from "lucide-react";
+
+const ACCEPTED_EXTENSIONS = [".pdf", ".docx", ".md", ".txt"];
 
 export default function RoadmapGeneratorForm({ onSubmit }) {
   const [subject, setSubject] = useState("");
@@ -11,6 +13,26 @@ export default function RoadmapGeneratorForm({ onSubmit }) {
   const [revisionFreq, setRevisionFreq] = useState("Every Week");
   const [customRevision, setCustomRevision] = useState(3); // default custom every 3 days
   const [assessmentMode, setAssessmentMode] = useState("Yes");
+  const [file, setFile] = useState(null);
+  const [customInstruction, setCustomInstruction] = useState("");
+  const fileInputRef = useRef(null);
+
+  const handleFileChange = (e) => {
+    const selected = e.target.files?.[0];
+    if (!selected) return;
+    const ext = "." + selected.name.split(".").pop().toLowerCase();
+    if (!ACCEPTED_EXTENSIONS.includes(ext)) {
+      alert(`Unsupported file type. Please upload one of: ${ACCEPTED_EXTENSIONS.join(", ")}`);
+      e.target.value = "";
+      return;
+    }
+    setFile(selected);
+  };
+
+  const clearFile = () => {
+    setFile(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -26,13 +48,15 @@ export default function RoadmapGeneratorForm({ onSubmit }) {
       dailyTime,
       revisionFrequency: finalRevisionFreq,
       assessmentMode: assessmentMode === "Yes",
+      file,
+      customInstruction: customInstruction.trim(),
     });
   };
 
   return (
     <div className="bg-white rounded-3xl border border-gray-200 shadow-sm p-6 md:p-8 max-w-4xl mx-auto">
       <form onSubmit={handleSubmit} className="space-y-6">
-        
+
         {/* Subject input */}
         <div>
           <label className="flex items-center gap-2 text-sm font-semibold text-[#1E1B4B] mb-2">
@@ -178,6 +202,60 @@ export default function RoadmapGeneratorForm({ onSubmit }) {
               💡 Recommended: You'll get a 10-question beginner-level check to personalise your starting point.
             </p>
           )}
+        </div>
+
+        {/* Course Material Upload (optional grounding document) */}
+        <div>
+          <label className="flex items-center gap-2 text-sm font-semibold text-[#1E1B4B] mb-2">
+            <FileUp size={16} className="text-[#43C6AC]" />
+            Ground it in your own material (optional)
+          </label>
+          {!file ? (
+            <label className="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-gray-200 rounded-2xl bg-[#FAFBFF] p-6 text-center cursor-pointer hover:border-[#43C6AC] transition-all duration-200">
+              <FileUp size={22} className="text-gray-400" />
+              <span className="text-sm font-medium text-gray-500">
+                Upload a syllabus, course profile, or textbook (PDF, DOCX, MD, TXT)
+              </span>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept={ACCEPTED_EXTENSIONS.join(",")}
+                onChange={handleFileChange}
+                className="hidden"
+              />
+            </label>
+          ) : (
+            <div className="flex items-center justify-between border border-gray-200 rounded-2xl bg-[#FAFBFF] p-4">
+              <div className="flex items-center gap-2 min-w-0">
+                <FileUp size={18} className="text-[#43C6AC] shrink-0" />
+                <span className="text-sm font-medium text-[#1E1B4B] truncate">{file.name}</span>
+              </div>
+              <button
+                type="button"
+                onClick={clearFile}
+                className="p-1.5 rounded-full hover:bg-gray-100 text-gray-400 hover:text-[#FF6584] transition-all duration-200 shrink-0"
+                aria-label="Remove file"
+              >
+                <X size={16} />
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Custom Instructions */}
+        <div>
+          <label className="flex items-center gap-2 text-sm font-semibold text-[#1E1B4B] mb-2">
+            <MessageSquarePlus size={16} className="text-[#6C63FF]" />
+            Anything specific you want the roadmap to focus on? (optional)
+          </label>
+          <textarea
+            value={customInstruction}
+            onChange={(e) => setCustomInstruction(e.target.value)}
+            placeholder="e.g. Focus purely on advanced neural networks and PyTorch implementation"
+            maxLength={1000}
+            rows={3}
+            className="w-full border border-gray-200 rounded-2xl bg-[#FAFBFF] p-4 text-sm text-[#1E1B4B] placeholder-gray-400 outline-none focus:ring-2 focus:ring-violet-400 transition-all duration-200 resize-none"
+          />
         </div>
 
         {/* Submit CTA */}

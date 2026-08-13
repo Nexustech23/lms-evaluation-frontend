@@ -3,11 +3,42 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Loader2 } from "lucide-react";
-import { createRoadmap, getRoadmapCreationStatus } from "../api";
+import {
+  createRoadmap,
+  getRoadmapCreationStatus,
+  uploadCourseMaterial,
+  getCourseMaterialUploadStatus,
+} from "../api";
 import RoadmapHeader from "../components/RoadmapHeader";
 import RoadmapGeneratorForm from "../components/RoadmapGeneratorForm";
 import SkillAssessmentModal from "../components/SkillAssessmentModal";
 import AssessmentResultCard from "../components/AssessmentResultCard";
+
+const POLL_INTERVAL = 2500;
+
+// Shared polling loop for any { job_id } background job that exposes a
+// { status: "processing"|"done"|"error", step? } status endpoint — used for
+// both course-material upload and roadmap creation.
+function pollJob(fetchStatus, jobId, onStep) {
+  return new Promise((resolve, reject) => {
+    const interval = setInterval(async () => {
+      try {
+        const status = await fetchStatus(jobId);
+        if (status.step) onStep(status.step);
+        if (status.status === "done") {
+          clearInterval(interval);
+          resolve(status);
+        } else if (status.status === "error") {
+          clearInterval(interval);
+          reject(new Error(status.error || "Processing failed. Please try again."));
+        }
+      } catch (pollErr) {
+        clearInterval(interval);
+        reject(pollErr);
+      }
+    }, POLL_INTERVAL);
+  });
+}
 
 export default function CreateRoadmapPage() {
   const router = useRouter();
@@ -19,6 +50,9 @@ export default function CreateRoadmapPage() {
   const [skillLevel, setSkillLevel] = useState("");
   const [dailyTime, setDailyTime] = useState("");
   const [revisionFrequency, setRevisionFrequency] = useState("");
+  const [file, setFile] = useState(null);
+  const [customInstruction, setCustomInstruction] = useState("");
+  const [docId, setDocId] = useState(null);
 
   const [showAssessment, setShowAssessment] = useState(false);
   const [assessmentResults, setAssessmentResults] = useState(null);
@@ -33,6 +67,8 @@ export default function CreateRoadmapPage() {
     skill_level:        skillLevel,
     daily_study_time:   dailyTime,
     revision_frequency: revisionFrequency,
+    custom_instruction: customInstruction || undefined,
+    doc_id:             docId || undefined,
     ...overrides,
   });
 
@@ -43,6 +79,8 @@ export default function CreateRoadmapPage() {
     setSkillLevel(formData.skillLevel);
     setDailyTime(formData.dailyTime);
     setRevisionFrequency(formData.revisionFrequency);
+    setFile(formData.file);
+    setCustomInstruction(formData.customInstruction);
 
     if (formData.assessmentMode) {
       // Show the skill assessment quiz first
@@ -55,7 +93,8 @@ export default function CreateRoadmapPage() {
         skill_level:        formData.skillLevel,
         daily_study_time:   formData.dailyTime,
         revision_frequency: formData.revisionFrequency,
-      });
+        custom_instruction: formData.customInstruction || undefined,
+      }, formData.file);
     }
   };
 
@@ -68,36 +107,29 @@ export default function CreateRoadmapPage() {
   };
 
   // ── Step 3: Save / trigger AI generation ─────────────────────────────────
-  const handleSaveRoadmap = async (payload) => {
+  const handleSaveRoadmap = async (payload, fileOverride) => {
     setGeneratingError(null);
     setGeneratingStep("Starting…");
     setStep("generating");
     try {
+      let finalPayload = payload;
+      const fileToUpload = fileOverride !== undefined ? fileOverride : file;
+
+      if (fileToUpload) {
+        setGeneratingStep("Uploading document…");
+        const { job_id: uploadJobId } = await uploadCourseMaterial(fileToUpload, payload.subject);
+        const uploadResult = await pollJob(getCourseMaterialUploadStatus, uploadJobId, setGeneratingStep);
+        setDocId(uploadResult.doc_id);
+        finalPayload = { ...payload, doc_id: uploadResult.doc_id };
+      }
+
+      setGeneratingStep("Generating curriculum with AI…");
       // Kick off the background job — returns immediately with a job_id
-      const { job_id } = await createRoadmap(payload);
+      const { job_id } = await createRoadmap(finalPayload);
 
       // Poll until done (no timeout — we wait as long as it takes)
-      const POLL_INTERVAL = 2500;
-      await new Promise((resolve, reject) => {
-        const interval = setInterval(async () => {
-          try {
-            const status = await getRoadmapCreationStatus(job_id);
-            if (status.step) setGeneratingStep(status.step);
-            if (status.status === "done") {
-              clearInterval(interval);
-              resolve(status.roadmap_id);
-            } else if (status.status === "error") {
-              clearInterval(interval);
-              reject(new Error(status.error || "AI generation failed. Please try again."));
-            }
-          } catch (pollErr) {
-            clearInterval(interval);
-            reject(pollErr);
-          }
-        }, POLL_INTERVAL);
-      }).then((roadmapId) => {
-        router.push(`/self-learner/roadmap/${roadmapId}`);
-      });
+      const { roadmap_id } = await pollJob(getRoadmapCreationStatus, job_id, setGeneratingStep);
+      router.push(`/self-learner/roadmap/${roadmap_id}`);
     } catch (e) {
       console.error("Failed to generate roadmap", e);
       const msg =

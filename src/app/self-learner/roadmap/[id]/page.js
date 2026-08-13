@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Play, Award, CheckCircle, HelpCircle, Lock, AlertCircle } from "lucide-react";
-import { fetchQuizHistory, getRoadmapById } from "../api";
+import { ArrowLeft, ChevronDown, Download, Loader2 } from "lucide-react";
+import toast from "react-hot-toast";
+import { fetchQuizHistory, getRoadmapById, downloadRoadmapPdf } from "../api";
 import RoadmapHeader from "../components/RoadmapHeader";
 import RoadmapStats from "../components/RoadmapStats";
 import StreakCard from "../components/StreakCard";
@@ -13,10 +14,12 @@ import WeakTopicCard from "../components/WeakTopicCard";
 export default function RoadmapDetailsPage() {
   const router = useRouter();
   const { id } = useParams();
-  
+
   const [roadmap, setRoadmap] = useState(null);
   const [quizHistory, setQuizHistory] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [downloadingPdf, setDownloadingPdf] = useState(false);
+  const [expandedWeeks, setExpandedWeeks] = useState(() => new Set());
 
   const loadRoadmap = async () => {
     try {
@@ -59,79 +62,93 @@ export default function RoadmapDetailsPage() {
     );
   }
 
-  // Check level status helper
-  const getLevelStatus = (lvl) => {
-    const isUnlocked = (roadmap.unlockedLevels || [1]).includes(lvl.level);
-    if (!isUnlocked) return "Locked";
-    
-    const isPassed = roadmap.progress?.passedQuizzes?.[lvl.level] !== undefined;
+  const weeks = roadmap.weeks || [];
+
+  // Check week status helper.
+  // The roadmap itself is never locked visually — every week's title,
+  // description and subtopics are always visible here. Access control
+  // (unlockedWeeks[]) is only enforced when the student tries to actually
+  // enter the Learning Lounge for a week, see handleSelectWeek below.
+  const getWeekStatus = (wk) => {
+    const isPassed = roadmap.progress?.passedQuizzes?.[wk.week] !== undefined;
     if (isPassed) return "Completed";
-    
-    return "In Progress";
+
+    const isUnlocked = (roadmap.unlockedWeeks || [1]).includes(wk.week);
+    return isUnlocked ? "In Progress" : "Upcoming";
   };
 
-  // Get completed subtopics count for a specific level
-  const getLevelCompletionCount = (lvl) => {
+  // Get completed subtopics count for a specific week
+  const getWeekCompletionCount = (wk) => {
     let total = 0;
     let completed = 0;
-    
-    lvl.topics.forEach((topic, tIdx) => {
-      topic.subtopics.forEach((sub) => {
-        total++;
-        const subKey = `${lvl.level}-${tIdx}-${sub.title}`;
-        if ((roadmap.progress?.completedSubtopics || []).includes(subKey)) {
-          completed++;
-        }
-      });
+
+    (wk.subtopics || []).forEach((sub, sIdx) => {
+      total++;
+      const subKey = `${wk.week}-${sIdx}-${sub.title}`;
+      if ((roadmap.progress?.completedSubtopics || []).includes(subKey)) {
+        completed++;
+      }
     });
-    
+
     return { completed, total };
   };
 
-  const handleSelectStage = (lvl) => {
-    const status = getLevelStatus(lvl);
-    if (status === "Locked") {
-      alert("🔒 This Stage is locked! Complete preceding stages and pass their quizzes to unlock.");
+  const handleSelectWeek = (wk) => {
+    const isUnlocked = (roadmap.unlockedWeeks || [1]).includes(wk.week);
+    if (!isUnlocked) {
+      toast.error(`Complete Week ${wk.week - 1} and pass its quiz to unlock Week ${wk.week}.`);
       return;
     }
-    // Route to dedicated study notes page
-    router.push(`/self-learner/roadmap/${id}/notes?level=${lvl.level}`);
+    router.push(`/self-learner/learning-lounge?roadmapId=${id}&week=${wk.week}`);
   };
 
-  const handleLaunchQuiz = (levelNum) => {
-    // Open the quiz page in a new tab as requested
-    window.open(`/self-learner/roadmap/${id}/quiz?level=${levelNum}`, "_blank");
+  const toggleWeekExpanded = (weekNum) => {
+    setExpandedWeeks((prev) => {
+      const next = new Set(prev);
+      if (next.has(weekNum)) next.delete(weekNum);
+      else next.add(weekNum);
+      return next;
+    });
+  };
+
+  const handleLaunchQuiz = () => {
+    router.push(`/self-learner/self-review/week-quiz?roadmapId=${id}`);
   };
 
   const handleReviewWeakTopic = (topicTitle) => {
-    // Locate the topic level
-    for (let lvl of roadmap.levels) {
-      if ((roadmap.unlockedLevels || [1]).includes(lvl.level)) {
-        for (let tIdx = 0; tIdx < lvl.topics.length; tIdx++) {
-          const t = lvl.topics[tIdx];
-          const sub = t.subtopics.find((s) => s.title === topicTitle);
-          if (sub) {
-            router.push(`/self-learner/roadmap/${id}/notes?level=${lvl.level}&topic=${tIdx}`);
-            return;
-          }
-        }
+    for (const wk of weeks) {
+      if (!(roadmap.unlockedWeeks || [1]).includes(wk.week)) continue;
+      const sub = (wk.subtopics || []).find((s) => s.title === topicTitle);
+      if (sub) {
+        router.push(`/self-learner/learning-lounge?roadmapId=${id}&week=${wk.week}`);
+        return;
       }
     }
   };
 
-  // Compute active roadmap stats percentages
-  const getCompletedLevelsCount = () => {
-    let count = 0;
-    [1, 2, 3, 4].forEach((lvl) => {
-      if (roadmap.progress?.passedQuizzes?.[lvl]) count++;
-    });
-    return count;
+  const getCompletedWeeksCount = () => {
+    return weeks.filter((wk) => roadmap.progress?.passedQuizzes?.[wk.week] !== undefined).length;
+  };
+
+  const allWeeksCompleted = weeks.length > 0 && weeks.every((wk) => getWeekStatus(wk) === "Completed");
+
+  const handleDownloadPdf = async () => {
+    if (downloadingPdf) return;
+    setDownloadingPdf(true);
+    try {
+      await downloadRoadmapPdf(id);
+    } catch (err) {
+      console.error("Failed to download roadmap PDF", err);
+      alert("Failed to download PDF. Please try again.");
+    } finally {
+      setDownloadingPdf(false);
+    }
   };
 
   return (
     <div className="min-h-screen bg-[#F5F7FB] p-4 md:p-6 text-slate-800 animate-fadeIn">
       <div className="max-w-6xl mx-auto space-y-6">
-        
+
         {/* Navigation and Header */}
         <div className="flex justify-between items-center">
           <button
@@ -139,6 +156,18 @@ export default function RoadmapDetailsPage() {
             className="flex items-center gap-1.5 text-xs font-bold text-gray-500 hover:text-[#6C63FF] transition-all duration-200"
           >
             <ArrowLeft size={14} /> Back to all roadmaps
+          </button>
+
+          <button
+            onClick={handleDownloadPdf}
+            disabled={downloadingPdf}
+            className="flex items-center gap-1.5 bg-white border border-gray-200 text-[#1E1B4B] px-4 py-2 rounded-xl text-xs font-bold shadow-xs hover:border-[#6C63FF]/40 hover:text-[#6C63FF] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {downloadingPdf ? (
+              <><Loader2 size={13} className="animate-spin" /> Preparing PDF…</>
+            ) : (
+              <><Download size={13} /> Download PDF</>
+            )}
           </button>
         </div>
 
@@ -150,7 +179,7 @@ export default function RoadmapDetailsPage() {
 
         {/* Dynamic overall statistics dashboard component */}
         <RoadmapStats
-          stats={roadmap.stats}
+          stats={{ ...roadmap.stats, totalQuizzes: roadmap.weeks?.length || 0 }}
           progress={{
             overallProgress: roadmap.progress?.overallProgress || 0,
             topicsCompleted: (roadmap.progress?.completedSubtopics || []).length,
@@ -160,117 +189,157 @@ export default function RoadmapDetailsPage() {
 
         {/* Dashboard layouts */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-          
-          {/* Left Grid: Curriculum Board stages (Snapshot 1 horizontal cards) */}
+
+          {/* Left: vertical weekly journey */}
           <div className="lg:col-span-2 space-y-6">
-            
+
             <div className="bg-[#F5F7FB] rounded-2xl">
               <h3 className="text-sm font-black text-[#1E1B4B] uppercase tracking-wider mb-4 pl-1">
-                Curriculum Board Stages
+                Your Learning Journey
               </h3>
 
-              {/* Stage cards horizontal/grid wrap matching Snapshot 1 */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {roadmap.levels.map((lvl) => {
-                  const status = getLevelStatus(lvl);
-                  const { completed, total } = getLevelCompletionCount(lvl);
-                  const isFullyLearned = completed === total && total > 0;
-                  const quizPassed = roadmap.progress?.passedQuizzes?.[lvl.level] !== undefined;
+              {allWeeksCompleted && (
+                <div className="bg-white rounded-3xl border border-[#43C6AC]/30 shadow-xs p-6 text-center mb-4">
+                  <p className="text-sm font-black text-[#1E1B4B]">Roadmap Complete! 🎉</p>
+                  <p className="text-xs font-semibold text-gray-500 mt-1">
+                    You've passed every week's quiz. Great work!
+                  </p>
+                </div>
+              )}
 
-                  // Define cards styling depending on stage lock status
+              <div className="space-y-4">
+                {weeks.map((wk) => {
+                  const status = getWeekStatus(wk);
+                  const { completed, total } = getWeekCompletionCount(wk);
+                  const isFullyLearned = completed === total && total > 0;
+                  const isExpanded = expandedWeeks.has(wk.week);
+
                   let borderStyle = "border-gray-200 shadow-xs hover:border-gray-300 bg-white";
-                  let topColor = "bg-gray-300";
+                  let leftColor = "bg-gray-300";
                   let badgeStyle = "";
-                  
+                  let weekLabelColor = "text-[#6C63FF]";
+
                   if (status === "Completed") {
                     borderStyle = "border-emerald-200 bg-white shadow-xs hover:border-emerald-300";
-                    topColor = "bg-[#43C6AC]";
+                    leftColor = "bg-[#43C6AC]";
                     badgeStyle = "bg-[#EDFAF5] text-[#43C6AC]";
                   } else if (status === "In Progress") {
                     borderStyle = "border-indigo-200 bg-white shadow-sm hover:border-indigo-300 hover:shadow-md";
-                    topColor = "bg-[#6C63FF]";
+                    leftColor = "bg-[#6C63FF]";
                     badgeStyle = "bg-[#F0EEFF] text-[#6C63FF]";
                   } else {
-                    // Locked
-                    borderStyle = "border-gray-150 bg-gray-50/50 opacity-80 cursor-not-allowed";
-                    topColor = "bg-gray-300";
-                    badgeStyle = "bg-gray-100 text-gray-400";
+                    // Upcoming — visible and browsable, just not enterable yet.
+                    borderStyle = "border-gray-200 bg-white shadow-xs hover:border-gray-300";
+                    leftColor = "bg-gray-300";
+                    badgeStyle = "bg-gray-100 text-gray-500";
+                    weekLabelColor = "text-gray-400";
                   }
 
                   return (
                     <div
-                      key={lvl.level}
-                      onClick={() => handleSelectStage(lvl)}
-                      className={`relative rounded-3xl border p-5 overflow-hidden transition-all duration-300 flex flex-col justify-between h-[360px] ${borderStyle}`}
+                      key={wk.week}
+                      onClick={() => toggleWeekExpanded(wk.week)}
+                      className={`relative rounded-3xl border p-5 overflow-hidden transition-all duration-300 flex cursor-pointer ${borderStyle}`}
                     >
-                      {/* Accent Top Line */}
-                      <div className={`absolute top-0 left-0 right-0 h-1.5 ${topColor}`} />
+                      {/* Accent Left Line */}
+                      <div className={`absolute top-0 left-0 bottom-0 w-1.5 ${leftColor}`} />
 
-                      <div>
-                        {/* Meta info */}
-                        <div className="flex justify-between items-start">
-                          <span className={`text-[10px] font-black uppercase tracking-wider block ${status === "Locked" ? "text-gray-400" : "text-[#6C63FF]"}`}>
-                            Stage {lvl.level}
+                      <div className="pl-3 flex-1">
+                        <div className="flex justify-between items-center">
+                          <span className={`text-[10px] font-black uppercase tracking-wider block ${weekLabelColor}`}>
+                            Week {wk.week}
                           </span>
-                          {status === "Locked" && <Lock size={12} className="text-gray-400" />}
+                          <ChevronDown
+                            size={16}
+                            className={`text-gray-400 transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`}
+                          />
                         </div>
 
                         <h4 className="text-base font-black text-[#1E1B4B] mt-1 leading-snug">
-                          {lvl.title}
+                          {wk.title}
                         </h4>
 
-                        {/* Bullet point topics list exactly as Snapshot 1 */}
-                        <div className="space-y-2 mt-4">
-                          {lvl.topics.map((topic, tIdx) => (
-                            <div
-                              key={tIdx}
-                              className="bg-[#FAFBFF] border border-gray-100 rounded-xl px-3 py-2.5 text-xs font-semibold text-gray-600 flex items-center justify-between"
-                            >
-                              <span className="truncate">• {topic.title}</span>
-                              {status !== "Locked" && (
-                                <span className="text-[10px] text-gray-400">
-                                  {topic.subtopics.length} items
-                                </span>
-                              )}
+                        {/* Collapsible description + subtopics — animated dropdown */}
+                        <div
+                          className={`grid transition-all duration-300 ease-in-out ${isExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+                            }`}
+                        >
+                          <div className="overflow-hidden">
+                            {wk.introDescription && (
+                              <p className="text-xs font-semibold text-gray-500 mt-1.5 leading-relaxed">
+                                {wk.introDescription}
+                              </p>
+                            )}
+
+                            {/* Subtopics list */}
+                            <div className="space-y-2 mt-4">
+                              {(wk.subtopics || []).map((sub, subIdx) => {
+                                const subKey = `${wk.week}-${subIdx}-${sub.title}`;
+                                const subDone = (roadmap.progress?.completedSubtopics || []).includes(subKey);
+                                return (
+                                  <div
+                                    key={subIdx}
+                                    className="bg-[#FAFBFF] border border-gray-100 rounded-xl px-3 py-2.5 text-xs font-semibold text-gray-600 flex items-center justify-between"
+                                  >
+                                    <span className="truncate">
+                                      {subDone ? "✓ " : "• "}{sub.title}
+                                    </span>
+                                    <span className="text-[10px] text-gray-400">{sub.difficulty}</span>
+                                  </div>
+                                );
+                              })}
                             </div>
-                          ))}
+                          </div>
+                        </div>
+
+                        {/* Bottom Controls */}
+                        <div className="pt-4 border-t border-gray-50 flex items-center justify-between mt-4">
+                          <span className={`px-3 py-1.5 rounded-full text-[10px] font-black uppercase ${badgeStyle}`}>
+                            {status}
+                          </span>
+
+                          {status === "In Progress" && isFullyLearned && (
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleSelectWeek(wk);
+                                }}
+                                className="flex items-center gap-1 px-4 py-2 rounded-xl text-[10px] font-extrabold shadow-2xs transition-all duration-200 hover:scale-102 bg-indigo-50 text-[#6C63FF] hover:bg-indigo-100"
+                              >
+                                Go to Learning Lounge
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleLaunchQuiz();
+                                }}
+                                className="flex items-center gap-1 px-4 py-2 rounded-xl text-[10px] font-extrabold shadow-2xs transition-all duration-200 hover:scale-102 bg-[#1E1B4B] text-white hover:bg-black"
+                              >
+                                Take Weekly Quiz
+                              </button>
+                            </div>
+                          )}
+
+                          {(status === "In Progress" && !isFullyLearned || status === "Upcoming") && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleSelectWeek(wk);
+                              }}
+                              className="flex items-center gap-1 px-4 py-2 rounded-xl text-[10px] font-extrabold shadow-2xs transition-all duration-200 hover:scale-102 bg-indigo-50 text-[#6C63FF] hover:bg-indigo-100"
+                            >
+                              Go to Learning Lounge
+                            </button>
+                          )}
+
+                          {status === "Completed" && (
+                            <span className="text-[10px] font-bold text-gray-400">
+                              Passed ({roadmap.progress?.passedQuizzes?.[wk.week]}%)
+                            </span>
+                          )}
                         </div>
                       </div>
-
-                      {/* Bottom Controls */}
-                      <div className="pt-4 border-t border-gray-50 flex items-center justify-between mt-auto">
-                        <span className={`px-3 py-1.5 rounded-full text-[10px] font-black uppercase ${badgeStyle}`}>
-                          {status}
-                        </span>
-
-                        {/* If in progress and ready to take quiz */}
-                        {status === "In Progress" && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (isFullyLearned) {
-                                handleLaunchQuiz(lvl.level);
-                              } else {
-                                handleSelectStage(lvl);
-                              }
-                            }}
-                            className={`flex items-center gap-1 px-4 py-2 rounded-xl text-[10px] font-extrabold shadow-2xs transition-all duration-200 hover:scale-102 ${
-                              isFullyLearned
-                                ? "bg-[#1E1B4B] text-white hover:bg-black"
-                                : "bg-indigo-50 text-[#6C63FF] hover:bg-indigo-100"
-                            }`}
-                          >
-                            {isFullyLearned ? "Take Stage Quiz" : "Study Topics"}
-                          </button>
-                        )}
-
-                        {status === "Completed" && (
-                          <span className="text-[10px] font-bold text-gray-400">
-                            Passed ({roadmap.progress?.passedQuizzes?.[lvl.level]}%)
-                          </span>
-                        )}
-                      </div>
-
                     </div>
                   );
                 })}
@@ -283,8 +352,9 @@ export default function RoadmapDetailsPage() {
           {/* Right Sidebar widgets */}
           <div className="space-y-6">
             <StreakCard
-              streakDays={roadmap.progress?.streakDays || 7}
-              completedLevelsCount={getCompletedLevelsCount()}
+              streakDays={roadmap.progress?.streakDays || 0}
+              completedLevelsCount={getCompletedWeeksCount()}
+              activityDates={roadmap.progress?.activityDates || []}
             />
 
             <RevisionPlanner initialFrequency={roadmap.revision_frequency} />
@@ -300,7 +370,7 @@ export default function RoadmapDetailsPage() {
               </h4>
               {quizHistory.length === 0 ? (
                 <p className="text-xs font-semibold text-gray-500 leading-relaxed">
-                  No quiz attempts yet. Complete a stage quiz to see attempts here.
+                  No quiz attempts yet. Complete a week quiz to see attempts here.
                 </p>
               ) : (
                 <div className="space-y-3">
@@ -311,7 +381,7 @@ export default function RoadmapDetailsPage() {
                     >
                       <div className="flex items-center justify-between">
                         <span className="text-[10px] font-black text-gray-400 uppercase">
-                          Stage {attempt.level}
+                          Week {attempt.week}
                         </span>
                         <span className={`text-[10px] font-black ${attempt.passed ? "text-[#43C6AC]" : "text-[#FF6584]"}`}>
                           {attempt.passed ? "Passed" : "Failed"}

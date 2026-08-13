@@ -27,6 +27,26 @@ const nextConfig = {
         source: "/api/self-learner/roadmap/:path*",
         destination: `${API_URL}/api/self-learner/roadmap/:path*`,
       },
+      // Self-learner course material upload (roadmap-creation grounding) —
+      // its own router is registered WITH an /api/self-learner/course-material
+      // prefix, same reasoning as the roadmap rule above. Exact base path
+      // needed too: POST /api/self-learner/course-material has zero extra
+      // segments, which :path* does not match on its own.
+      {
+        source: "/api/self-learner/course-material",
+        destination: `${API_URL}/api/self-learner/course-material`,
+      },
+      {
+        source: "/api/self-learner/course-material/:path*",
+        destination: `${API_URL}/api/self-learner/course-material/:path*`,
+      },
+      // ai_tutor.py's router is also registered WITH an /api/ai-tutor prefix
+      // (unlike most other routers, which mount at root) — same reasoning
+      // as the roadmap rule above, must come before the generic catch-all.
+      {
+        source: "/api/ai-tutor/:path*",
+        destination: `${API_URL}/api/ai-tutor/:path*`,
+      },
       // All other API calls: strips /api prefix — non-roadmap Flask routes have no /api prefix.
       {
         source: "/api/:path*",
