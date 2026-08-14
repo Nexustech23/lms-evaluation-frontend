@@ -5,8 +5,8 @@ import { Sparkles, ListChecks, PenLine, Wrench, Hash, MessageSquarePlus } from "
 
 const TYPES = [
   { key: "mcqPercent", label: "Multiple Choice", desc: "Auto-graded, instant", icon: ListChecks, color: "#6C63FF" },
-  { key: "subjectivePercent", label: "Subjective", desc: "Written answers, AI-graded", icon: PenLine, color: "#43C6AC" },
-  { key: "practicalPercent", label: "Practical", desc: "Applied problem-solving, AI-graded", icon: Wrench, color: "#F7971E" },
+  { key: "subjectivePercent", label: "Subjective", desc: "Written answers, Guru -graded", icon: PenLine, color: "#43C6AC" },
+  { key: "practicalPercent", label: "Practical", desc: "Applied problem-solving, Guru -graded", icon: Wrench, color: "#F7971E" },
 ];
 
 /**
@@ -72,9 +72,8 @@ export default function AutoTestConfigForm({ onGenerate, generating, error }) {
         ))}
       </div>
 
-      <div className={`rounded-xl p-3 text-center text-xs font-bold ${
-        total === 100 ? "bg-[#FAFBFF] text-gray-500" : "bg-[#FFF0F3] text-[#FF6584]"
-      }`}>
+      <div className={`rounded-xl p-3 text-center text-xs font-bold ${total === 100 ? "bg-[#FAFBFF] text-gray-500" : "bg-[#FFF0F3] text-[#FF6584]"
+        }`}>
         {total === 100 ? "Total: 100%" : `Total is ${total}% — sliders must add up to exactly 100% to continue.`}
       </div>
 

@@ -62,13 +62,13 @@ export default function CreateRoadmapPage() {
 
   // ── Helpers ──────────────────────────────────────────────────────────────
   const buildPayload = (overrides = {}) => ({
-    subject:            subject,
-    goal:               goal,
-    skill_level:        skillLevel,
-    daily_study_time:   dailyTime,
+    subject: subject,
+    goal: goal,
+    skill_level: skillLevel,
+    daily_study_time: dailyTime,
     revision_frequency: revisionFrequency,
     custom_instruction: customInstruction || undefined,
-    doc_id:             docId || undefined,
+    doc_id: docId || undefined,
     ...overrides,
   });
 
@@ -88,10 +88,10 @@ export default function CreateRoadmapPage() {
     } else {
       // Immediately send to backend for AI generation
       handleSaveRoadmap({
-        subject:            formData.subject,
-        goal:               formData.goal,
-        skill_level:        formData.skillLevel,
-        daily_study_time:   formData.dailyTime,
+        subject: formData.subject,
+        goal: formData.goal,
+        skill_level: formData.skillLevel,
+        daily_study_time: formData.dailyTime,
         revision_frequency: formData.revisionFrequency,
         custom_instruction: formData.customInstruction || undefined,
       }, formData.file);
@@ -133,7 +133,7 @@ export default function CreateRoadmapPage() {
     } catch (e) {
       console.error("Failed to generate roadmap", e);
       const msg =
-        e?.message || e?.response?.data?.error || "AI generation failed. Please try again.";
+        e?.message || e?.response?.data?.error || "Generation failed. Please try again.";
       setGeneratingError(msg);
       setStep(assessmentResults ? "result" : "form");
     }

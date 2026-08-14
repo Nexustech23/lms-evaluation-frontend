@@ -7,12 +7,11 @@ export default function WeakTopicCard({ weakTopics = [], onReviewTopic }) {
 
   return (
     <div className="bg-white rounded-3xl border border-gray-200 shadow-sm p-5 space-y-4">
-      
+
       {/* Header */}
       <div className="flex items-center gap-2 border-b border-gray-100 pb-3">
-        <div className={`p-1.5 rounded-lg flex items-center justify-center ${
-          hasWeakAreas ? "bg-[#FFF0F3] text-[#FF6584]" : "bg-[#EDFAF5] text-[#43C6AC]"
-        }`}>
+        <div className={`p-1.5 rounded-lg flex items-center justify-center ${hasWeakAreas ? "bg-[#FFF0F3] text-[#FF6584]" : "bg-[#EDFAF5] text-[#43C6AC]"
+          }`}>
           {hasWeakAreas ? <AlertTriangle size={16} /> : <CheckCircle2 size={16} />}
         </div>
         <h3 className="text-sm font-bold text-[#1E1B4B]">
@@ -33,9 +32,9 @@ export default function WeakTopicCard({ weakTopics = [], onReviewTopic }) {
       ) : (
         <div className="space-y-3">
           <p className="text-xs font-semibold text-gray-400">
-            AI detected struggles on these topics. Review study notes and retry practice questions:
+            Guru detected struggles on these topics. Review study notes and retry practice questions:
           </p>
-          
+
           <div className="space-y-2">
             {weakTopics.map((topic, i) => (
               <div

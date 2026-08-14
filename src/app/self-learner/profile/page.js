@@ -250,11 +250,10 @@ const UserProfile = () => {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`flex-1 py-3.5 text-sm font-semibold capitalize transition ${
-                  activeTab === tab
-                    ? "bg-orange-50 border-b-2"
-                    : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
-                }`}
+                className={`flex-1 py-3.5 text-sm font-semibold capitalize transition ${activeTab === tab
+                  ? "bg-orange-50 border-b-2"
+                  : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                  }`}
                 style={activeTab === tab ? { color: user?.color, borderBottomColor: user?.color } : {}}
               >
                 {tab === "profile" ? "👤 Profile" : tab === "edit" ? "✏️ Edit" : "🔒 Password"}
@@ -286,8 +285,8 @@ const UserProfile = () => {
                     >
                       {uploadingAvatar ? (
                         <svg className="w-6 h-6 text-white animate-spin" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                         </svg>
                       ) : (
                         <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -427,7 +426,7 @@ const UserProfile = () => {
                       value={editForm.specialization}
                       onChange={e => setEditForm({ ...editForm, specialization: e.target.value })}
                       className={inputCls}
-                      placeholder="e.g. AI"
+                      placeholder="e.g. Guru"
                     />
                   </div>
                 </div>
@@ -542,13 +541,12 @@ const UserProfile = () => {
                       name="confirmPassword"
                       value={passwordData.confirmPassword}
                       onChange={handlePasswordChange}
-                      className={`${inputCls} pr-10 ${
-                        passwordData.confirmPassword && passwordData.newPassword !== passwordData.confirmPassword
-                          ? "border-red-400 focus:ring-red-300"
-                          : passwordData.confirmPassword && passwordData.newPassword === passwordData.confirmPassword
-                            ? "border-green-400 focus:ring-green-300"
-                            : ""
-                      }`}
+                      className={`${inputCls} pr-10 ${passwordData.confirmPassword && passwordData.newPassword !== passwordData.confirmPassword
+                        ? "border-red-400 focus:ring-red-300"
+                        : passwordData.confirmPassword && passwordData.newPassword === passwordData.confirmPassword
+                          ? "border-green-400 focus:ring-green-300"
+                          : ""
+                        }`}
                       placeholder="Confirm new password"
                       required
                       disabled={isSubmitting}

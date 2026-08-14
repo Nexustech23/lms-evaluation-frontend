@@ -59,12 +59,12 @@ export default function RoadmapsListPage() {
       />
 
       <div className="max-w-6xl mx-auto space-y-6">
-        
+
         {/* Create new CTA Bar */}
         <div className="flex justify-between items-center bg-white rounded-3xl border border-gray-200 shadow-sm p-5">
           <div>
             <h3 className="text-sm font-black text-[#1E1B4B]">Need to learn a new skill?</h3>
-            <p className="text-xs font-semibold text-gray-500 mt-0.5">Generate a custom structured curriculum path in seconds using AI.</p>
+            <p className="text-xs font-semibold text-gray-500 mt-0.5">Generate a custom structured curriculum path in seconds.</p>
           </div>
           <button
             onClick={() => router.push("/self-learner/roadmap/create")}
@@ -111,11 +111,10 @@ export default function RoadmapsListPage() {
                 <div
                   key={roadmapId}
                   onClick={() => router.push(`/self-learner/roadmap/${roadmapId}`)}
-                  className={`bg-white rounded-3xl border cursor-pointer hover:-translate-y-1 transition-all duration-300 relative overflow-hidden flex flex-col justify-between p-6 h-[240px] ${
-                    isUserActive
+                  className={`bg-white rounded-3xl border cursor-pointer hover:-translate-y-1 transition-all duration-300 relative overflow-hidden flex flex-col justify-between p-6 h-[240px] ${isUserActive
                       ? "border-[#6C63FF]/50 shadow-md ring-1 ring-[#6C63FF]/20"
                       : "border-gray-200 shadow-xs hover:border-gray-300"
-                  }`}
+                    }`}
                 >
                   {/* Active Indicator Top Tag */}
                   {isUserActive && (

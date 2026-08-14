@@ -26,7 +26,7 @@ export default function Page() {
   const loadingSteps = [
     "Uploading study material",
     "Extracting learning content",
-    "Analyzing topics with AI",
+    "Analyzing topics with Guru",
     "Generating smart notes",
     "Building notes PDF",
     "Finalizing notes document",
@@ -99,7 +99,7 @@ export default function Page() {
           clearTimeout(pollTimerRef.current);
           setResult(job);
           setLoading(false);
-          toast.success("AI Notes generated successfully!");
+          toast.success("Notes generated successfully!");
           return;
         }
 
@@ -172,7 +172,7 @@ export default function Page() {
         {/* HEADING */}
         <div className="mb-7">
           <h1 className="text-2xl md:text-3xl font-bold text-[#1E1B4B]">
-            Generate AI Notes
+            Generate Your Notes
           </h1>
           <p className="text-sm text-gray-600 mt-2 font-medium">
             Create short notes, detailed notes, summaries, or presentation-style notes.
@@ -199,9 +199,8 @@ export default function Page() {
           <div className="absolute bottom-6 right-6">
             <button
               onClick={isListening ? stopListening : startListening}
-              className={`w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition ${
-                isListening ? "bg-red-500 hover:bg-red-600" : "bg-violet-500 hover:bg-violet-600"
-              } text-white`}
+              className={`w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition ${isListening ? "bg-red-500 hover:bg-red-600" : "bg-violet-500 hover:bg-violet-600"
+                } text-white`}
             >
               {isListening ? <Square size={16} /> : <Mic size={18} />}
             </button>
@@ -260,14 +259,14 @@ export default function Page() {
           disabled={loading}
           className="w-full mt-8 h-14 rounded-2xl bg-[#1E1B4B] text-white text-sm font-semibold hover:opacity-90 transition disabled:opacity-50"
         >
-          {loading ? "Generating AI Notes..." : "Generate AI Notes"}
+          {loading ? "Generating Notes..." : "Generate Your Notes"}
         </button>
 
         {/* LOADING */}
         {loading && (
           <LoadingState
-            title="Generating AI Notes..."
-            subtitle="AI is analyzing your study material and preparing smart notes."
+            title="Generating Notes..."
+            subtitle="Guru is analyzing your study material and preparing smart notes."
             steps={loadingSteps}
             loadingStep={loadingStep}
           />
@@ -278,7 +277,7 @@ export default function Page() {
           <OutputPreview
             title="Generated Notes Preview"
             result={result}
-            emptyMessage="Your AI-generated notes preview will appear here."
+            emptyMessage="Your generated notes preview will appear here."
           />
         )}
 

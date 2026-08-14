@@ -23,7 +23,7 @@ export default function Page() {
   const loadingSteps = [
     "Uploading homework file",
     "Extracting homework content",
-    "Analyzing questions with AI",
+    "Analyzing questions with Guru",
     "Generating detailed solution",
     "Building PDF document",
     "Finalizing homework output",
@@ -198,9 +198,8 @@ Help with programming homework.`}
           <div className="absolute bottom-6 right-6">
             <button
               onClick={isListening ? stopListening : startListening}
-              className={`w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition ${
-                isListening ? "bg-red-500 hover:bg-red-600" : "bg-violet-500 hover:bg-violet-600"
-              } text-white`}
+              className={`w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition ${isListening ? "bg-red-500 hover:bg-red-600" : "bg-violet-500 hover:bg-violet-600"
+                } text-white`}
             >
               {isListening ? <Square size={16} /> : <Mic size={18} />}
             </button>

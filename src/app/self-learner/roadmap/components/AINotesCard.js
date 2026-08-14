@@ -20,12 +20,12 @@ export default function AINotesCard({ subtopic, isCompleted, onToggleComplete })
 
   return (
     <div className="bg-white rounded-3xl border border-gray-200 shadow-sm p-6 space-y-6">
-      
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-100 pb-5">
         <div>
           <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">
-            AI-Generated Study Notes
+            Generated Study Notes
           </span>
           <h3 className="text-lg font-black text-[#1E1B4B] mt-0.5">
             {subtopic.title}
@@ -34,11 +34,10 @@ export default function AINotesCard({ subtopic, isCompleted, onToggleComplete })
 
         <button
           onClick={onToggleComplete}
-          className={`flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 hover:scale-102 ${
-            isCompleted
-              ? "bg-[#EDFAF5] text-[#43C6AC] border border-[#43C6AC]/30"
-              : "bg-[#1E1B4B] hover:bg-[#1E1B4B]/95 text-white border border-transparent shadow-xs"
-          }`}
+          className={`flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 hover:scale-102 ${isCompleted
+            ? "bg-[#EDFAF5] text-[#43C6AC] border border-[#43C6AC]/30"
+            : "bg-[#1E1B4B] hover:bg-[#1E1B4B]/95 text-white border border-transparent shadow-xs"
+            }`}
         >
           <CheckCircle size={14} />
           {isCompleted ? "Completed" : "Mark as Completed"}
@@ -54,11 +53,10 @@ export default function AINotesCard({ subtopic, isCompleted, onToggleComplete })
             <button
               key={tab.name}
               onClick={() => setActiveTab(tab.name)}
-              className={`flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 ${
-                isActive
-                  ? "bg-white text-[#6C63FF] shadow-2xs font-extrabold"
-                  : "text-gray-500 hover:text-[#1E1B4B]"
-              }`}
+              className={`flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 ${isActive
+                ? "bg-white text-[#6C63FF] shadow-2xs font-extrabold"
+                : "text-gray-500 hover:text-[#1E1B4B]"
+                }`}
             >
               <Icon size={12} />
               {tab.name}
