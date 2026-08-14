@@ -23,14 +23,14 @@ function resolveCurrentWeek(roadmap) {
 // ─── Quiz Logic ───────────────────────────────────────────────────────────────
 
 function WeekQuizContent() {
-  const router       = useRouter();
+  const router = useRouter();
   const searchParams = useSearchParams();
 
   // Both self-resolve to the student's active roadmap / current in-progress
   // week when not given explicitly — mirrors the Learning Lounge, so the
   // Self-Review hub tile can link here with no query params at all.
   const [roadmapId, setRoadmapId] = useState(searchParams.get("roadmapId"));
-  const [weekNum,   setWeekNum]   = useState(searchParams.get("week") ? parseInt(searchParams.get("week")) : null);
+  const [weekNum, setWeekNum] = useState(searchParams.get("week") ? parseInt(searchParams.get("week")) : null);
 
   // Phase state machine: loading -> gated -> config -> generating -> exam -> grading -> results
   const [phase, setPhase] = useState("loading");
@@ -40,10 +40,10 @@ function WeekQuizContent() {
 
   const [questions, setQuestions] = useState(null);
 
-  const [currentIdx,   setCurrentIdx]   = useState(0);
-  const [answers,      setAnswers]      = useState({});
-  const [timeLeft,     setTimeLeft]     = useState(600);
-  const [quizResult,   setQuizResult]   = useState(null);
+  const [currentIdx, setCurrentIdx] = useState(0);
+  const [answers, setAnswers] = useState({});
+  const [timeLeft, setTimeLeft] = useState(600);
+  const [quizResult, setQuizResult] = useState(null);
 
   // ── Resolve roadmap/week, check the completion gate, then check for a resumable test ──
   useEffect(() => {
@@ -221,7 +221,7 @@ function WeekQuizContent() {
         <div className="text-center">
           <h3 className="text-base font-black">Generating Week {weekNum} Quiz…</h3>
           <p className="text-xs text-gray-400 font-semibold mt-1 max-w-xs">
-            The AI is crafting personalised questions based on your curriculum. ~10-20 seconds.
+            The Guru is crafting personalised questions based on your curriculum. ~10-20 seconds.
           </p>
         </div>
       </div>
@@ -234,7 +234,7 @@ function WeekQuizContent() {
         <Loader2 size={48} className="animate-spin text-[#6C63FF]" />
         <h3 className="text-lg font-black">Evaluating Your Answers…</h3>
         <p className="text-xs text-gray-400 font-semibold max-w-xs text-center leading-relaxed">
-          The backend is grading your responses (written answers are graded by AI) and updating your progress.
+          The backend is grading your responses (written answers are graded by Guru) and updating your progress.
         </p>
       </div>
     );
@@ -378,11 +378,10 @@ function WeekQuizContent() {
                   key={optIdx}
                   type="button"
                   onClick={() => handleSelectOption(optIdx)}
-                  className={`w-full text-left p-4 rounded-2xl border text-xs font-bold flex items-center justify-between transition-all duration-200 ${
-                    isSelected
-                      ? "bg-[#6C63FF] border-[#6C63FF] text-white shadow-md"
-                      : "bg-white/5 border-white/10 text-gray-300 hover:bg-white/10"
-                  }`}
+                  className={`w-full text-left p-4 rounded-2xl border text-xs font-bold flex items-center justify-between transition-all duration-200 ${isSelected
+                    ? "bg-[#6C63FF] border-[#6C63FF] text-white shadow-md"
+                    : "bg-white/5 border-white/10 text-gray-300 hover:bg-white/10"
+                    }`}
                 >
                   <span>{option}</span>
                   {isSelected && (

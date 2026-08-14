@@ -77,15 +77,15 @@ function useReadAloud() {
 // ─── AI Notes Renderer ────────────────────────────────────────────────────────
 
 const markdownComponents = {
-  strong: ({node, ...props}) => <strong className="font-bold text-[#1E1B4B]" {...props} />,
-  h1: ({node, ...props}) => <h3 className="text-lg font-black text-[#1E1B4B] mt-4 mb-2" {...props} />,
-  h2: ({node, ...props}) => <h4 className="text-base font-black text-[#1E1B4B] mt-3 mb-2" {...props} />,
-  h3: ({node, ...props}) => <h5 className="text-sm font-bold text-[#1E1B4B] mt-2 mb-1" {...props} />,
-  h4: ({node, ...props}) => <h6 className="text-xs font-bold text-[#1E1B4B] mt-2 mb-1" {...props} />,
-  p: ({node, ...props}) => <p className="mb-2 last:mb-0" {...props} />,
-  ul: ({node, ...props}) => <ul className="list-disc pl-4 mb-2" {...props} />,
-  ol: ({node, ...props}) => <ol className="list-decimal pl-4 mb-2" {...props} />,
-  li: ({node, ...props}) => <li className="mb-1" {...props} />
+  strong: ({ node, ...props }) => <strong className="font-bold text-[#1E1B4B]" {...props} />,
+  h1: ({ node, ...props }) => <h3 className="text-lg font-black text-[#1E1B4B] mt-4 mb-2" {...props} />,
+  h2: ({ node, ...props }) => <h4 className="text-base font-black text-[#1E1B4B] mt-3 mb-2" {...props} />,
+  h3: ({ node, ...props }) => <h5 className="text-sm font-bold text-[#1E1B4B] mt-2 mb-1" {...props} />,
+  h4: ({ node, ...props }) => <h6 className="text-xs font-bold text-[#1E1B4B] mt-2 mb-1" {...props} />,
+  p: ({ node, ...props }) => <p className="mb-2 last:mb-0" {...props} />,
+  ul: ({ node, ...props }) => <ul className="list-disc pl-4 mb-2" {...props} />,
+  ol: ({ node, ...props }) => <ol className="list-decimal pl-4 mb-2" {...props} />,
+  li: ({ node, ...props }) => <li className="mb-1" {...props} />
 };
 
 function AINotesDisplay({ notes, isCompleted, onToggleComplete, onDiagramError }) {
@@ -292,11 +292,10 @@ function AINotesDisplay({ notes, isCompleted, onToggleComplete, onDiagramError }
       <div className="flex flex-col items-center gap-2">
         <button
           onClick={handleToggle}
-          className={`w-full h-11 rounded-xl text-xs font-black flex items-center justify-center gap-2 transition-all duration-200 hover:scale-[1.01] ${
-            isCompleted
-              ? "bg-[#EDFAF5] text-[#43C6AC] border border-[#43C6AC]/30"
-              : "bg-[#1E1B4B] text-white hover:bg-black"
-          }`}
+          className={`w-full h-11 rounded-xl text-xs font-black flex items-center justify-center gap-2 transition-all duration-200 hover:scale-[1.01] ${isCompleted
+            ? "bg-[#EDFAF5] text-[#43C6AC] border border-[#43C6AC]/30"
+            : "bg-[#1E1B4B] text-white hover:bg-black"
+            }`}
         >
           <CheckCircle2 size={14} />
           {isCompleted ? "Marked as Complete ✓" : "Mark as Complete"}
@@ -312,9 +311,9 @@ function AINotesDisplay({ notes, isCompleted, onToggleComplete, onDiagramError }
 // ─── Practice Questions Panel ─────────────────────────────────────────────────
 
 const VERDICT_STYLE = {
-  correct:            { label: "Correct",           bg: "bg-[#EDFAF5]", border: "border-[#43C6AC]/30", text: "text-[#43C6AC]" },
-  partially_correct:  { label: "Partially Correct",  bg: "bg-[#FFF8F0]", border: "border-amber-300",    text: "text-amber-600" },
-  incorrect:          { label: "Needs Work",         bg: "bg-[#FFF0F3]", border: "border-[#FF6584]/30", text: "text-[#FF6584]" },
+  correct: { label: "Correct", bg: "bg-[#EDFAF5]", border: "border-[#43C6AC]/30", text: "text-[#43C6AC]" },
+  partially_correct: { label: "Partially Correct", bg: "bg-[#FFF8F0]", border: "border-amber-300", text: "text-amber-600" },
+  incorrect: { label: "Needs Work", bg: "bg-[#FFF0F3]", border: "border-[#FF6584]/30", text: "text-[#FF6584]" },
 };
 
 function PracticeQuestionsPanel({ questions, loading, error, roadmapId, week, subtopicIdx }) {
@@ -455,7 +454,7 @@ function PracticeQuestionsPanel({ questions, loading, error, roadmapId, week, su
             className="flex-1 h-9 bg-[#6C63FF] text-white rounded-xl text-xs font-black hover:bg-[#5B52EE] transition-all disabled:opacity-40 flex items-center justify-center gap-2"
           >
             {evaluating ? <Loader2 size={14} className="animate-spin" /> : null}
-            {evaluating ? "Evaluating…" : "Submit for AI Feedback"}
+            {evaluating ? "Evaluating…" : "Submit for Feedback"}
           </button>
           <button
             onClick={() => setRevealed(true)}
@@ -527,30 +526,30 @@ function resolveCurrentWeek(roadmap) {
 // ─── Main Learning Lounge Workspace ────────────────────────────────────────────
 
 function LearningLoungeContent() {
-  const router       = useRouter();
+  const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [allRoadmaps,   setAllRoadmaps]   = useState([]);
+  const [allRoadmaps, setAllRoadmaps] = useState([]);
   const [roadmapsLoading, setRoadmapsLoading] = useState(true);
-  const [roadmapId,     setRoadmapId]     = useState(searchParams.get("roadmapId") || null);
-  const [roadmap,       setRoadmap]       = useState(null);
-  const [loading,       setLoading]       = useState(true);
-  const [showSwitcher,  setShowSwitcher]  = useState(false);
+  const [roadmapId, setRoadmapId] = useState(searchParams.get("roadmapId") || null);
+  const [roadmap, setRoadmap] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [showSwitcher, setShowSwitcher] = useState(false);
 
   const [weekNum, setWeekNum] = useState(searchParams.get("week") ? parseInt(searchParams.get("week")) : null);
-  const [subIdx,  setSubIdx]  = useState(searchParams.get("subtopic") ? parseInt(searchParams.get("subtopic")) : 0);
+  const [subIdx, setSubIdx] = useState(searchParams.get("subtopic") ? parseInt(searchParams.get("subtopic")) : 0);
 
   // VARK blend + difficulty — remembered per (roadmapId, week) in localStorage.
-  const [vark,        setVark]        = useState(null);
-  const [difficulty,  setDifficulty]  = useState(null);
-  const [showPicker,  setShowPicker]  = useState(false);
-  const [retryTick,   setRetryTick]   = useState(0);
+  const [vark, setVark] = useState(null);
+  const [difficulty, setDifficulty] = useState(null);
+  const [showPicker, setShowPicker] = useState(false);
+  const [retryTick, setRetryTick] = useState(0);
   const forceRegenerateRef = useRef(false);
 
-  const [notes,         setNotes]         = useState(null);
-  const [noteMeta,      setNoteMeta]      = useState(null);
-  const [notesLoading,  setNotesLoading]  = useState(false);
-  const [notesError,    setNotesError]    = useState(null);
+  const [notes, setNotes] = useState(null);
+  const [noteMeta, setNoteMeta] = useState(null);
+  const [notesLoading, setNotesLoading] = useState(false);
+  const [notesError, setNotesError] = useState(null);
 
   const healAttemptedRef = useRef(new Set());
 
@@ -655,9 +654,9 @@ function LearningLoungeContent() {
   // ── Load real learning resources for the current subtopic ─────────────────
   // Deliberately not keyed on vark/difficulty — resources don't vary by
   // style or difficulty, so they don't need to reload when the blend changes.
-  const [resources,        setResources]        = useState(null);
+  const [resources, setResources] = useState(null);
   const [resourcesLoading, setResourcesLoading] = useState(false);
-  const [resourcesError,   setResourcesError]   = useState(null);
+  const [resourcesError, setResourcesError] = useState(null);
 
   useEffect(() => {
     if (!roadmap?.weeks || !weekNum) return;
@@ -714,8 +713,8 @@ function LearningLoungeContent() {
   // Scoped to the subtopic just completed, not the whole week — generated
   // automatically the moment "Mark as Complete" flips this subtopic to done.
   const [practiceQuestions, setPracticeQuestions] = useState(null);
-  const [practiceLoading,   setPracticeLoading]   = useState(false);
-  const [practiceError,     setPracticeError]     = useState(null);
+  const [practiceLoading, setPracticeLoading] = useState(false);
+  const [practiceError, setPracticeError] = useState(null);
 
   useEffect(() => {
     if (!roadmap?.weeks || !weekNum) return;
@@ -814,10 +813,10 @@ function LearningLoungeContent() {
     );
   }
 
-  const weekData        = roadmap.weeks.find((w) => w.week === weekNum) || roadmap.weeks[0];
-  const activeSubtopic  = weekData.subtopics[subIdx] || weekData.subtopics[0];
-  const isCompleted     = activeSubtopicKey ? (roadmap.progress?.completedSubtopics || []).includes(activeSubtopicKey) : false;
-  const unlockedWeeks   = roadmap.unlockedWeeks?.length ? roadmap.unlockedWeeks : [1];
+  const weekData = roadmap.weeks.find((w) => w.week === weekNum) || roadmap.weeks[0];
+  const activeSubtopic = weekData.subtopics[subIdx] || weekData.subtopics[0];
+  const isCompleted = activeSubtopicKey ? (roadmap.progress?.completedSubtopics || []).includes(activeSubtopicKey) : false;
+  const unlockedWeeks = roadmap.unlockedWeeks?.length ? roadmap.unlockedWeeks : [1];
 
   return (
     <div className="min-h-screen bg-[#F5F7FB] p-4 md:p-6 text-slate-800 animate-fadeIn">
@@ -868,9 +867,8 @@ function LearningLoungeContent() {
                       <button
                         key={rId}
                         onClick={() => handleSwitchRoadmap(rId)}
-                        className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-between transition-all ${
-                          rId === roadmapId ? "bg-[#F0EEFF] text-[#6C63FF]" : "hover:bg-gray-50 text-gray-600"
-                        }`}
+                        className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-between transition-all ${rId === roadmapId ? "bg-[#F0EEFF] text-[#6C63FF]" : "hover:bg-gray-50 text-gray-600"
+                          }`}
                       >
                         <span className="truncate">{r.subject}</span>
                         <span className="text-[10px] font-semibold text-gray-400 shrink-0 ml-2">
@@ -895,13 +893,12 @@ function LearningLoungeContent() {
                 key={wk.week}
                 disabled={!isUnlocked}
                 onClick={() => handleSelectWeek(wk.week)}
-                className={`shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[11px] font-black transition-all duration-200 ${
-                  isActive
-                    ? "bg-[#1E1B4B] text-white"
-                    : isUnlocked
+                className={`shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[11px] font-black transition-all duration-200 ${isActive
+                  ? "bg-[#1E1B4B] text-white"
+                  : isUnlocked
                     ? "bg-white border border-gray-200 text-gray-600 hover:border-[#6C63FF]/40"
                     : "bg-gray-100 text-gray-400 cursor-not-allowed"
-                }`}
+                  }`}
               >
                 {!isUnlocked && <Lock size={10} />}
                 Week {wk.week}
@@ -930,19 +927,18 @@ function LearningLoungeContent() {
 
               <div className="space-y-1">
                 {weekData.subtopics.map((sub, sIdx) => {
-                  const subKey   = `${weekNum}-${sIdx}-${sub.title}`;
-                  const isDone   = (roadmap.progress?.completedSubtopics || []).includes(subKey);
+                  const subKey = `${weekNum}-${sIdx}-${sub.title}`;
+                  const isDone = (roadmap.progress?.completedSubtopics || []).includes(subKey);
                   const isCurrent = subIdx === sIdx;
 
                   return (
                     <button
                       key={sIdx}
                       onClick={() => handleSelectSubtopic(sIdx)}
-                      className={`w-full text-left p-2.5 rounded-xl text-xs font-bold flex items-center justify-between transition-all duration-200 ${
-                        isCurrent
-                          ? "bg-[#F0EEFF] text-[#6C63FF]"
-                          : "hover:bg-gray-50 text-gray-600"
-                      }`}
+                      className={`w-full text-left p-2.5 rounded-xl text-xs font-bold flex items-center justify-between transition-all duration-200 ${isCurrent
+                        ? "bg-[#F0EEFF] text-[#6C63FF]"
+                        : "hover:bg-gray-50 text-gray-600"
+                        }`}
                     >
                       <span className="truncate pl-2">• {sub.title}</span>
                       {isDone && (
@@ -960,27 +956,27 @@ function LearningLoungeContent() {
           <div className="md:col-span-2 space-y-6">
 
             {activeSubtopic && (
-                <>
+              <>
 
-                  {/* Subtopic title bar — stays put, only the notes below it scroll */}
-                  <div className="bg-white rounded-3xl border border-gray-200 shadow-sm p-5">
-                    <span className="text-[10px] font-black text-[#6C63FF] uppercase tracking-widest block">
-                      Week {weekNum} — {weekData.title}
+                {/* Subtopic title bar — stays put, only the notes below it scroll */}
+                <div className="bg-white rounded-3xl border border-gray-200 shadow-sm p-5">
+                  <span className="text-[10px] font-black text-[#6C63FF] uppercase tracking-widest block">
+                    Week {weekNum} — {weekData.title}
+                  </span>
+                  <h2 className="text-base font-black text-[#1E1B4B] mt-1">
+                    {activeSubtopic.title}
+                  </h2>
+                  {activeSubtopic.difficulty && (
+                    <span className="inline-block mt-2 text-[10px] font-bold bg-[#F0EEFF] text-[#6C63FF] px-2 py-0.5 rounded-full">
+                      {activeSubtopic.difficulty}
                     </span>
-                    <h2 className="text-base font-black text-[#1E1B4B] mt-1">
-                      {activeSubtopic.title}
-                    </h2>
-                    {activeSubtopic.difficulty && (
-                      <span className="inline-block mt-2 text-[10px] font-bold bg-[#F0EEFF] text-[#6C63FF] px-2 py-0.5 rounded-full">
-                        {activeSubtopic.difficulty}
-                      </span>
-                    )}
-                  </div>
+                  )}
+                </div>
 
-                  {/* Scrollable notes region — one dedicated scroller for
+                {/* Scrollable notes region — one dedicated scroller for
                       notes/resources/practice, independent from the sidebar
                       and the title bar above it. */}
-                  <div className="space-y-6 md:max-h-[calc(100vh-220px)] md:overflow-y-auto md:pr-2 -mr-2">
+                <div className="space-y-6 md:max-h-[calc(100vh-220px)] md:overflow-y-auto md:pr-2 -mr-2">
 
                   {/* Notes area */}
                   {notesLoading ? (
@@ -988,7 +984,7 @@ function LearningLoungeContent() {
                       <Loader2 size={36} className="animate-spin text-[#6C63FF]" />
                       <div>
                         <p className="text-sm font-black text-[#1E1B4B]">
-                          AI is generating your study notes…
+                          Guru is generating your study notes…
                         </p>
                         <p className="text-xs text-gray-400 font-semibold mt-1">
                           This takes ~10 seconds on first load. Notes are cached after that.
@@ -1041,9 +1037,9 @@ function LearningLoungeContent() {
                     />
                   )}
 
-                  </div>
+                </div>
 
-                </>
+              </>
             )}
           </div>
 

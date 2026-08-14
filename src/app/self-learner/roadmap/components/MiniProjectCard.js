@@ -40,7 +40,7 @@ export default function MiniProjectCard({ project, isCompleted, onCompleteProjec
 
   return (
     <div className="bg-white rounded-3xl border border-gray-200 shadow-sm p-6 space-y-6">
-      
+
       {/* Header */}
       <div className="flex justify-between items-start border-b border-gray-150 pb-5">
         <div>
@@ -102,17 +102,17 @@ export default function MiniProjectCard({ project, isCompleted, onCompleteProjec
             {loading ? (
               <>
                 <Loader2 size={14} className="animate-spin" />
-                AI Grading Execution in progress...
+                Grading Execution in progress...
               </>
             ) : (
-              "Submit Project for AI Evaluation"
+              "Submit Project for Guru Evaluation"
             )}
           </button>
         </form>
       ) : (
         /* Grading Feedback Card */
         <div className="space-y-4 animate-fadeIn">
-          
+
           <div className="bg-[#EDFAF5] border border-[#43C6AC]/30 rounded-2xl p-5 text-center">
             <div className="flex justify-center mb-2">
               <Award size={36} className="text-[#43C6AC]" />

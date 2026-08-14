@@ -7,7 +7,7 @@ import RoadmapHeader from "../roadmap/components/RoadmapHeader";
 const TILES = [
   {
     title: "Notes Generate",
-    desc: "Turn any topic or uploaded material into structured AI study notes.",
+    desc: "Turn any topic or uploaded material into structured study notes.",
     icon: NotebookPen,
     color: "#6C63FF",
     bg: "#F0EEFF",
@@ -15,7 +15,7 @@ const TILES = [
   },
   {
     title: "Homework Help",
-    desc: "Get step-by-step AI help on homework questions or uploaded files.",
+    desc: "Get step-by-step Guru help on homework questions or uploaded files.",
     icon: MessageCircleQuestion,
     color: "#43C6AC",
     bg: "#EDFAF5",
@@ -23,7 +23,7 @@ const TILES = [
   },
   {
     title: "Weekly Quiz",
-    desc: "Take your current roadmap week's AI-generated evaluation once you've finished studying it.",
+    desc: "Take your current roadmap week's evaluation once you've finished studying it.",
     icon: ClipboardCheck,
     color: "#F7971E",
     bg: "#FFF8EE",

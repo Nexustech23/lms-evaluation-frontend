@@ -466,7 +466,7 @@ function ModePicker({ color, onSelect }) {
           >
             <div className="text-2xl mb-2">📚</div>
             <h3 className="font-bold text-gray-900">Practice Test</h3>
-            <p className="text-xs text-gray-500 mt-1">Test yourself on any subject or topic — AI-generated, fully configurable.</p>
+            <p className="text-xs text-gray-500 mt-1">Test yourself on any subject or topic — Generated, fully configurable.</p>
           </button>
           <button
             type="button"
@@ -872,7 +872,7 @@ export default function StudentCreateTest() {
 
           {/* Help nudge */}
           <p className="text-center text-xs mt-4" style={{ color: color + "bb" }}>
-            Test questions are auto-generated from your syllabus using AI.
+            Test questions are auto-generated from your syllabusS.
           </p>
         </div>
       </div>

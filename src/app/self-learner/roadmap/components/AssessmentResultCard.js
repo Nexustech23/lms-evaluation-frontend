@@ -10,12 +10,12 @@ export default function AssessmentResultCard({ results, onProceed }) {
     score >= 80
       ? { text: "text-[#43C6AC]", bg: "bg-[#EDFAF5]", border: "border-[#43C6AC]/30" }
       : score >= 40
-      ? { text: "text-[#F7971E]", bg: "bg-[#FFF8EE]", border: "border-[#F7971E]/30" }
-      : { text: "text-[#FF6584]", bg: "bg-[#FFF0F3]", border: "border-[#FF6584]/30" };
+        ? { text: "text-[#F7971E]", bg: "bg-[#FFF8EE]", border: "border-[#F7971E]/30" }
+        : { text: "text-[#FF6584]", bg: "bg-[#FFF0F3]", border: "border-[#FF6584]/30" };
 
   return (
     <div className="bg-white rounded-3xl border border-gray-200 shadow-sm p-6 md:p-8 max-w-2xl mx-auto text-center space-y-6">
-      
+
       {/* Icon Banner */}
       <div className="flex justify-center">
         <div className="bg-[#F0EEFF] text-[#6C63FF] p-5 rounded-full flex items-center justify-center animate-bounce duration-1000">
@@ -27,14 +27,14 @@ export default function AssessmentResultCard({ results, onProceed }) {
       <div>
         <h2 className="text-2xl font-black text-[#1E1B4B]">Assessment Completed!</h2>
         <p className="text-sm font-medium text-gray-500 mt-1">
-          Our AI engine has evaluated your current level.
+          Our engine has evaluated your current level.
         </p>
       </div>
 
       {/* Score Box */}
       <div className={`p-6 rounded-2xl border ${scoreColors.bg} ${scoreColors.border} max-w-sm mx-auto`}>
         <span className="block text-xs font-extrabold text-gray-400 uppercase tracking-widest">
-          AI Evaluation Score
+          Evaluation Score
         </span>
         <span className={`block text-5xl font-black mt-1 ${scoreColors.text}`}>
           {score}%

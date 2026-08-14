@@ -26,9 +26,8 @@ function QuestionCard({ q, index }) {
           <span className="text-gray-400 mr-1.5">Q{index + 1}.</span>{q.question}
         </p>
         <span
-          className={`flex-shrink-0 flex items-center gap-1 text-[10px] font-black uppercase px-2.5 py-1 rounded-full ${
-            q.isCorrect ? "bg-[#EDFAF5] text-[#43C6AC]" : "bg-red-50 text-red-500"
-          }`}
+          className={`flex-shrink-0 flex items-center gap-1 text-[10px] font-black uppercase px-2.5 py-1 rounded-full ${q.isCorrect ? "bg-[#EDFAF5] text-[#43C6AC]" : "bg-red-50 text-red-500"
+            }`}
         >
           {q.isCorrect ? <CheckCircle2 size={12} /> : <XCircle size={12} />}
           {q.isCorrect ? "Correct" : "Incorrect"}
@@ -126,7 +125,7 @@ export default function AttemptInsightReportPage() {
         <div className="text-center">
           <h3 className="text-base font-black">Analyzing your answers…</h3>
           <p className="text-xs text-gray-400 font-semibold mt-1 max-w-xs">
-            AI is writing detailed reasoning, feedback, and improvement tips for each question.
+            Guru is writing detailed reasoning, feedback, and improvement tips for each question.
           </p>
         </div>
       </div>
