@@ -2,14 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, BookOpen, Clock, Target, ArrowRight, Activity, Calendar } from "lucide-react";
-import { getRoadmaps } from "./api";
+import { Plus, BookOpen, Clock, Target, ArrowRight, Activity, Calendar, Trash2 } from "lucide-react";
+import { getRoadmaps, deleteRoadmap } from "./api";
 import RoadmapHeader from "./components/RoadmapHeader";
 
 export default function RoadmapsListPage() {
   const router = useRouter();
   const [roadmaps, setRoadmaps] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState(null);
 
   useEffect(() => {
     async function load() {
@@ -24,6 +25,22 @@ export default function RoadmapsListPage() {
     }
     load();
   }, []);
+
+  const handleDelete = async (e, roadmapId, subject) => {
+    e.stopPropagation();
+    if (!window.confirm(`Delete the "${subject}" roadmap? This can't be undone.`)) return;
+
+    setDeletingId(roadmapId);
+    try {
+      await deleteRoadmap(roadmapId);
+      setRoadmaps((prev) => prev.filter((r) => (r._id || r.id) !== roadmapId));
+    } catch (err) {
+      console.error("Failed to delete roadmap", err);
+      alert("Failed to delete roadmap. Please try again.");
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   const getUnlockedWeeksCount = (r) => {
     return (r.unlockedWeeks || [1]).length;
@@ -106,6 +123,16 @@ export default function RoadmapsListPage() {
                       Active
                     </div>
                   )}
+
+                  {/* Delete button */}
+                  <button
+                    onClick={(e) => handleDelete(e, roadmapId, r.subject)}
+                    disabled={deletingId === roadmapId}
+                    aria-label="Delete roadmap"
+                    className="absolute top-4 right-4 p-1.5 rounded-full text-gray-300 hover:text-[#FF6584] hover:bg-[#FFF0F3] transition-all duration-200 disabled:opacity-40"
+                  >
+                    <Trash2 size={15} />
+                  </button>
 
                   <div>
                     {/* Meta info */}
