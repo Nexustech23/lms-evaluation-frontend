@@ -682,7 +682,13 @@ const fetchDocuments = async () => {
 
                   <tbody>
                     {files.length > 0 ? (
-                      files.map((file, index) => (
+                      files.map((file, index) => {
+                        // Manual marks entry never produces a PDF report (no answer
+                        // script involved), so evaluated_report_url alone can't tell
+                        // "evaluated" from "pending" — total_final_marks is set by
+                        // both the AI-grading and manual-entry paths, so check that too.
+                        const isEvaluated = Boolean(file.evaluated_report_url) || file.total_final_marks != null;
+                        return (
                         <tr
                           key={file.answer_id}
                           className="border-b border-gray-200 hover:bg-gray-50"
@@ -692,12 +698,12 @@ const fetchDocuments = async () => {
                           </td>
                           <td className="p-3 text-center">
                             <span
-                              className={`px-3 py-1 rounded-full text-sm font-medium ${file.evaluated_report_url
+                              className={`px-3 py-1 rounded-full text-sm font-medium ${isEvaluated
                                 ? "bg-green-100 text-green-700"
                                 : "bg-gray-100 text-gray-700"
                                 }`}
                             >
-                              {file.evaluated_report_url
+                              {isEvaluated
                                 ? t("evaluated")
                                 : t("evaluationPending")}
                             </span>
@@ -845,7 +851,8 @@ const fetchDocuments = async () => {
                             </div>
                           </td>
                         </tr>
-                      ))
+                        );
+                      })
                     ) : (
                       <tr>
                         <td

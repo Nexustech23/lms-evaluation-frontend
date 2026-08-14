@@ -107,6 +107,10 @@ const [confirmModal, setConfirmModal] = useState({
     router.push(`/faculty/answer-script-upload/${currentFolderId}`);
   };
 
+  const handleManualEntry = async () => {
+    router.push(`/faculty/manual-marks-entry/${currentFolderId}`);
+  };
+
   // Rename File Function
  const handleRenameFile = (answer_id, oldFilename) => {
   setRenameModal({ open: true, value: oldFilename, folderId: answer_id, type: "file" });
@@ -600,7 +604,13 @@ const fetchDocuments = async () => {
 
                   <tbody>
                     {files.length > 0 ? (
-                      files.map((file, index) => (
+                      files.map((file, index) => {
+                        // Manual marks entry never produces a PDF report (no answer
+                        // script involved), so evaluated_report_url alone can't tell
+                        // "evaluated" from "pending" — total_final_marks is set by
+                        // both the AI-grading and manual-entry paths, so check that too.
+                        const isEvaluated = Boolean(file.evaluated_report_url) || file.total_final_marks != null;
+                        return (
                         <tr
                           key={file.answer_id}
                           className="border-b border-gray-200 hover:bg-gray-50"
@@ -610,12 +620,12 @@ const fetchDocuments = async () => {
                           </td>
                           <td className="p-3 text-center">
                             <span
-                              className={`px-3 py-1 rounded-full text-sm font-medium ${file.evaluated_report_url
+                              className={`px-3 py-1 rounded-full text-sm font-medium ${isEvaluated
                                 ? "bg-green-100 text-green-700"
                                 : "bg-gray-100 text-gray-700"
                                 }`}
                             >
-                              {file.evaluated_report_url ? t("evaluated") : t("evaluationPending")}
+                              {isEvaluated ? t("evaluated") : t("evaluationPending")}
                             </span>
                           </td>
                           <td className="p-3">
@@ -823,7 +833,8 @@ const fetchDocuments = async () => {
                             </div>
                           </td>
                         </tr>
-                      ))
+                        );
+                      })
                     ) : (
                       <tr>
                         <td colSpan="3" className="p-8 text-center text-gray-500">
@@ -837,12 +848,20 @@ const fetchDocuments = async () => {
                   </tbody>
                 </table>
               </div>
-              <button
-                className="mt-8 px-4 py-2 bg-[#18cc00] text-white rounded hover:bg-[#129900]"
-                onClick={handleaddnewfiles}
-              >
-               {t("addNewFiles")}
-              </button>
+              <div className="mt-8 flex gap-3">
+                <button
+                  className="px-4 py-2 bg-[#18cc00] text-white rounded hover:bg-[#129900]"
+                  onClick={handleaddnewfiles}
+                >
+                 {t("addNewFiles")}
+                </button>
+                <button
+                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50"
+                  onClick={handleManualEntry}
+                >
+                  Enter Marks Manually
+                </button>
+              </div>
             </div>
           )}
         </div>
