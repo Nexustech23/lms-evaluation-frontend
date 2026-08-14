@@ -536,15 +536,15 @@ export default function Analytics() {
         {/* ── Motivation Banner ── */}
         {summary.testsAttempted > 0 && (
           <div className="rounded-xl p-5 text-center"
-            style={{ backgroundColor: color + "12", border: `1px solid ${color}28` }}>
-            <p className="text-base font-bold" style={{ color }}>
+            style={{ backgroundColor: "rgba(255, 255, 255, 0.12)", border: "1px solid rgba(255, 255, 255, 0.2)" }}>
+            <p className="text-base font-bold text-white">
               {overallPct >= 80
                 ? "🌟 Outstanding performance! Keep it up."
                 : overallPct >= 60
                   ? "💪 Good progress! A little more practice will get you there."
                   : "📚 Keep practising! Consistency is the key to improvement."}
             </p>
-            <p className="text-xs text-white-500 mt-1.5">
+            <p className="text-xs text-white/80 mt-1.5">
               You've made <strong>{summary.testsAttempted}</strong> attempt{summary.testsAttempted !== 1 ? "s" : ""} and solved <strong>{summary.totalQuestions}</strong> questions.
             </p>
           </div>

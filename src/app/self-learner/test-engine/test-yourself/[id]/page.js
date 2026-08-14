@@ -203,7 +203,7 @@ export default function TestAttemptPage() {
         const tryFetch = async () => {
             try {
                 const res = await axios.get(`/api/mock-tests/${testId}`, { withCredentials: true });
-                const qs = res.data.questions || [];
+                const qs = res.data.test?.questions || [];
 
                 if (qs.length === 0 && attempts < MAX_ATTEMPTS) {
                     attempts++;
