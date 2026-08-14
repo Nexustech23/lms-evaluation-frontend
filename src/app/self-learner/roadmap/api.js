@@ -89,6 +89,13 @@ export async function getRoadmapById(id) {
 }
 
 /**
+ * Permanently delete a roadmap. Cannot be undone.
+ */
+export async function deleteRoadmap(id) {
+  return request(() => roadmapClient.delete(`${BASE_URL}/${id}`));
+}
+
+/**
  * Start a new AI-generated roadmap (background job). The AI decides the
  * week count itself based on subject scope and daily study time.
  * Returns immediately with { job_id, status: "processing" }.
