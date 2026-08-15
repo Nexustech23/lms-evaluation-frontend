@@ -153,7 +153,7 @@ export default function TestYourselfList() {
   const fetchTests = useCallback(async () => {
     try {
       const res = await axios.get("/api/mock-tests", { withCredentials: true });
-      setTests(res.data.mockTests || []);
+      setTests(res.data.tests || []);
     } catch {
       toast.error("Failed to load tests.");
     } finally {
