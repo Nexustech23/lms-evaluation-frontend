@@ -60,6 +60,7 @@ async function translateText(text, from, to) {
  *   from      - Source language (default: "en")
  *   className - Optional CSS class
  */
+
 export default function AutoTranslate({
   children,
   tag: Tag = "span",

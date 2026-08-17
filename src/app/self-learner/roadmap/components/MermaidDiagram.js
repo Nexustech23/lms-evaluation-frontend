@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { X, Maximize2 } from "lucide-react";
 
 let renderCounter = 0;
 
@@ -17,8 +18,18 @@ let renderCounter = 0;
 export default function MermaidDiagram({ diagram, onError }) {
   const [svg, setSvg] = useState(null);
   const [failed, setFailed] = useState(false);
+  const [fullscreen, setFullscreen] = useState(false);
   const onErrorRef = useRef(onError);
   onErrorRef.current = onError;
+
+  useEffect(() => {
+    if (!fullscreen) return;
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") setFullscreen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [fullscreen]);
 
   useEffect(() => {
     if (!diagram) {
@@ -65,9 +76,39 @@ export default function MermaidDiagram({ diagram, onError }) {
   }
 
   return (
-    <div
-      className="bg-white border border-gray-100 rounded-2xl p-4 overflow-x-auto [&_svg]:mx-auto"
-      dangerouslySetInnerHTML={{ __html: svg }}
-    />
+    <>
+      <button
+        type="button"
+        onClick={() => setFullscreen(true)}
+        className="group relative w-full bg-white border border-gray-100 rounded-2xl p-4 overflow-x-auto [&_svg]:mx-auto cursor-zoom-in text-left"
+        title="Click to view full screen"
+      >
+        <div dangerouslySetInnerHTML={{ __html: svg }} />
+        <div className="absolute top-2 right-2 bg-white/90 border border-gray-100 rounded-lg p-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+          <Maximize2 size={14} className="text-gray-500" />
+        </div>
+      </button>
+
+      {fullscreen && (
+        <div
+          className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-6"
+          onClick={() => setFullscreen(false)}
+        >
+          <button
+            type="button"
+            onClick={() => setFullscreen(false)}
+            className="absolute top-4 right-4 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 rounded-full p-2 transition-colors"
+            title="Close"
+          >
+            <X size={20} />
+          </button>
+          <div
+            className="bg-white rounded-2xl p-6 w-[95vw] max-h-[90vh] overflow-auto [&_svg]:mx-auto"
+            onClick={(e) => e.stopPropagation()}
+            dangerouslySetInnerHTML={{ __html: svg }}
+          />
+        </div>
+      )}
+    </>
   );
 }
