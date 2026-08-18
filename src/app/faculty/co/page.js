@@ -159,6 +159,10 @@ export default function SavedResult() {
             `/api/subjects/faculty`,
             {
               withCredentials: true,
+              // Default server-side limit is 10 — a faculty with subjects
+              // across several batches/semesters can easily exceed that,
+              // silently dropping older batches from this picker.
+              params: { limit: 500 },
             }
           );
 
