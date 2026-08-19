@@ -113,6 +113,13 @@ export default function SavedResult() {
         { withCredentials: true }
       );
 
+      if (kickoff.data?.token_warnings?.length) {
+        toast(
+          "Your institute is running low on AI tokens — contact your administrator to top up soon.",
+          { icon: "⚠️" },
+        );
+      }
+
       const jobId = kickoff.data?.job_id;
       if (!jobId) throw new Error("Server did not return a job_id");
 

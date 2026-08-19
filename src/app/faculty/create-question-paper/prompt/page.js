@@ -489,8 +489,15 @@ export default function QuestionPaperGenerator() {
           headers: { "Content-Type": "multipart/form-data" },
         },
       );
-      const { jobId } = startRes.data;
+      const { jobId, token_warnings } = startRes.data;
       if (!jobId) throw new Error("No jobId returned from server.");
+
+      if (token_warnings?.length) {
+        toast(
+          "Your institute is running low on AI tokens — contact your administrator to top up soon.",
+          { icon: "⚠️" },
+        );
+      }
 
       // Polling loop
       const result = await new Promise((resolve, reject) => {

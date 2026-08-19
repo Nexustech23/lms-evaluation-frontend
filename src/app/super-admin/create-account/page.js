@@ -241,6 +241,10 @@ const Register = () => {
   const [color, setColor] = useState("#FF7F10");
   const [accountData, setAccountData] = useState(null);
   const [instituteData, setInstituteData] = useState(null);
+  const [tokenLimit, setTokenLimit] = useState(null); // { gemini, claude } | null = unlimited
+  const [tokenUsage, setTokenUsage] = useState(null);
+  const [geminiLimitInput, setGeminiLimitInput] = useState("");
+  const [claudeLimitInput, setClaudeLimitInput] = useState("");
 
   const { user } = useContext(AuthContext);
 
@@ -299,6 +303,13 @@ const Register = () => {
         setHasCOAccess(data.hasCOAccess ?? inst.hasCOAccess ?? false);
         setHasQPGAccess(data.hasQPGAccess ?? inst.hasQPGAccess ?? false);
         setIs_active(inst.is_active ?? true);
+
+        // token_limit is absent entirely for institutes onboarded before
+        // this feature existed — that means unlimited, not zero.
+        setTokenLimit(inst.token_limit ?? null);
+        setTokenUsage(inst.token_usage ?? null);
+        setGeminiLimitInput(inst.token_limit?.gemini ?? "");
+        setClaudeLimitInput(inst.token_limit?.claude ?? "");
       } catch (err) {
         setError(err.message);
       } finally {
@@ -349,6 +360,15 @@ const Register = () => {
 
     try {
       if (isEditMode) {
+        // Blank input = "leave as-is", so only send a limit if the
+        // superadmin actually typed a value into that field.
+        if (geminiLimitInput !== "") {
+          institutePayload.gemini_token_limit = parseInt(geminiLimitInput, 10);
+        }
+        if (claudeLimitInput !== "") {
+          institutePayload.claude_token_limit = parseInt(claudeLimitInput, 10);
+        }
+
         // PUT /institute/:id
         const res = await fetch(
           `/api/institute/${instituteId}`,
@@ -358,7 +378,7 @@ const Register = () => {
             credentials: "include",
             body: JSON.stringify({ hasCOAccess, hasQPGAccess,   institute: {
     ...institutePayload,
-    color, 
+    color,
   } }),
           }
         );
@@ -600,6 +620,51 @@ const Register = () => {
 
   </div>
 </div>
+                  {/* Token Limits (edit mode only — new institutes get the default automatically) */}
+                  {isEditMode && (
+                    <div>
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+                        AI Token Limits
+                      </p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        <div className="space-y-1">
+                          <label className="block text-sm font-medium text-gray-700">Gemini Token Limit</label>
+                          <input
+                            type="number"
+                            min="0"
+                            value={geminiLimitInput}
+                            onChange={(e) => setGeminiLimitInput(e.target.value)}
+                            placeholder="Unlimited"
+                            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400/50 focus:border-orange-400 transition"
+                          />
+                          <p className="text-xs text-gray-400">
+                            Used so far: {(tokenUsage?.gemini?.total_tokens ?? 0).toLocaleString()}
+                            {tokenLimit?.gemini != null && ` of ${tokenLimit.gemini.toLocaleString()}`}
+                          </p>
+                        </div>
+                        <div className="space-y-1">
+                          <label className="block text-sm font-medium text-gray-700">Claude Token Limit</label>
+                          <input
+                            type="number"
+                            min="0"
+                            value={claudeLimitInput}
+                            onChange={(e) => setClaudeLimitInput(e.target.value)}
+                            placeholder="Unlimited"
+                            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400/50 focus:border-orange-400 transition"
+                          />
+                          <p className="text-xs text-gray-400">
+                            Used so far: {(tokenUsage?.claude?.total_tokens ?? 0).toLocaleString()}
+                            {tokenLimit?.claude != null && ` of ${tokenLimit.claude.toLocaleString()}`}
+                          </p>
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-2">
+                        Leave a field blank to keep its current setting. An empty limit means unlimited usage.
+                        Setting a new value replaces the total limit — it does not reset tokens already used.
+                      </p>
+                    </div>
+                  )}
+
                   {/* CO Access */}
                   <Toggle
                     checked={hasCOAccess}

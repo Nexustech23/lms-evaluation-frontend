@@ -20,6 +20,39 @@ const BillingPage = () => {
 
   const router = useRouter();
 
+  /* ================= TOKEN DISPLAY ================= */
+
+  const WARNING_RATIO = 0.05;
+
+  const renderTokenCell = (used, limit, remaining) => {
+    if (limit == null) {
+      return (
+        <span>
+          {used.toLocaleString()} <span className="text-gray-400 text-xs">· Unlimited</span>
+        </span>
+      );
+    }
+
+    const isExhausted = remaining <= 0;
+    const isLow = !isExhausted && remaining <= limit * WARNING_RATIO;
+
+    return (
+      <span
+        className={
+          isExhausted
+            ? "text-red-600 font-semibold"
+            : isLow
+            ? "text-amber-600 font-semibold"
+            : ""
+        }
+      >
+        {used.toLocaleString()} / {limit.toLocaleString()}
+        {isExhausted && <span className="ml-1 text-xs">(limit reached)</span>}
+        {isLow && <span className="ml-1 text-xs">(low)</span>}
+      </span>
+    );
+  };
+
   /* ================= FETCH ================= */
 
   const fetchInstitutes = async (page = 1) => {
@@ -198,8 +231,8 @@ const BillingPage = () => {
                       <th className="p-3 text-left">Institute Name</th>
                       <th className="p-3 text-left">Institute Email</th>
                       <th className="p-3 text-left">Joined At</th>
-                      <th className="p-3 text-left">Gemini Tokens</th>
-                      <th className="p-3 text-left">Claude Tokens</th>
+                      <th className="p-3 text-left">Gemini Tokens (Used/Limit)</th>
+                      <th className="p-3 text-left">Claude Tokens (Used/Limit)</th>
                       <th className="p-3 text-left">Status</th>
                       <th className="p-3 text-left">Update Institute</th>
                     </tr>
@@ -234,11 +267,19 @@ const BillingPage = () => {
                           </td>
 
                           <td className="p-3">
-                            {item.gemini_total_tokens}
+                            {renderTokenCell(
+                              item.gemini_total_tokens,
+                              item.gemini_token_limit,
+                              item.gemini_tokens_remaining
+                            )}
                           </td>
 
                           <td className="p-3">
-                            {item.claude_total_tokens}
+                            {renderTokenCell(
+                              item.claude_total_tokens,
+                              item.claude_token_limit,
+                              item.claude_tokens_remaining
+                            )}
                           </td>
 
                           <td className="p-3">
