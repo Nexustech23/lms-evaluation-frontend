@@ -17,9 +17,7 @@ export function AuthProvider({ children }) {
 
       setUser(res.data.user);
     } catch (err) {
-      console.log("ERROR:", err);
-      // Temp mock user for visual testing: role 7 = self-learner
-      setUser({ role: 7, name: "Test Learner", color: "#6C63FF" });
+      setUser(null);
     } finally {
       setLoading(false);
     }
