@@ -32,6 +32,7 @@ import VarkDifficultyPicker from "../roadmap/components/VarkDifficultyPicker";
 import MermaidDiagram from "../roadmap/components/MermaidDiagram";
 import HandsOnTaskPanel from "../roadmap/components/HandsOnTaskPanel";
 import ResourcesPanel from "../roadmap/components/ResourcesPanel";
+import InteractiveLessonRenderer from "./components/InteractiveLessonRenderer";
 
 // ─── Read-aloud (browser Web Speech API — no backend/API cost) ───────────────
 
@@ -46,6 +47,38 @@ function notesToSpeechText(notes) {
   if (notes.commonMistakes?.length) parts.push("Common mistakes.", ...notes.commonMistakes);
   if (notes.interviewTips?.length) parts.push("Interview tips.", ...notes.interviewTips);
   if (notes.revisionChecklist?.length) parts.push("Revision checklist.", ...notes.revisionChecklist);
+  if (notes.interactiveLesson?.blocks?.length) {
+    const lesson = notes.interactiveLesson;
+    parts.push(
+      lesson.title,
+      lesson.mission?.goal,
+      lesson.mission?.whyItMatters,
+      ...(lesson.learningOutcomes || []),
+      ...(lesson.keyTerms || []).flatMap((item) => [item.term, item.meaning]),
+      lesson.anchorExample?.context,
+      lesson.anchorExample?.whyChosen,
+      lesson.visualAid?.title,
+      lesson.visualAid?.purpose,
+      lesson.visualAid?.caption,
+      ...(lesson.visualAid?.columnHeaders || []),
+      ...(lesson.visualAid?.rows || []).flatMap((row) => [row.label, ...(row.values || [])]),
+      ...(lesson.visualAid?.items || []).flatMap((item) => [item.label, item.value, item.description]),
+    );
+    notes.interactiveLesson.blocks.forEach((block) => {
+      parts.push(
+        block.title,
+        block.simpleExplanation,
+        block.whyItMatters,
+        block.analogy,
+        block.explanation,
+        block.scenario,
+        block.purpose,
+        block.question,
+        block.conclusion,
+        block.outcome,
+      );
+    });
+  }
   return parts.filter(Boolean).join(". ");
 }
 
@@ -88,7 +121,30 @@ const markdownComponents = {
   li: ({ node, ...props }) => <li className="mb-1" {...props} />
 };
 
-function AINotesDisplay({ notes, isCompleted, onToggleComplete, onDiagramError }) {
+function DetailedExplanationContent({ explanation }) {
+  return Array.isArray(explanation) ? (
+    <div className="space-y-5">
+      {explanation.map((section, index) => (
+        <div key={index}>
+          {section.heading && (
+            <h5 className="text-xs font-black text-[#1E1B4B] uppercase tracking-wide mb-1.5 border-b border-gray-100 pb-1">
+              {section.heading}
+            </h5>
+          )}
+          <div className="text-xs text-slate-700 leading-relaxed font-medium whitespace-pre-wrap">
+            <ReactMarkdown components={markdownComponents}>{section.content}</ReactMarkdown>
+          </div>
+        </div>
+      ))}
+    </div>
+  ) : (
+    <div className="text-xs text-slate-700 leading-relaxed font-medium whitespace-pre-wrap">
+      <ReactMarkdown components={markdownComponents}>{explanation}</ReactMarkdown>
+    </div>
+  );
+}
+
+function AINotesDisplay({ notes, isCompleted, onToggleComplete, onDiagramError, lessonStorageKey }) {
   const [compliment, setCompliment] = useState("");
   const { speaking, speak, stop } = useReadAloud();
 
@@ -135,35 +191,36 @@ function AINotesDisplay({ notes, isCompleted, onToggleComplete, onDiagramError }
       )}
 
       {/* Hands-On Task (Kinesthetic-dominant notes only) */}
-      <HandsOnTaskPanel task={notes.handsOnTask} />
+      {(!notes.interactiveLesson?.schemaVersion || notes.interactiveLesson.schemaVersion < 3) && <HandsOnTaskPanel task={notes.handsOnTask} />}
+
+      {/* Validated, domain-aware guided lesson (v4 adds structured visuals) */}
+      <InteractiveLessonRenderer
+        key={lessonStorageKey}
+        lesson={notes.interactiveLesson}
+        storageKey={lessonStorageKey}
+      />
 
       {/* Detailed Explanation */}
       {notes.detailedExplanation && (
-        <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-xs">
-          <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-4">
-            Detailed Explanation
-          </span>
-          {Array.isArray(notes.detailedExplanation) ? (
-            <div className="space-y-5">
-              {notes.detailedExplanation.map((section, i) => (
-                <div key={i}>
-                  {section.heading && (
-                    <h5 className="text-xs font-black text-[#1E1B4B] uppercase tracking-wide mb-1.5 border-b border-gray-100 pb-1">
-                      {section.heading}
-                    </h5>
-                  )}
-                  <div className="text-xs text-slate-700 leading-relaxed font-medium whitespace-pre-wrap">
-                    <ReactMarkdown components={markdownComponents}>{section.content}</ReactMarkdown>
-                  </div>
-                </div>
-              ))}
+        notes.interactiveLesson?.schemaVersion >= 3 ? (
+          <details className="group bg-white border border-gray-100 rounded-2xl p-5 shadow-xs">
+            <summary className="cursor-pointer list-none flex items-center justify-between gap-3">
+              <span>
+                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Deep Reading</span>
+                <span className="text-xs font-semibold text-slate-500 mt-1 block">Open the complete reference notes when you want more detail.</span>
+              </span>
+              <ChevronDown size={16} className="text-[#6C63FF] transition-transform group-open:rotate-180" />
+            </summary>
+            <div className="mt-5 border-t border-gray-100 pt-5">
+              <DetailedExplanationContent explanation={notes.detailedExplanation} />
             </div>
-          ) : (
-            <div className="text-xs text-slate-700 leading-relaxed font-medium whitespace-pre-wrap">
-              <ReactMarkdown components={markdownComponents}>{notes.detailedExplanation}</ReactMarkdown>
-            </div>
-          )}
-        </div>
+          </details>
+        ) : (
+          <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-xs">
+            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-4">Detailed Explanation</span>
+            <DetailedExplanationContent explanation={notes.detailedExplanation} />
+          </div>
+        )
       )}
 
       {/* Key Points */}
@@ -642,7 +699,11 @@ function LearningLoungeContent() {
         setNoteMeta({ style: res.style, difficulty: res.difficulty });
       } catch (err) {
         console.error("Failed to fetch notes", err);
-        setNotesError(err?.response?.data?.error || "Failed to generate notes. Try again.");
+        setNotesError(
+          err?.response?.data?.detail ||
+          err?.response?.data?.error ||
+          "Failed to load notes. Try again."
+        );
       } finally {
         setNotesLoading(false);
       }
@@ -987,7 +1048,7 @@ function LearningLoungeContent() {
                           Guru is generating your study notes…
                         </p>
                         <p className="text-xs text-gray-400 font-semibold mt-1">
-                          This takes ~10 seconds on first load. Notes are cached after that.
+                          A new guided lesson can take 1–2 minutes. It loads quickly from cache after that.
                         </p>
                       </div>
                     </div>
@@ -996,7 +1057,12 @@ function LearningLoungeContent() {
                       <p className="text-xs font-bold text-red-600">⚠️ {notesError}</p>
                       <button
                         onClick={() => {
-                          forceRegenerateRef.current = true;
+                          // Retry the request normally so a generation that
+                          // finished after a dropped connection can be read
+                          // from cache. Explicit regeneration is reserved for
+                          // a known-invalid generated artifact (for example,
+                          // the Mermaid repair path below).
+                          forceRegenerateRef.current = false;
                           setRetryTick((t) => t + 1);
                         }}
                         className="bg-red-500 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-red-600 transition"
@@ -1011,6 +1077,7 @@ function LearningLoungeContent() {
                         isCompleted={isCompleted}
                         onToggleComplete={handleToggleComplete}
                         onDiagramError={handleDiagramError}
+                        lessonStorageKey={`${roadmapId}:${weekNum}:${subIdx}`}
                       />
                     </div>
                   ) : null}
