@@ -36,7 +36,7 @@ function Privacy() {
                 <li>Visitors who access our website, pricing page, contact page, demo page, or public pages;</li>
                 <li>Institutes and institutional administrators;</li>
                 <li>Faculty, instructors, tutors, and evaluators;</li>
-                <li>Students, self-learners, and other end users;</li>
+                <li>Students, MyCareerGuru learners, and other end users;</li>
                 <li>Users who upload, generate, evaluate, review, download, or manage academic content through grAdelytics.</li>
               </ul>
               <p>Where grAdelytics is provided to an institution, the institution may be the primary controller of student, faculty, course, assessment, and academic data. NexusTech processes such data to provide, maintain, secure, and improve the grAdelytics service.</p>
@@ -55,7 +55,7 @@ function Privacy() {
               <p>We collect only the information needed to operate grAdelytics and provide academic evaluation, learning, reporting, and administration features.</p>  
               <div className='flex flex-col gap-3'>
                 <h1 className='font-[600] text-xl'>Account and Identity Information</h1>
-                <p>When accounts are created or managed, we may collect: (i) Full name: (ii) Email address; (iii) Password or password-related credentials; (iv) Role, such as super admin, institute admin, faculty, tutor, student, or self-learner; (v) Phone number; (vi) Profile Image (vii) Login/session information; (viii) User preferences such as theme color and language.</p>
+                <p>When accounts are created or managed, we may collect: (i) Full name: (ii) Email address; (iii) Password or password-related credentials; (iv) Role, such as super admin, institute admin, faculty, tutor, student, or MyCareerGuru learner; (v) Phone number; (vi) Profile Image (vii) Login/session information; (viii) User preferences such as theme color and language.</p>
               </div>
               <div className='flex flex-col gap-3'>
                 <h1 className='font-[600] text-xl'>Institution and Academic Information</h1>

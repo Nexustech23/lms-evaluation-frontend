@@ -237,6 +237,7 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [hasCOAccess, setHasCOAccess] = useState(false);
   const [hasQPGAccess, setHasQPGAccess] = useState(false);
+  const [hasMyCareerGuruAccess, setHasMyCareerGuruAccess] = useState(false);
   const [is_active, setIs_active] = useState(true);
   const [color, setColor] = useState("#FF7F10");
   const [accountData, setAccountData] = useState(null);
@@ -302,6 +303,7 @@ const Register = () => {
         
         setHasCOAccess(data.hasCOAccess ?? inst.hasCOAccess ?? false);
         setHasQPGAccess(data.hasQPGAccess ?? inst.hasQPGAccess ?? false);
+        setHasMyCareerGuruAccess(data.hasMyCareerGuruAccess ?? inst.hasMyCareerGuruAccess ?? false);
         setIs_active(inst.is_active ?? true);
 
         // token_limit is absent entirely for institutes onboarded before
@@ -376,7 +378,7 @@ const Register = () => {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
-            body: JSON.stringify({ hasCOAccess, hasQPGAccess,   institute: {
+            body: JSON.stringify({ hasCOAccess, hasQPGAccess, hasMyCareerGuruAccess,   institute: {
     ...institutePayload,
     color,
   } }),
@@ -397,6 +399,7 @@ const Register = () => {
         if (payload.role === "institute") {
           payload.hasCOAccess = hasCOAccess;
           payload.hasQPGAccess = hasQPGAccess;
+          payload.hasMyCareerGuruAccess = hasMyCareerGuruAccess;
           payload.institute =  {
     ...institutePayload,
     color, 
@@ -678,6 +681,13 @@ const Register = () => {
                     onChange={(e) => setHasQPGAccess(e.target.checked)}
                     label="Question Paper Generate Access"
                     description="Grant Question Paper Generate access to this institute account"
+                  />
+                  {/* MyCareerGuru Access */}
+                  <Toggle
+                    checked={hasMyCareerGuruAccess}
+                    onChange={(e) => setHasMyCareerGuruAccess(e.target.checked)}
+                    label="MyCareerGuru Access"
+                    description="Allow this institute to enable MyCareerGuru per school for its students"
                   />
                      {/*Deactivate university as well as all faculty under it*/}
                   <Toggle

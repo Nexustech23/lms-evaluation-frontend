@@ -48,6 +48,7 @@ export default function SchoolsPage() {
         description: "",
         established_year: "",
         image_url: "",
+        mycareerguru_enabled: false,
     });
 
     /* ================= FETCH SCHOOLS ================= */
@@ -120,6 +121,7 @@ export default function SchoolsPage() {
             description: "",
             established_year: "",
             image_url: "",
+            mycareerguru_enabled: false,
         });
         setShowModal(true);
     };
@@ -134,6 +136,7 @@ export default function SchoolsPage() {
             description: school.description || "",
             established_year: school.established_year || "",
             image_url: school.image_url || "",
+            mycareerguru_enabled: school.mycareerguru_enabled || false,
         });
         setShowModal(true);
     };
@@ -926,6 +929,33 @@ export default function SchoolsPage() {
                                     }}
                                 />
                             </div>
+
+                            {/* MyCareerGuru per-school toggle — only shown once Super Admin has
+                                granted the institute-wide MyCareerGuru flag; a school can't be
+                                enabled individually if the institute itself doesn't have access. */}
+                            {user?.hasMyCareerGuruAccess && (
+                                <div className="flex items-center justify-between p-3 border rounded-lg bg-gray-50">
+                                    <div>
+                                        <p className="text-sm font-medium text-gray-700">MyCareerGuru Access</p>
+                                        <p className="text-xs text-gray-400 mt-0.5">
+                                            Let students of this school use MyCareerGuru (roadmaps, self-review, Test Engine)
+                                        </p>
+                                    </div>
+                                    <label className="relative inline-flex items-center cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={formData.mycareerguru_enabled}
+                                            onChange={(e) => handleChange("mycareerguru_enabled", e.target.checked)}
+                                            className="sr-only peer"
+                                        />
+                                        <div
+                                            className="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-colors relative
+                                                after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full
+                                                after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-5"
+                                        />
+                                    </label>
+                                </div>
+                            )}
                         </div>
 
                         {/* Modal Footer */}

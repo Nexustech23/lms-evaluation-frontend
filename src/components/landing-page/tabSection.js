@@ -155,7 +155,7 @@ function TabSection() {
           </h2>
 
           <p className="text-gray-600 text-lg mt-6 max-w-3xl mx-auto leading-relaxed">
-            Whether you are an institute, tutor, or self-learner, grAdelytics
+            Whether you are an institute, tutor, or a MyCareerGuru learner, grAdelytics
             provides AI-powered tools to simplify teaching, evaluation, and
             learning.
           </p>

@@ -6,6 +6,31 @@ import Navbar from "@/components/ui/Navbar";
 import Spinner from "@/components/ui/Spinner";
 import { AuthContext } from "@/app/AuthContext";
 
+const AI_USAGE_FEATURE_LABELS = {
+  roadmap_curriculum: "Roadmap Generation",
+  roadmap_pre_assessment: "Pre-Assessment Quiz",
+  roadmap_notes: "Roadmap Notes (VARK)",
+  roadmap_resources: "Learning Resources",
+  roadmap_quiz_generate: "Week Quiz Generation",
+  roadmap_quiz_grading: "Week Quiz Grading",
+  roadmap_practice_questions: "Practice Questions",
+  roadmap_practice_evaluate: "Practice Answer Evaluation",
+  roadmap_diagram_repair: "Concept Diagram Repair",
+  self_review_homework_help: "Homework Help",
+  self_review_homework_extraction: "Homework File Reading",
+  self_review_notes: "AI Notes",
+  self_review_notes_extraction: "AI Notes File Reading",
+  test_engine_generate: "Test Engine — Question Generation",
+  test_engine_grading: "Test Engine — Grading",
+  detailed_feedback: "Detailed Feedback",
+  rag_ingest_extraction: "Course Material Reading",
+  rag_embedding: "Course Material Indexing",
+  rag_summarize: "Course Material Summarizing",
+  rag_retrieve: "Course Material Search",
+};
+
+const aiUsageFeatureLabel = (feature) => AI_USAGE_FEATURE_LABELS[feature] || feature;
+
 const UserProfile = () => {
   const { user } = useContext(AuthContext);
   const router = useRouter();
@@ -16,6 +41,9 @@ const UserProfile = () => {
     fullName: "", email: "", profileImage: { url: defaultAvatar }, sessions: [], faculty_profile: null
   });
   const [activeTab, setActiveTab] = useState("profile");
+  const [aiUsage, setAiUsage] = useState(null);
+  const [aiUsageLoading, setAiUsageLoading] = useState(false);
+  const [aiUsageError, setAiUsageError] = useState("");
   const [passwordData, setPasswordData] = useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
   const [showPass, setShowPass] = useState({ current: false, new: false, confirm: false });
   const [error, setError] = useState("");
@@ -84,6 +112,25 @@ const UserProfile = () => {
       if (err.response?.status === 401) router.push('/');
     } finally {
       setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === "usage" && !aiUsage && !aiUsageLoading) {
+      fetchAiUsage();
+    }
+  }, [activeTab]);
+
+  const fetchAiUsage = async () => {
+    setAiUsageLoading(true);
+    setAiUsageError("");
+    try {
+      const res = await axios.get(`/api/self-learner/analytics/ai-usage`, { withCredentials: true });
+      setAiUsage(res.data);
+    } catch (err) {
+      setAiUsageError("Failed to load AI usage. Please try again.");
+    } finally {
+      setAiUsageLoading(false);
     }
   };
 
@@ -246,7 +293,7 @@ const UserProfile = () => {
 
           {/* Tab Navigation */}
           <div className="flex border-b">
-            {["profile", "edit", "password"].map(tab => (
+            {["profile", "edit", "password", "usage"].map(tab => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -256,7 +303,7 @@ const UserProfile = () => {
                   }`}
                 style={activeTab === tab ? { color: user?.color, borderBottomColor: user?.color } : {}}
               >
-                {tab === "profile" ? "👤 Profile" : tab === "edit" ? "✏️ Edit" : "🔒 Password"}
+                {tab === "profile" ? "👤 Profile" : tab === "edit" ? "✏️ Edit" : tab === "password" ? "🔒 Password" : "🤖 AI Usage"}
               </button>
             ))}
           </div>
@@ -577,6 +624,64 @@ const UserProfile = () => {
                   </button>
                 </div>
               </form>
+            )}
+
+            {/* ===== AI USAGE TAB ===== */}
+            {activeTab === "usage" && (
+              <div className="space-y-5">
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Your AI Usage</p>
+
+                {aiUsageError && <Alert type="error" message={aiUsageError} />}
+
+                {aiUsageLoading && (
+                  <div className="flex justify-center py-10"><Spinner /></div>
+                )}
+
+                {!aiUsageLoading && aiUsage && aiUsage.byFeature.length === 0 && (
+                  <p className="text-sm text-gray-500 py-6 text-center">
+                    No AI usage yet — this fills in as you use roadmap generation, self-review, and Test Engine.
+                  </p>
+                )}
+
+                {!aiUsageLoading && aiUsage && aiUsage.byFeature.length > 0 && (
+                  <>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="bg-gray-50 rounded-lg p-3">
+                        <p className="text-xs text-gray-400 font-medium">Total Tokens</p>
+                        <p className="text-lg text-gray-800 font-bold mt-0.5">
+                          {aiUsage.totals.total_tokens.toLocaleString()}
+                        </p>
+                      </div>
+                      <div className="bg-gray-50 rounded-lg p-3">
+                        <p className="text-xs text-gray-400 font-medium">Estimated Cost</p>
+                        <p className="text-lg text-gray-800 font-bold mt-0.5">
+                          ${aiUsage.totals.cost_usd.toFixed(4)}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2 max-h-96 overflow-y-auto">
+                      {aiUsage.byFeature.map(row => (
+                        <div key={row.feature} className="flex items-center justify-between p-2.5 bg-gray-50 rounded-lg border">
+                          <div>
+                            <p className="text-sm font-medium text-gray-700">{aiUsageFeatureLabel(row.feature)}</p>
+                            <p className="text-xs text-gray-400 mt-0.5">
+                              {row.call_count} call{row.call_count === 1 ? "" : "s"} · {row.total_tokens.toLocaleString()} tokens
+                            </p>
+                          </div>
+                          <p className="text-sm font-semibold" style={{ color: user?.color }}>
+                            ${row.cost_usd.toFixed(4)}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+
+                    <p className="text-xs text-gray-400 text-center pt-2">
+                      Costs are internal estimates based on provider list pricing, not a bill.
+                    </p>
+                  </>
+                )}
+              </div>
             )}
           </div>
         </div>

@@ -15,6 +15,11 @@ const PUBLIC_ROUTES = [
   "/faq",
 ];
 
+// Prefix match, not exact — everything under /mycareerguru (landing, login,
+// register, and any future page added there) is public by design, unlike
+// PUBLIC_ROUTES above which is deliberately exact-match for single pages.
+const PUBLIC_ROUTE_PREFIXES = ["/mycareerguru"];
+
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useContext(AuthContext);
 
@@ -27,7 +32,7 @@ const ProtectedRoute = ({ children }) => {
     if (loading) return;
 
     // Public routes
-    if (PUBLIC_ROUTES.includes(pathname)) {
+    if (PUBLIC_ROUTES.includes(pathname) || PUBLIC_ROUTE_PREFIXES.some((p) => pathname.startsWith(p))) {
       setAuthorized(true);
       return;
     }

@@ -99,7 +99,7 @@ const Signup = ({ close, openLogin }) => {
               </h1>
 
               <p className="text-white/85 text-lg leading-relaxed mt-6 max-w-md">
-                AI powered ecosystem for institutes, tutors, and self learners
+                AI powered ecosystem for institutes, tutors, and MyCareerGuru learners
                 with smart analytics, evaluations, and learning tools.
               </p>
             </div>

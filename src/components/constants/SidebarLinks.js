@@ -82,6 +82,16 @@ export const getSidebarLinks = (role, user, t) => {
           href: "/super-admin/query-management",
           icon: <IconInbox />,
         },
+        {
+          label: "AI Usage",
+          href: "/super-admin/ai-usage",
+          icon: <IconChartPie />,
+        },
+        {
+          label: "MyCareerGuru Accounts",
+          href: "/super-admin/self-learners",
+          icon: <IconUsers />,
+        },
       ]
       : []),
 
@@ -262,6 +272,17 @@ export const getSidebarLinks = (role, user, t) => {
           label: "Result",
           icon: <IconClipboardText />,
           href: "/institute-student/results",
+        },
+        // Only reachable once Super Admin has enabled MyCareerGuru for this
+        // institute AND the institute admin has enabled it for this
+        // student's specific school (see app.api.deps.can_use_mycareerguru
+        // on the backend) — the link itself is always shown; the backend
+        // gate is what actually enforces access on every API call once
+        // inside.
+        {
+          label: "MyCareerGuru",
+          href: "/self-learner/dashboard",
+          icon: <IconRobot />,
         },
       ]
       : []),

@@ -4,8 +4,8 @@ import ProtectedRoute from "../admin/protected_routes";
 import { SidebarDemo } from "@/components/sidebar";
 
 export const metadata = {
-  title: "grAdelytIcs",
-  description: "AI-Powered Evaluation Management System",
+  title: "MyCareerGuru",
+  description: "AI-powered personalized learning roadmaps, self-review, and practice tests",
   icons: {
     icon: "/pics/Logo5.png",
   },
