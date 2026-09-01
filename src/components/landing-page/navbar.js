@@ -26,7 +26,7 @@ function Navbar() {
     return (
         <>
             {/* Floating Frosted Glass Navbar */}
-            <nav className="fixed top-0 left-0 right-0 z-50 px-4 pt-4">
+            <nav className="absolute top-0 left-0 right-0 z-50 px-4 pt-4">
                 <div className="max-w-6xl mx-auto">
                     <div className="bg-black/40 backdrop-blur-2xl border border-white/10 rounded-2xl px-6 py-3 flex items-center justify-between shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
 
