@@ -117,10 +117,21 @@ export default function CreateRoadmapPage() {
 
       if (fileToUpload) {
         setGeneratingStep("Uploading document…");
-        const { job_id: uploadJobId } = await uploadCourseMaterial(fileToUpload, payload.subject);
-        const uploadResult = await pollJob(getCourseMaterialUploadStatus, uploadJobId, setGeneratingStep);
-        setDocId(uploadResult.doc_id);
-        finalPayload = { ...payload, doc_id: uploadResult.doc_id };
+        try {
+          const { job_id: uploadJobId } = await uploadCourseMaterial(fileToUpload, payload.subject);
+          const uploadResult = await pollJob(getCourseMaterialUploadStatus, uploadJobId, setGeneratingStep);
+          setDocId(uploadResult.doc_id);
+          finalPayload = { ...payload, doc_id: uploadResult.doc_id };
+        } catch (uploadErr) {
+          // Grounding is a best-effort enhancement, not a prerequisite —
+          // every other AI call site in this app (notes, Auto Test, practice
+          // questions) already falls back to ungrounded generation when the
+          // vector store or a document lookup is unavailable. Course-material
+          // upload failing (e.g. Qdrant unreachable) shouldn't block roadmap
+          // creation itself; just proceed without grounding.
+          console.warn("Course material upload/indexing failed — continuing without grounding", uploadErr);
+          setGeneratingStep("Course material unavailable — generating without it…");
+        }
       }
 
       setGeneratingStep("Generating curriculum with AI…");

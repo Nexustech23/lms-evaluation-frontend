@@ -12,6 +12,13 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
 
+  experimental: {
+    // Next's rewrite proxy defaults to a 10MB request body cap, which silently
+    // truncates larger course-material uploads before they reach FastAPI,
+    // causing the backend to drop the connection (ECONNRESET / "socket hang up").
+    proxyClientMaxBodySize: "50mb",
+  },
+
   async rewrites() {
     const API_URL = process.env.API_URL || "http://127.0.0.1:5050";
     return [
