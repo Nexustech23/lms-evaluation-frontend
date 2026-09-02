@@ -17,6 +17,7 @@ import { AuthContext } from "@/app/AuthContext";
 import { STAGES } from "@/lib/question-paper/constants";
 import { withAlpha, darkenColor } from "@/lib/question-paper/colorHelpers";
 import { buildPreviewHtml } from "@/lib/question-paper/previewBuilder";
+import { nextPollDelay } from "@/lib/pollBackoff";
 
 import Navbar from "@/components/ui/Navbar";
 import FilterBar from "@/components/question-paper/FilterBar";
@@ -499,13 +500,17 @@ export default function QuestionPaperGenerator() {
         );
       }
 
-      // Polling loop
+      // Polling loop — exponential backoff (Phase 5.2), 5-minute wall-clock
+      // deadline (was 120 * 2.5s fixed).
       const result = await new Promise((resolve, reject) => {
-        let attempts = 0;
-        const timer = setInterval(async () => {
-          attempts++;
-          if (attempts > 120) {
-            clearInterval(timer);
+        const startedAt = Date.now();
+        let delay = 0;
+        const schedule = () => {
+          delay = nextPollDelay(delay);
+          setTimeout(tick, delay);
+        };
+        const tick = async () => {
+          if (Date.now() - startedAt > 300000) {
             reject(new Error("Generation timed out."));
             return;
           }
@@ -517,22 +522,25 @@ export default function QuestionPaperGenerator() {
             const job = pollRes.data;
             if (job.step) setGenerationStep(job.step);
             if (job.status === "completed") {
-              clearInterval(timer);
               resolve(job);
             } else if (job.status === "failed") {
-              clearInterval(timer);
               reject(new Error(job.error || "Generation failed."));
+            } else {
+              schedule();
             }
           } catch (pollErr) {
             if (
               pollErr?.response?.status >= 400 &&
               pollErr?.response?.status < 500
             ) {
-              clearInterval(timer);
               reject(pollErr);
+              return;
             }
+            // transient (5xx / network) — keep polling
+            schedule();
           }
-        }, 2500);
+        };
+        schedule();
       });
 
       const {

@@ -3,12 +3,16 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
-import * as XLSX from "xlsx";
 import Navbar from "@/components/ui/Navbar";
 import Spinner from "@/components/ui/Spinner";
 import toast from "react-hot-toast";
 import { useContext } from "react";
 import { AuthContext } from "@/app/AuthContext";
+
+// Lazy-load SheetJS (~500KB) — only pulled in when the user uploads a
+// PO/PSO spreadsheet (Phase 5.3).
+let _xlsxPromise;
+const loadXLSX = () => (_xlsxPromise ||= import("xlsx"));
 
 const Page = () => {
 
@@ -96,8 +100,9 @@ const Page = () => {
 
         const reader = new FileReader();
 
-        reader.onload = (evt) => {
+        reader.onload = async (evt) => {
             try {
+                const XLSX = await loadXLSX();
                 const workbook  = XLSX.read(evt.target.result, { type: "binary" });
                 const sheetName = workbook.SheetNames[0];
                 const sheet     = workbook.Sheets[sheetName];

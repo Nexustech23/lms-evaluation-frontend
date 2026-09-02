@@ -11,8 +11,7 @@ import { useContext } from "react";
 import { AuthContext } from "@/app/AuthContext";
 import { FaArrowLeft } from "react-icons/fa";
 import { useTranslations } from "next-intl";
-
-const POLL_INTERVAL_MS = 4000;
+import { nextPollDelay } from "@/lib/pollBackoff";
 
 function withAlpha(hex = "#ff7f10", alpha = 1) {
   const h = hex.replace("#", "");
@@ -55,9 +54,10 @@ export default function SavedResult() {
 
   const [evaluatingStates, setEvaluatingStates] = useState({});
   const pollingRefs = useRef({});
+  const pollDelayRefs = useRef({});
 
   useEffect(() => {
-    return () => { Object.values(pollingRefs.current).forEach(clearInterval); };
+    return () => { Object.values(pollingRefs.current).forEach(clearTimeout); };
   }, []);
 
   // ─── helpers ─────────────────────────────────────────────────────────────────
@@ -77,9 +77,10 @@ export default function SavedResult() {
 
   const stopPolling = (answerId) => {
     if (pollingRefs.current[answerId]) {
-      clearInterval(pollingRefs.current[answerId]);
+      clearTimeout(pollingRefs.current[answerId]);
       delete pollingRefs.current[answerId];
     }
+    delete pollDelayRefs.current[answerId];
   };
 
   // ─── data fetching ────────────────────────────────────────────────────────────
@@ -125,7 +126,11 @@ export default function SavedResult() {
 
       setEvalState(answerscriptId, { jobId, progress: 5, step: "Job queued…" });
 
-      pollingRefs.current[answerscriptId] = setInterval(async () => {
+      // Recursive setTimeout with exponential backoff (Phase 5.2) — an
+      // "Evaluate All" burst no longer fires one request per script every 4s
+      // for the whole (minutes-long) run. Timer id still lives in
+      // pollingRefs so stopPolling / unmount cleanup cancel it.
+      const pollOnce = async () => {
         try {
           const statusRes = await axios.get(
             `/api/evaluate-answer-script/status/${jobId}`,
@@ -135,6 +140,8 @@ export default function SavedResult() {
 
           if (status === "processing") {
             setEvalState(answerscriptId, { progress: progress ?? 0, step: step ?? "Processing…" });
+            pollDelayRefs.current[answerscriptId] = nextPollDelay(pollDelayRefs.current[answerscriptId]);
+            pollingRefs.current[answerscriptId] = setTimeout(pollOnce, pollDelayRefs.current[answerscriptId]);
             return;
           }
 
@@ -159,7 +166,10 @@ export default function SavedResult() {
           clearEvalState(answerscriptId);
           toast.error(pollErr?.response?.data?.error || pollErr?.message || "Evaluation failed");
         }
-      }, POLL_INTERVAL_MS);
+      };
+
+      pollDelayRefs.current[answerscriptId] = nextPollDelay(0);
+      pollingRefs.current[answerscriptId] = setTimeout(pollOnce, pollDelayRefs.current[answerscriptId]);
     } catch (err) {
       stopPolling(answerscriptId);
       clearEvalState(answerscriptId);
