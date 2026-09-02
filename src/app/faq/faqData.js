@@ -1,7 +1,10 @@
-// Canonical product FAQ — content mirrors
-// .codex-gradelytics/output/Gradelytics_Product_FAQ_A4_Portrait.pdf
-// (22 questions, 5 sections). Replaced the original hand-written
-// 18-question set, which is archived as old_faq.pdf.
+// Canonical product FAQ. Content mirrors
+// .codex-gradelytics/output/Gradelytics_Product_FAQ_A4_Portrait.pdf, plus
+// a "Data & security" and an "Evaluation accuracy & limitations" section
+// answering questions raised in live demos (30 questions, 7 sections).
+// Replaced the original hand-written 18-question set, archived as old_faq.pdf.
+// Every answer here is checked against what the system actually does and
+// against the Terms / Privacy Policy pages.
 
 export const faqSections = [
   {
@@ -19,6 +22,24 @@ export const faqSections = [
       {
         q: "Does Gradelytics replace teachers?",
         a: "No. It works as an academic assistant. AI can prepare drafts, suggestions, explanations and preliminary evaluations, while educators retain responsibility for teaching decisions, feedback, marks and final approval.",
+      },
+    ],
+  },
+  {
+    section: "Data & security",
+    blurb: "Where your academic data lives and who can reach it",
+    items: [
+      {
+        q: "Who can see our institution's data?",
+        a: "Only people inside your institution, and only what their role lets them see. Your data is walled off from every other institution on the platform. No outside institution, faculty or student can reach it.",
+      },
+      {
+        q: "Who owns the academic data?",
+        a: "You do. Student records, submissions, marks, results and transcripts belong to your institution and the people they concern. Gradelytics only processes that data to run the service. We do not own it, and neither do the AI services we use to process it. We may use de-identified, aggregated data to operate and improve the service, as set out in the Privacy Policy.",
+      },
+      {
+        q: "Is student data shared with third parties?",
+        a: "Only with the services needed to actually run the evaluation. ImageKit stores the uploaded scripts and reports, Google's Gemini reads the handwriting into text, and Anthropic's Claude grades it. On the paid plans we use, none of them train their models on your content, none of it is sold, and it is kept only briefly for security checks. Nothing goes anywhere else. Full details are in the Privacy Policy.",
       },
     ],
   },
@@ -45,6 +66,32 @@ export const faqSections = [
       {
         q: "What if an AI output is unsuitable?",
         a: "The user can regenerate content, choose another option or edit the result manually. High-impact outputs such as question papers, evaluations, marks, results and transcripts should always be reviewed by an authorized person.",
+      },
+    ],
+  },
+  {
+    section: "Evaluation accuracy & limitations",
+    blurb: "What the AI can and cannot judge, and how faculty stay in control",
+    items: [
+      {
+        q: "Can Gradelytics get an evaluation wrong? What causes it, and how do we fix it?",
+        a: "Yes, it can. It does not predict future scores; it works only from what is actually on the page. Even so, the first attempt at an evaluation can be off if the handwriting is hard to read, the answer is unusual or ambiguous, it leans on a diagram the system cannot judge, or the rubric is thin. That is why nothing is final until a faculty member has checked it. They can adjust the marks, override any question, or re-run the whole evaluation.",
+      },
+      {
+        q: "How are diagrams, formulas, graphs and ruled tables handled?",
+        a: "It grades from the text of the answer. Formulas and step by step working written out in text are read and marked against the rubric, and it will dock marks for missing steps or derivations the rubric asks for. Diagrams and graphs work differently. The system notes that one is present and can flag when a required diagram is missing, but it does not judge whether the drawing itself is right. For that, add a manual parameter and let faculty score it.",
+      },
+      {
+        q: "If the handwriting is misread, can faculty correct it?",
+        a: "Faculty correct it at the marks stage, not before. The system transcribes the handwriting as it is, without quietly rewriting what the student wrote, and it does not show faculty that raw transcription to edit. What faculty do get is the full result: every question's marks, the score for each parameter, and the feedback, all of which they can change or override before finalising.",
+      },
+      {
+        q: "For parameters like logical reasoning or creativity, what does the AI actually look at? Does it learn from our examples?",
+        a: "It goes by whatever your faculty put in the rubric. For each question the AI gets the question, the student's answer, and your rubric: the parameters and their weights, any guidelines you have written, and the course outcomes. It scores the answer against those, not by hunting for keywords. There is no fixed idea of 'reasoning' or 'creativity' built in; it assesses exactly what your rubric describes. It also does not learn from your data. Every evaluation is judged fresh against the rubric you set.",
+      },
+      {
+        q: "How does handwriting quality affect results?",
+        a: "Neat handwriting transcribes well. Cursive, light pen pressure, smudges and heavy crossing out make it harder, which is part of why every evaluation gets a faculty review. The best way to know how it will do with your students is a short pilot on a sample of your own scripts.",
       },
     ],
   },
