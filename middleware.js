@@ -83,8 +83,20 @@ function decodeUnverified(token) {
   }
 }
 
+let _warnedNoSecret = false;
+
 async function readSession(token) {
   const secret = process.env.JWT_SECRET_KEY;
+  if (!secret && !_warnedNoSecret) {
+    _warnedNoSecret = true;
+    const msg =
+      "[middleware] JWT_SECRET_KEY is not set — the edge auth guard is running in " +
+      "UNVERIFIED decode mode. It still redirects unauthenticated/wrong-role deep links, " +
+      "but a forged cookie is not rejected here (the backend still verifies every API call). " +
+      "Set JWT_SECRET_KEY to the backend's value to make this a verifying boundary.";
+    if (process.env.NODE_ENV === "production") console.error(msg);
+    else console.warn(msg);
+  }
   const payload = secret ? await verifyHS256(token, secret) : decodeUnverified(token);
   if (!payload) return null;
   if (payload.exp && Date.now() / 1000 >= payload.exp) return null;
