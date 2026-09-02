@@ -29,6 +29,13 @@ const FEATURE_LABELS = {
 
 const featureLabel = (feature) => FEATURE_LABELS[feature] || feature;
 
+const PROVIDER_LABELS = {
+  claude: "Claude",
+  gemini: "Gemini",
+};
+
+const providerLabel = (provider) => PROVIDER_LABELS[provider] || provider;
+
 const DAY_OPTIONS = [7, 30, 90];
 
 const AiUsagePage = () => {
@@ -109,6 +116,36 @@ const AiUsagePage = () => {
                   <div className="bg-orange-50 rounded-lg p-4">
                     <p className="text-xs text-gray-500 font-medium">Estimated Cost</p>
                     <p className="text-xl font-bold text-gray-800 mt-1">${data.totals.cost_usd.toFixed(2)}</p>
+                  </div>
+                </div>
+              )}
+
+              {data && data.byProvider && data.byProvider.length > 0 && (
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-3">By Provider</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {data.byProvider.map((row) => (
+                      <div key={row.provider} className="bg-orange-50 rounded-lg p-4 border border-orange-100">
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="text-sm font-bold text-gray-800">{providerLabel(row.provider)}</p>
+                          <p className="text-sm font-semibold text-gray-800">${row.cost_usd.toFixed(4)}</p>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2 text-xs text-gray-600">
+                          <div>
+                            <p className="text-gray-400">Input</p>
+                            <p className="font-semibold text-gray-800">{row.input_tokens.toLocaleString()}</p>
+                          </div>
+                          <div>
+                            <p className="text-gray-400">Output</p>
+                            <p className="font-semibold text-gray-800">{row.output_tokens.toLocaleString()}</p>
+                          </div>
+                          <div>
+                            <p className="text-gray-400">Calls</p>
+                            <p className="font-semibold text-gray-800">{row.call_count.toLocaleString()}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}

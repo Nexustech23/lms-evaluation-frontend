@@ -57,8 +57,11 @@ export default function Page() {
 
     recognition.onstart = () => setIsListening(true);
     recognition.onresult = (event) => {
+      // Rebuild from 0, not event.resultIndex — see notes-generate/page.js's
+      // startListening for why starting mid-session drops every sentence
+      // that already finalized.
       let transcript = "";
-      for (let i = event.resultIndex; i < event.results.length; i++) {
+      for (let i = 0; i < event.results.length; i++) {
         transcript += event.results[i][0].transcript;
       }
       setPrompt(transcript);
