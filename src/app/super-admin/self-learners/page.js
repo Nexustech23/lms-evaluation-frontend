@@ -10,20 +10,34 @@ const STATUS_FILTERS = [
   { value: "active", label: "Active" },
 ];
 
+const SORT_OPTIONS = [
+  { value: "recent", label: "Newest" },
+  { value: "tokens_desc", label: "Most AI Tokens" },
+  { value: "tokens_asc", label: "Least AI Tokens" },
+];
+
+const formatTokens = (usage) => {
+  const input = usage?.input_tokens || 0;
+  const output = usage?.output_tokens || 0;
+  if (!input && !output) return "— / —";
+  return `${input.toLocaleString()} / ${output.toLocaleString()}`;
+};
+
 const SelfLearnersPage = () => {
   const [learners, setLearners] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [status, setStatus] = useState("pending");
+  const [sort, setSort] = useState("recent");
   const [busyId, setBusyId] = useState(null);
   const [pagination, setPagination] = useState({ page: 1, limit: 10, total: 0 });
 
-  const fetchLearners = async (page = 1, statusFilter = status) => {
+  const fetchLearners = async (page = 1, statusFilter = status, sortOption = sort) => {
     try {
       setLoading(true);
       const res = await axios.get(`/api/self-learners`, {
-        params: { page, limit: pagination.limit, status: statusFilter || undefined },
+        params: { page, limit: pagination.limit, status: statusFilter || undefined, sort: sortOption },
         withCredentials: true,
       });
       setLearners(res.data.self_learners || []);
@@ -36,8 +50,8 @@ const SelfLearnersPage = () => {
   };
 
   useEffect(() => {
-    fetchLearners(1, status);
-  }, [status]);
+    fetchLearners(1, status, sort);
+  }, [status, sort]);
 
   useEffect(() => {
     if (error || success) {
@@ -84,7 +98,7 @@ const SelfLearnersPage = () => {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
             <h2 className="text-2xl font-bold text-[#ff7f10]">MyCareerGuru Accounts</h2>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               {STATUS_FILTERS.map((f) => (
                 <button
                   key={f.value}
@@ -96,6 +110,17 @@ const SelfLearnersPage = () => {
                   {f.label}
                 </button>
               ))}
+              <select
+                value={sort}
+                onChange={(e) => setSort(e.target.value)}
+                className="px-3 py-1.5 rounded-md text-sm font-medium border text-gray-600 hover:bg-gray-100 transition"
+              >
+                {SORT_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    Sort: {opt.label}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
@@ -117,6 +142,8 @@ const SelfLearnersPage = () => {
                       <th className="p-3 text-left">Phone</th>
                       <th className="p-3 text-left">Signed Up</th>
                       <th className="p-3 text-left">Status</th>
+                      <th className="p-3 text-right">Claude (In / Out)</th>
+                      <th className="p-3 text-right">Gemini (In / Out)</th>
                       <th className="p-3 text-left">Actions</th>
                     </tr>
                   </thead>
@@ -139,6 +166,8 @@ const SelfLearnersPage = () => {
                               {learner.is_active ? "Active" : "Pending"}
                             </span>
                           </td>
+                          <td className="p-3 text-right text-sm">{formatTokens(learner.token_usage?.claude)}</td>
+                          <td className="p-3 text-right text-sm">{formatTokens(learner.token_usage?.gemini)}</td>
                           <td className="p-3">
                             <div className="flex items-center gap-3">
                               {!learner.is_active ? (
@@ -171,7 +200,7 @@ const SelfLearnersPage = () => {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={6} className="text-center py-10 text-gray-500">
+                        <td colSpan={8} className="text-center py-10 text-gray-500">
                           No MyCareerGuru accounts {status === "pending" ? "pending approval" : "found"}.
                         </td>
                       </tr>
