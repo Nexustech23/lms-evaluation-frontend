@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { X, Maximize2 } from "lucide-react";
+import DOMPurify from "dompurify";
 
 let renderCounter = 0;
 
@@ -49,7 +50,15 @@ export default function MermaidDiagram({ diagram, onError }) {
         mermaid.initialize({ startOnLoad: false, theme: "neutral", securityLevel: "strict" });
         const { svg: renderedSvg } = await mermaid.render(renderId, diagram);
         if (!cancelled) {
-          setSvg(renderedSvg);
+          // `securityLevel: "strict"` already sanitises, but the diagram
+          // source is AI-generated (and steerable via the student's custom
+          // instruction), so scrub the rendered SVG once more before it goes
+          // into dangerouslySetInnerHTML.
+          setSvg(
+            DOMPurify.sanitize(renderedSvg, {
+              USE_PROFILES: { svg: true, svgFilters: true },
+            }),
+          );
           setFailed(false);
         }
       } catch (err) {
