@@ -1,8 +1,21 @@
 "use client";
 
-import { RichEditorPane } from "./RichEditorPane";
+import dynamic from "next/dynamic";
 import { withAlpha, darkenColor } from "@/lib/question-paper/colorHelpers";
 import { useState } from "react";
+
+// RichEditorPane pulls in tiptap + lexical (~200KB+). It only mounts once
+// the user reaches the editor stage of question-paper creation — load it
+// lazily, client-only (Phase 5.3).
+const RichEditorPane = dynamic(
+  () => import("./RichEditorPane").then((m) => m.RichEditorPane),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="animate-pulse bg-gray-50 rounded-b-2xl" style={{ minHeight: 480 }} />
+    ),
+  },
+);
 
 export default function EditorStage({
   color,

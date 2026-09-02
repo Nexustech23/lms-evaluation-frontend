@@ -10,10 +10,15 @@ import {
   IconTable,
   IconUpload,
 } from "@tabler/icons-react";
-import * as XLSX from "xlsx";
 import Navbar from "@/components/ui/Navbar";
 import Spinner from "@/components/ui/Spinner";
 import { AuthContext } from "@/app/AuthContext";
+
+// Lazy-load SheetJS (~500KB) — only needed when the user downloads the
+// template (Phase 5.3). The marks upload itself goes to the backend as a
+// raw file, so nothing else here touches xlsx.
+let _xlsxPromise;
+const loadXLSX = () => (_xlsxPromise ||= import("xlsx"));
 
 
 function withAlpha(hex = "#ff7f10", alpha = 1) {
@@ -301,7 +306,8 @@ export default function ImportMarksExcel() {
     }
   };
 
-  const downloadTranscriptTemplate = () => {
+  const downloadTranscriptTemplate = async () => {
+    const XLSX = await loadXLSX();
     const studentIds = Array.from({ length: 60 }, (_, index) => `Student ${index + 1}`);
     const rows = [];
     for (let semester = 1; semester <= 6; semester += 1) {

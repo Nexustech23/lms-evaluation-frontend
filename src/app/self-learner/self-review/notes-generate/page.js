@@ -7,8 +7,7 @@ import toast from "react-hot-toast";
 import LoadingState from "@/components/question-paper/ai-tutor/LoadingState";
 import OutputPreview from "@/components/question-paper/ai-tutor/OutputPreview";
 import FileUploadBox from "@/components/question-paper/ai-tutor/FileUploadBox";
-
-const POLL_INTERVAL = 3000;
+import { nextPollDelay } from "@/lib/pollBackoff";
 
 export default function Page() {
   const [prompt, setPrompt] = useState("");
@@ -22,6 +21,7 @@ export default function Page() {
 
   const recognitionRef = useRef(null);
   const pollTimerRef = useRef(null);
+  const pollDelayRef = useRef(0);
 
   const loadingSteps = [
     "Uploading study material",
@@ -74,6 +74,7 @@ export default function Page() {
 
   // ── POLLING ──
   const pollJobStatus = (jobId) => {
+    pollDelayRef.current = nextPollDelay(pollDelayRef.current);
     pollTimerRef.current = setTimeout(async () => {
       try {
         const res = await axios.get(
@@ -117,7 +118,7 @@ export default function Page() {
         setLoading(false);
         toast.error("Error checking job status.");
       }
-    }, POLL_INTERVAL);
+    }, pollDelayRef.current);
   };
 
   // ── GENERATE NOTES ──
@@ -154,6 +155,7 @@ export default function Page() {
         throw new Error("Job ID missing.");
       }
 
+      pollDelayRef.current = 0;
       pollJobStatus(jobId);
 
     } catch (error) {

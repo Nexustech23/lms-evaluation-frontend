@@ -3,15 +3,14 @@
 import Navbar from "@/components/ui/Navbar";
 import { useTranslations } from "next-intl";
 import { useState, useContext } from "react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  CartesianGrid,
-} from "recharts";
+import dynamic from "next/dynamic";
+
+// recharts (~150KB) is only needed once this dashboard renders its chart —
+// load it lazily, client-only (Phase 5.3).
+const PerformanceBarChart = dynamic(() => import("./PerformanceBarChart"), {
+  ssr: false,
+  loading: () => <div className="h-full w-full" />,
+});
 
 import {
   Bell,
@@ -492,63 +491,7 @@ const Dashboard = () => {
               </div>
 
               <div className="h-[350px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={data}>
-                    <defs>
-                      <linearGradient
-                        id="barGradient"
-                        x1="0"
-                        y1="0"
-                        x2="0"
-                        y2="1"
-                      >
-                        <stop
-                          offset="0%"
-                          stopColor={user?.color || "#6366f1"}
-                        />
-                        <stop
-                          offset="100%"
-                          stopColor="#8b5cf6"
-                        />
-                      </linearGradient>
-                    </defs>
-
-                    <CartesianGrid
-                      strokeDasharray="4 4"
-                      vertical={false}
-                      stroke="#e5e7eb"
-                    />
-
-                    <XAxis
-                      dataKey="name"
-                      tick={{ fill: "#6b7280", fontSize: 12 }}
-                      axisLine={false}
-                      tickLine={false}
-                    />
-
-                    <YAxis
-                      axisLine={false}
-                      tickLine={false}
-                      tick={{ fill: "#6b7280", fontSize: 12 }}
-                    />
-
-                    <Tooltip
-                      cursor={{ fill: "rgba(99,102,241,0.08)" }}
-                      contentStyle={{
-                        borderRadius: "20px",
-                        border: "none",
-                        boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
-                      }}
-                    />
-
-                    <Bar
-                      dataKey="value"
-                      fill="url(#barGradient)"
-                      radius={[14, 14, 0, 0]}
-                      barSize={45}
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
+                <PerformanceBarChart data={data} barColor={user?.color || "#6366f1"} />
               </div>
             </div>
 

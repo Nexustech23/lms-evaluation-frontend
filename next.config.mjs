@@ -4,6 +4,12 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.js");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Emit a self-contained .next/standalone bundle (server + only the
+  // node_modules actually traced as used). Smaller Docker image and faster
+  // container cold-start; no runtime behaviour change. Deploy runs
+  // `node .next/standalone/server.js` with .next/static + public copied in.
+  output: "standalone",
+
   images: {
     domains: ["assets.aceternity.com"],
   },
