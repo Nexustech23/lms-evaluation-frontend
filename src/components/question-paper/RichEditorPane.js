@@ -9,6 +9,8 @@ import {
   Rows3, Columns3, Maximize2, Plus, Scissors,
 } from "lucide-react";
 
+import DOMPurify from "dompurify";
+
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
@@ -1051,9 +1053,22 @@ function PreviewPane({ html, pageStyle, previewMeta }) {
     ? "1px solid #c8cdd5"
     : `${pageStyle.borderWidth}px ${pageStyle.border} ${pageStyle.borderColor}`;
 
+  // The page HTML is built from editor content (and can carry pasted markup);
+  // scrub scripts / event handlers / javascript: URLs before it ever hits
+  // dangerouslySetInnerHTML. Formatting, tables and inline styles are kept.
+  const safePages = useMemo(
+    () =>
+      pages.map((h) =>
+        typeof window === "undefined"
+          ? ""
+          : DOMPurify.sanitize(h || "", { ADD_TAGS: ["style"], ADD_ATTR: ["target"] }),
+      ),
+    [pages],
+  );
+
   return (
     <div style={{ height: "100%", overflowY: "auto", background: "#d1d5db", padding: "28px 20px" }}>
-      {pages.map((pageHtml, idx) => (
+      {safePages.map((pageHtml, idx) => (
         <div key={idx} style={{
           width: A4_WIDTH_PX,
           minHeight: A4_HEIGHT_PX,
