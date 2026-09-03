@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { X, Maximize2 } from "lucide-react";
-import DOMPurify from "dompurify";
 
 let renderCounter = 0;
 
@@ -47,18 +46,20 @@ export default function MermaidDiagram({ diagram, onError }) {
       try {
         const mermaidModule = await import("mermaid");
         const mermaid = mermaidModule.default;
+        // securityLevel: "strict" is Mermaid's own XSS sanitiser — it strips
+        // <script>, disables click bindings and event handlers, and escapes
+        // label text. That is the sanitisation for the SVG that goes into
+        // dangerouslySetInnerHTML below.
+        //
+        // A prior extra DOMPurify.sanitize() pass was removed: its svg-only
+        // profile also dropped <foreignObject>, which Mermaid uses to hold
+        // node label text, so diagrams rendered as empty boxes. If you want
+        // that belt-and-braces layer back, add `flowchart: { htmlLabels:
+        // false }` here first so labels become native <text> that survives it.
         mermaid.initialize({ startOnLoad: false, theme: "neutral", securityLevel: "strict" });
         const { svg: renderedSvg } = await mermaid.render(renderId, diagram);
         if (!cancelled) {
-          // `securityLevel: "strict"` already sanitises, but the diagram
-          // source is AI-generated (and steerable via the student's custom
-          // instruction), so scrub the rendered SVG once more before it goes
-          // into dangerouslySetInnerHTML.
-          setSvg(
-            DOMPurify.sanitize(renderedSvg, {
-              USE_PROFILES: { svg: true, svgFilters: true },
-            }),
-          );
+          setSvg(renderedSvg);
           setFailed(false);
         }
       } catch (err) {
