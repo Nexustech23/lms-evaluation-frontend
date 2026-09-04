@@ -9,8 +9,12 @@ import {
 } from "react";
 
 import axios from "axios";
-import * as XLSX from "xlsx";
 import toast from "react-hot-toast";
+
+// Lazy-load SheetJS (~500KB) only when the user actually imports/exports a
+// spreadsheet — keeps it out of this route's initial JS (Phase 5.3).
+let _xlsxPromise;
+const loadXLSX = () => (_xlsxPromise ||= import("xlsx"));
 
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -207,7 +211,7 @@ export default function StudentEnrollment() {
     bulkFileInputRef.current?.click();
   };
 
-  const downloadBulkTemplate = () => {
+  const downloadBulkTemplate = async () => {
 
     if (!formData.school_id) {
       toast.error("Please select a school first");
@@ -218,6 +222,8 @@ export default function StudentEnrollment() {
       toast.error("Please select a programme first");
       return;
     }
+
+    const XLSX = await loadXLSX();
 
     const headers = [
       "student_name",
@@ -330,6 +336,8 @@ export default function StudentEnrollment() {
     // ============================================
 
     const fileBuffer = await bulkUploadFile.arrayBuffer();
+
+    const XLSX = await loadXLSX();
 
     const workbook = XLSX.read(fileBuffer, {
       type: "array",

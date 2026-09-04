@@ -13,30 +13,34 @@ import RoadmapHeader from "../components/RoadmapHeader";
 import RoadmapGeneratorForm from "../components/RoadmapGeneratorForm";
 import SkillAssessmentModal from "../components/SkillAssessmentModal";
 import AssessmentResultCard from "../components/AssessmentResultCard";
-
-const POLL_INTERVAL = 2500;
+import { nextPollDelay } from "@/lib/pollBackoff";
 
 // Shared polling loop for any { job_id } background job that exposes a
 // { status: "processing"|"done"|"error", step? } status endpoint — used for
-// both course-material upload and roadmap creation.
+// both course-material upload and roadmap creation. The delay between polls
+// backs off exponentially (Phase 5.2) so a long roadmap generation doesn't
+// hammer the backend.
 function pollJob(fetchStatus, jobId, onStep) {
   return new Promise((resolve, reject) => {
-    const interval = setInterval(async () => {
+    let delay = 0;
+    const tick = async () => {
       try {
         const status = await fetchStatus(jobId);
         if (status.step) onStep(status.step);
         if (status.status === "done") {
-          clearInterval(interval);
           resolve(status);
         } else if (status.status === "error") {
-          clearInterval(interval);
           reject(new Error(status.error || "Processing failed. Please try again."));
+        } else {
+          delay = nextPollDelay(delay);
+          setTimeout(tick, delay);
         }
       } catch (pollErr) {
-        clearInterval(interval);
         reject(pollErr);
       }
-    }, POLL_INTERVAL);
+    };
+    delay = nextPollDelay(delay);
+    setTimeout(tick, delay);
   });
 }
 
