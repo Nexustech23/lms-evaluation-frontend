@@ -30,8 +30,8 @@ export const faqSections = [
     blurb: "Where your academic data lives and who can reach it",
     items: [
       {
-        q: "Who can see our institution's data?",
-        a: "Only people inside your institution, and only what their role lets them see. Your data is walled off from every other institution on the platform. No outside institution, faculty or student can reach it.",
+        q: "Who can see our institution's data, and how is it kept secure?",
+        a: "The platform offers flexible data hosting options, with deployment either on the institution's on-premises infrastructure or on a secure AWS Cloud environment. The institution retains full ownership and control of its data, which is accessible only to authorised users as per role-based access permissions. No unauthorised third party can access institutional data.",
       },
       {
         q: "Who owns the academic data?",
