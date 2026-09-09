@@ -4,7 +4,7 @@ import Link from "next/link";
 import { AuthContext } from "@/app/AuthContext";
 import LocaleSwitcher from "@/components/LocaleSwitcher";
 
-export default function Navbar({ title,style }) {
+export default function Navbar({ title, style, hideLogo }) {
   const { user, loading } = useContext(AuthContext);
 
   if (loading) {
@@ -49,6 +49,7 @@ export default function Navbar({ title,style }) {
               <LocaleSwitcher />
             </div>
           )}
+      {!hideLogo &&
       <img
         src="/pics/Logo6.png"
         alt="Logo 2"
@@ -56,6 +57,7 @@ export default function Navbar({ title,style }) {
         height={50}
         className="h-16 w-auto rounded-xl"
       />
+      }
       </div>
      
     </header>

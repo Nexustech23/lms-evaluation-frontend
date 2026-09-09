@@ -276,7 +276,7 @@ const UserProfile = () => {
   if (loading) {
     return (
       <div className="min-h-screen" style={{ backgroundColor: user?.color }}>
-        <Navbar title="User Profile" />
+        <Navbar title="User Profile" hideLogo />
         <div className="flex flex-1 items-center justify-center p-6 mt-20">
           <Spinner />
         </div>
@@ -286,14 +286,14 @@ const UserProfile = () => {
 
   return (
     <div className="flex flex-col min-h-screen" style={{ backgroundColor: user?.color }}>
-      <Navbar title="User Profile" />
+      <Navbar title="User Profile" hideLogo />
 
       <div className="p-6 w-[600px] mx-auto">
         <div className="bg-white rounded-xl w-full shadow-xl overflow-hidden">
 
           {/* Tab Navigation */}
           <div className="flex border-b">
-            {["profile", "edit", "password", "usage"].map(tab => (
+            {["profile", "edit", "password"].map(tab => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -303,7 +303,7 @@ const UserProfile = () => {
                   }`}
                 style={activeTab === tab ? { color: user?.color, borderBottomColor: user?.color } : {}}
               >
-                {tab === "profile" ? "👤 Profile" : tab === "edit" ? "✏️ Edit" : tab === "password" ? "🔒 Password" : "🤖 AI Usage"}
+                {tab === "profile" ? "👤 Profile" : tab === "edit" ? "✏️ Edit" : "🔒 Password"}
               </button>
             ))}
           </div>
@@ -626,63 +626,6 @@ const UserProfile = () => {
               </form>
             )}
 
-            {/* ===== AI USAGE TAB ===== */}
-            {activeTab === "usage" && (
-              <div className="space-y-5">
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Your AI Usage</p>
-
-                {aiUsageError && <Alert type="error" message={aiUsageError} />}
-
-                {aiUsageLoading && (
-                  <div className="flex justify-center py-10"><Spinner /></div>
-                )}
-
-                {!aiUsageLoading && aiUsage && aiUsage.byFeature.length === 0 && (
-                  <p className="text-sm text-gray-500 py-6 text-center">
-                    No AI usage yet — this fills in as you use roadmap generation, self-review, and Test Engine.
-                  </p>
-                )}
-
-                {!aiUsageLoading && aiUsage && aiUsage.byFeature.length > 0 && (
-                  <>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="bg-gray-50 rounded-lg p-3">
-                        <p className="text-xs text-gray-400 font-medium">Total Tokens</p>
-                        <p className="text-lg text-gray-800 font-bold mt-0.5">
-                          {aiUsage.totals.total_tokens.toLocaleString()}
-                        </p>
-                      </div>
-                      <div className="bg-gray-50 rounded-lg p-3">
-                        <p className="text-xs text-gray-400 font-medium">Estimated Cost</p>
-                        <p className="text-lg text-gray-800 font-bold mt-0.5">
-                          ${aiUsage.totals.cost_usd.toFixed(4)}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="space-y-2 max-h-96 overflow-y-auto">
-                      {aiUsage.byFeature.map(row => (
-                        <div key={row.feature} className="flex items-center justify-between p-2.5 bg-gray-50 rounded-lg border">
-                          <div>
-                            <p className="text-sm font-medium text-gray-700">{aiUsageFeatureLabel(row.feature)}</p>
-                            <p className="text-xs text-gray-400 mt-0.5">
-                              {row.call_count} call{row.call_count === 1 ? "" : "s"} · {row.total_tokens.toLocaleString()} tokens
-                            </p>
-                          </div>
-                          <p className="text-sm font-semibold" style={{ color: user?.color }}>
-                            ${row.cost_usd.toFixed(4)}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-
-                    <p className="text-xs text-gray-400 text-center pt-2">
-                      Costs are internal estimates based on provider list pricing, not a bill.
-                    </p>
-                  </>
-                )}
-              </div>
-            )}
           </div>
         </div>
       </div>
