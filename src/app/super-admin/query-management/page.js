@@ -333,26 +333,37 @@ const QueryManagementPage = () => {
           ) : (
             <>
               {/* ── Table ─────────────────────────────────────────────── */}
-              <div style={{ overflowX: "auto" }}>
-                <table style={{ width: "100%", minWidth: 1080, borderCollapse: "collapse" }}>
+              <div style={{ width: "100%" }}>
+                <table style={{ width: "100%", tableLayout: "fixed", borderCollapse: "collapse" }}>
 
                   <thead>
                     <tr style={{
                       background: "linear-gradient(90deg, #FFF7ED 0%, #FFEDD5 100%)",
                       borderBottom: "2px solid #FED7AA",
                     }}>
-                      {["#", "User", "Email", "Phone", "Topic", "Role", "Institute", "Message", "Status", "Actions"].map((h) => (
-                        <th key={h} style={{
-                          padding: "13px 16px",
+                      {[
+                        { label: "#",         width: "3%"  },
+                        { label: "User",      width: "13%" },
+                        { label: "Email",     width: "14%" },
+                        { label: "Phone",     width: "9%"  },
+                        { label: "Topic",     width: "8%"  },
+                        { label: "Role",      width: "9%"  },
+                        { label: "Institute", width: "9%"  },
+                        { label: "Message",   width: "17%" },
+                        { label: "Status",    width: "6%"  },
+                        { label: "Actions",   width: "12%" },
+                      ].map(({ label, width }) => (
+                        <th key={label} style={{
+                          width,
+                          padding: "13px 12px",
                           textAlign: "left",
                           fontSize: 10,
                           fontWeight: 800,
                           letterSpacing: "0.08em",
                           textTransform: "uppercase",
                           color: "#9A3412",
-                          whiteSpace: "nowrap",
                         }}>
-                          {h}
+                          {label}
                         </th>
                       ))}
                     </tr>
@@ -376,13 +387,13 @@ const QueryManagementPage = () => {
                           }}
                         >
                           {/* # */}
-                          <td style={{ padding: "15px 16px", fontSize: 12, color: "#FDBA74", fontVariantNumeric: "tabular-nums", fontWeight: 700 }}>
+                          <td style={{ padding: "15px 12px", fontSize: 12, color: "#FDBA74", fontVariantNumeric: "tabular-nums", fontWeight: 700 }}>
                             {(pagination.page - 1) * pagination.limit + index + 1}
                           </td>
 
                           {/* User */}
-                          <td style={{ padding: "15px 16px" }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                          <td style={{ padding: "15px 12px", overflow: "hidden" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
                               <div style={{
                                 width: 38, height: 38, borderRadius: "50%",
                                 background: "linear-gradient(135deg, #FED7AA, #FDBA74)",
@@ -393,25 +404,30 @@ const QueryManagementPage = () => {
                               }}>
                                 {initials(item.first_name)}
                               </div>
-                              <span style={{ fontSize: 14, fontWeight: 700, color: "#431407", whiteSpace: "nowrap" }}>
+                              <span style={{
+                                fontSize: 14, fontWeight: 700, color: "#431407",
+                                overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                              }}>
                                 {item.first_name} {item.last_name}
                               </span>
                             </div>
                           </td>
 
                           {/* Email */}
-                          <td style={{ padding: "15px 16px", fontSize: 13, color: "#6B7280" }}>
+                          <td style={{ padding: "15px 12px", fontSize: 13, color: "#6B7280", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                             {item.email}
                           </td>
 
                           {/* Phone */}
-                          <td style={{ padding: "15px 16px", fontSize: 13, color: "#6B7280", fontVariantNumeric: "tabular-nums" }}>
+                          <td style={{ padding: "15px 12px", fontSize: 13, color: "#6B7280", fontVariantNumeric: "tabular-nums", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                             {item.contact_no}
                           </td>
 
                           {/* Topic */}
-                          <td style={{ padding: "15px 16px" }}>
+                          <td style={{ padding: "15px 12px" }}>
                             <span style={{
+                              display: "inline-block", maxWidth: "100%",
+                              overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
                               padding: "4px 11px", borderRadius: 99,
                               background: topicStyle.bg, color: topicStyle.text,
                               fontSize: 11, fontWeight: 700, letterSpacing: "0.04em",
@@ -422,17 +438,17 @@ const QueryManagementPage = () => {
                           </td>
 
                           {/* Role */}
-                          <td style={{ padding: "15px 16px", fontSize: 13, color: "#374151", textTransform: "capitalize", fontWeight: 600 }}>
+                          <td style={{ padding: "15px 12px", fontSize: 13, color: "#374151", textTransform: "capitalize", fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                             {item.role}
                           </td>
 
                           {/* Institute */}
-                          <td style={{ padding: "15px 16px", fontSize: 13, color: "#9CA3AF", maxWidth: 130 }}>
+                          <td style={{ padding: "15px 12px", fontSize: 13, color: "#9CA3AF", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                             {instituteName || <span style={{ color: "#D1D5DB" }}>—</span>}
                           </td>
 
                           {/* Message */}
-                          <td style={{ padding: "15px 16px", maxWidth: 230 }}>
+                          <td style={{ padding: "15px 12px" }}>
                             <p style={{
                               margin: 0, fontSize: 13, color: "#4B5563",
                               overflow: "hidden", display: "-webkit-box",
@@ -459,7 +475,7 @@ const QueryManagementPage = () => {
                           </td>
 
                           {/* Status */}
-                          <td style={{ padding: "15px 16px" }}>
+                          <td style={{ padding: "15px 12px" }}>
                             <span style={{
                               padding: "4px 11px", borderRadius: 99,
                               fontSize: 11, fontWeight: 700,
@@ -471,54 +487,55 @@ const QueryManagementPage = () => {
                           </td>
 
                           {/* Actions */}
-                          <td style={{ padding: "15px 16px" }}>
-                            <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                          <td style={{ padding: "15px 12px" }}>
+                            <div style={{ display: "flex", flexWrap: "wrap", gap: 6, alignItems: "center" }}>
                               <a
                                 href={`https://mail.google.com/mail/?view=cm&fs=1&to=${item.email}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
+                                title="Reply"
                                 className="qm-action-btn"
                                 style={{
-                                  display: "flex", alignItems: "center", gap: 4,
-                                  padding: "5px 11px", borderRadius: 8,
+                                  display: "flex", alignItems: "center", justifyContent: "center",
+                                  padding: "6px 8px", borderRadius: 8,
                                   border: "1px solid #BFDBFE",
                                   background: "rgba(239,246,255,.9)",
                                   backdropFilter: "blur(4px)",
                                   color: "#1D4ED8",
-                                  fontSize: 12, fontWeight: 700,
-                                  textDecoration: "none", whiteSpace: "nowrap",
+                                  textDecoration: "none",
                                   transition: "opacity .15s",
                                 }}
                               >
-                                <Mail size={12} /> Reply
+                                <Mail size={13} />
                               </a>
 
                               {!item.read && (
                                 <button
                                   onClick={() => handleMarkAsRead(item.id)}
+                                  title="Mark as read"
                                   className="qm-action-btn"
                                   style={{
-                                    display: "flex", alignItems: "center", gap: 4,
-                                    padding: "5px 11px", borderRadius: 8,
+                                    display: "flex", alignItems: "center", justifyContent: "center",
+                                    padding: "6px 8px", borderRadius: 8,
                                     border: "1px solid #BBF7D0",
                                     background: "rgba(240,253,244,.9)",
                                     backdropFilter: "blur(4px)",
                                     color: "#166534",
-                                    fontSize: 12, fontWeight: 700,
-                                    cursor: "pointer", whiteSpace: "nowrap",
+                                    cursor: "pointer",
                                     transition: "opacity .15s",
                                   }}
                                 >
-                                  <CheckCircle2 size={12} /> Read
+                                  <CheckCircle2 size={13} />
                                 </button>
                               )}
 
                               <button
                                 onClick={() => handleDelete(item.id)}
+                                title="Delete"
                                 className="qm-action-btn"
                                 style={{
-                                  display: "flex", alignItems: "center",
-                                  padding: "6px 9px", borderRadius: 8,
+                                  display: "flex", alignItems: "center", justifyContent: "center",
+                                  padding: "6px 8px", borderRadius: 8,
                                   border: "1px solid #FECACA",
                                   background: "rgba(255,245,245,.9)",
                                   backdropFilter: "blur(4px)",

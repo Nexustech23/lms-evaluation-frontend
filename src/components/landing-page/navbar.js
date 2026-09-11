@@ -25,10 +25,13 @@ function Navbar() {
 
     return (
         <>
-            {/* Floating Frosted Glass Navbar */}
+            {/* Floating Navbar */}
             <nav className="absolute top-0 left-0 right-0 z-50 px-4 pt-4">
                 <div className="max-w-6xl mx-auto">
-                    <div className="bg-black/40 backdrop-blur-2xl border border-white/10 rounded-2xl px-6 py-3 flex items-center justify-between shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+                    <div
+                        className="backdrop-blur-xl border border-gray-200 rounded-2xl px-6 py-3 flex items-center justify-between shadow-[0_4px_20px_rgba(0,0,0,0.06)]"
+                        style={{ background: "rgba(255,255,255,0.92)" }}
+                    >
 
                         {/* Logo */}
                         <Link href="/" className="flex items-center">
@@ -42,11 +45,11 @@ function Navbar() {
                         </Link>
 
                         {/* Desktop Links */}
-                        <div className="hidden lg:flex items-center gap-8 text-white/70 text-sm font-medium">
-                            <Link href="/pricing" className="hover:text-orange-400 transition-colors duration-200">
+                        <div className="hidden lg:flex items-center gap-8 text-gray-600 text-sm font-medium">
+                            <Link href="/pricing" className="hover:text-orange-600 transition-colors duration-200">
                                 Pricing
                             </Link>
-                            <Link href="/get-a-demo" className="hover:text-orange-400 transition-colors duration-200">
+                            <Link href="/get-a-demo" className="hover:text-orange-600 transition-colors duration-200">
                                 Get a Demo
                             </Link>
                             <button
@@ -54,11 +57,11 @@ function Navbar() {
                                     const section = document.getElementById("aboutus");
                                     if (section) section.scrollIntoView({ behavior: "smooth", block: "start" });
                                 }}
-                                className="hover:text-orange-400 transition-colors duration-200"
+                                className="hover:text-orange-600 transition-colors duration-200"
                             >
                                 About Us
                             </button>
-                            <Link href="/contact-us" className="hover:text-orange-400 transition-colors duration-200">
+                            <Link href="/contact-us" className="hover:text-orange-600 transition-colors duration-200">
                                 Contact Us
                             </Link>
                         </div>
@@ -67,7 +70,7 @@ function Navbar() {
                         <div className="hidden lg:flex items-center gap-3">
                             <button
                                 onClick={handleLogin}
-                                className="px-5 py-2 rounded-xl text-white/80 text-sm font-medium border border-white/10 bg-white/5 hover:bg-white/10 hover:text-white hover:border-white/20 transition-all duration-200"
+                                className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors duration-200"
                             >
                                 Log In
                             </button>
@@ -76,7 +79,7 @@ function Navbar() {
                                     const section = document.getElementById("signup");
                                     if (section) section.scrollIntoView({ behavior: "smooth", block: "start" });
                                 }}
-                                className="px-5 py-2 rounded-xl text-white text-sm font-semibold bg-gradient-to-r from-orange-600 to-amber-500 shadow-[0_0_20px_rgba(234,88,12,0.35)] hover:shadow-[0_0_30px_rgba(234,88,12,0.55)] hover:scale-105 transition-all duration-200"
+                                className="px-5 py-2 rounded-xl text-white text-sm font-semibold bg-gradient-to-r from-orange-600 to-amber-500 shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200"
                             >
                                 Sign Up Free
                             </button>
@@ -85,7 +88,7 @@ function Navbar() {
                         {/* Mobile Toggle */}
                         <button
                             onClick={() => setMobileMenu(!mobileMenu)}
-                            className="lg:hidden text-white/80 hover:text-white transition-colors"
+                            className="lg:hidden text-gray-700 hover:text-gray-900 transition-colors"
                         >
                             {mobileMenu ? <X size={24} /> : <Menu size={24} />}
                         </button>
@@ -93,20 +96,23 @@ function Navbar() {
 
                     {/* Mobile Menu Dropdown */}
                     {mobileMenu && (
-                        <div className="mt-2 bg-black/60 backdrop-blur-2xl border border-white/10 rounded-2xl px-6 py-6 flex flex-col gap-5 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
-                            <Link href="/pricing" className="text-white/70 hover:text-orange-400 text-sm font-medium transition-colors">
+                        <div
+                            className="mt-2 backdrop-blur-xl border border-gray-200 rounded-2xl px-6 py-6 flex flex-col gap-5 shadow-[0_8px_32px_rgba(0,0,0,0.1)]"
+                            style={{ background: "rgba(255,255,255,0.97)" }}
+                        >
+                            <Link href="/pricing" className="text-gray-600 hover:text-orange-600 text-sm font-medium transition-colors">
                                 Pricing
                             </Link>
-                            <Link href="/get-a-demo" className="text-white/70 hover:text-orange-400 text-sm font-medium transition-colors">
+                            <Link href="/get-a-demo" className="text-gray-600 hover:text-orange-600 text-sm font-medium transition-colors">
                                 Get a Demo
                             </Link>
-                            <Link href="/contact-us" className="text-white/70 hover:text-orange-400 text-sm font-medium transition-colors">
+                            <Link href="/contact-us" className="text-gray-600 hover:text-orange-600 text-sm font-medium transition-colors">
                                 Contact Us
                             </Link>
-                            <div className="flex flex-col gap-3 pt-2 border-t border-white/10">
+                            <div className="flex flex-col gap-3 pt-2 border-t border-gray-200">
                                 <button
                                     onClick={handleLogin}
-                                    className="w-full py-3 rounded-xl text-white/80 text-sm border border-white/10 bg-white/5 hover:bg-white/10 transition-all"
+                                    className="w-full py-3 rounded-xl text-gray-700 text-sm border border-gray-200 bg-white hover:bg-gray-50 transition-all"
                                 >
                                     Log In
                                 </button>
