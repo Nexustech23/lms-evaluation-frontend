@@ -137,7 +137,7 @@ export const getSidebarLinks = (role, user, t) => {
         },
 
         {
-          label: "Enroll",
+          label: "Student",
           href: "/admin/enroll",
           icon: <IconUserPlus />,
         },

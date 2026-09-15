@@ -10,7 +10,7 @@ export const ALL_STEPS = [
   { key: "starting",                  label: "Starting job"              },
   { key: "extracting_question_bank",  label: "Extracting question bank"  },
   { key: "extracting_course_planner", label: "Extracting course planner" },
-  { key: "generating_paper",          label: "Generating paper with AI"  },
+  { key: "generating_paper",          label: "Generating question paper" },
   { key: "building_docx",             label: "Building DOCX"             },
   { key: "uploading",                 label: "Uploading document"        },
   { key: "done",                      label: "Finishing up"              },
