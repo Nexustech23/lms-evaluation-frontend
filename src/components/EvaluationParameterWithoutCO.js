@@ -19,11 +19,38 @@ const MARK_PARAMETERS = [
   "Logical arguments and conclusion",
 ];
 
-const EMPTY_QUESTION = () => ({
-  minMarks: "",
-  maxMarks: "",
+// Faculty otherwise had to add all 6 parameters + type a percentage for
+// every single question, every time — this prefills a valid (sums to 100)
+// starting table they can edit/remove/re-weight before saving. Mirrors
+// EvaluationParamterCO.js's DEFAULT_PARAMETERS.
+const DEFAULT_PARAMETERS = () => {
+  const base = Math.floor(100 / MARK_PARAMETERS.length);
+  const remainder = 100 - base * MARK_PARAMETERS.length;
+  return MARK_PARAMETERS.map((name, i) => ({
+    name,
+    percentage: base + (i < remainder ? 1 : 0),
+    isCustom: false,
+  }));
+};
+
+// Pulls each question's marks (e.g. "Q1. ... [5 Marks]") from the raw
+// question-paper text, in order, so maxMarks can be prefilled instead of
+// left blank — teacher can still edit it, this is just a starting value.
+// Mirrors EvaluationParamterCO.js's identical helper.
+const parseQuestionMarksFromPaperText = (text) => {
+  if (!text || typeof text !== "string") return [];
+  const blocks = text.split(/(?=^Q\d+[.)])/m).filter((b) => /^Q\d+[.)]/.test(b));
+  return blocks.map((block) => {
+    const match = block.match(/\[(\d+)\s*Marks?\]/i);
+    return match ? Number(match[1]) : "";
+  });
+};
+
+const EMPTY_QUESTION = (maxMarks = "") => ({
+  minMarks: 0,
+  maxMarks,
   guidelines: "",
-  parameters: [],
+  parameters: DEFAULT_PARAMETERS(),
 });
 
 export default function EvaluationParameterWithoutCO() {
@@ -116,7 +143,7 @@ export default function EvaluationParameterWithoutCO() {
             }))
           );
         } else {
-          // ── Create path: blank inputs, count from question paper ──
+          // ── Create path: prefilled inputs, count from question paper ──
           setHasExistingEval(false);
           const count =
             folderResult?.question_paper?.no_of_questions ||
@@ -129,8 +156,10 @@ export default function EvaluationParameterWithoutCO() {
             toast.error("Could not determine number of questions from folder");
           }
 
+          const paperText = folderResult?.question_paper?.text;
+          const parsedMarks = parseQuestionMarksFromPaperText(paperText);
           setQuestionInputs(
-            Array.from({ length: Number(count) }, EMPTY_QUESTION)
+            Array.from({ length: Number(count) }, (_, i) => EMPTY_QUESTION(parsedMarks[i] ?? ""))
           );
         }
       } catch (err) {
@@ -228,7 +257,9 @@ export default function EvaluationParameterWithoutCO() {
     const errors = [];
     questionInputs.forEach((q, i) => {
       const n = i + 1;
-      if (!q.minMarks || !q.maxMarks)
+      const minMissing = q.minMarks == null || q.minMarks === "";
+      const maxMissing = q.maxMarks == null || q.maxMarks === "";
+      if (minMissing || maxMissing)
         errors.push(`Question ${n}: Min / Max marks are required`);
 
       if (q.parameters.length > 0) {
