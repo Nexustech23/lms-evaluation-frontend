@@ -92,6 +92,11 @@ export const getSidebarLinks = (role, user, t) => {
           href: "/super-admin/self-learners",
           icon: <IconUsers />,
         },
+        {
+          label: "Activity Logs",
+          href: "/super-admin/activity-logs",
+          icon: <IconHistory />,
+        },
       ]
       : []),
 
@@ -135,6 +140,11 @@ export const getSidebarLinks = (role, user, t) => {
           label: "Enroll",
           href: "/admin/enroll",
           icon: <IconUserPlus />,
+        },
+        {
+          label: "Activity Logs",
+          href: "/admin/activity-logs",
+          icon: <IconHistory />,
         },
 
 
@@ -245,6 +255,15 @@ export const getSidebarLinks = (role, user, t) => {
               icon: <IconArchive />,
             },
           ],
+        },
+        // Reuses the institute admin's Activity Logs page/route directly
+        // (no separate /faculty/* app section exists yet) — the backend
+        // endpoint already allows FACULTY callers, scoped to their own
+        // institute via resolve_current_institute_id's faculty fallback.
+        {
+          label: "Activity Logs",
+          href: "/admin/activity-logs",
+          icon: <IconHistory />,
         },
       ]
       : []),
