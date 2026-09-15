@@ -19,10 +19,23 @@ const MARK_PARAMETERS = [
   "Logical arguments and conclusion",
 ];
 
+// Faculty otherwise had to add all 6 parameters + type a percentage for
+// every single question, every time — this prefills a valid (sums to 100)
+// starting table they can edit/remove/re-weight before saving.
+const DEFAULT_PARAMETERS = () => {
+  const base = Math.floor(100 / MARK_PARAMETERS.length);
+  const remainder = 100 - base * MARK_PARAMETERS.length;
+  return MARK_PARAMETERS.map((name, i) => ({
+    name,
+    percentage: base + (i < remainder ? 1 : 0),
+    isCustom: false,
+  }));
+};
+
 const EMPTY_QUESTION = (maxMarks = "", cos = []) => ({
   minMarks: 0,
   maxMarks,
-  parameters: [],
+  parameters: DEFAULT_PARAMETERS(),
   cos, // [{ co_code, description, marks }]
 });
 
