@@ -256,15 +256,6 @@ export const getSidebarLinks = (role, user, t) => {
             },
           ],
         },
-        // Reuses the institute admin's Activity Logs page/route directly
-        // (no separate /faculty/* app section exists yet) — the backend
-        // endpoint already allows FACULTY callers, scoped to their own
-        // institute via resolve_current_institute_id's faculty fallback.
-        {
-          label: "Activity Logs",
-          href: "/admin/activity-logs",
-          icon: <IconHistory />,
-        },
       ]
       : []),
 
