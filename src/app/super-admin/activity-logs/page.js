@@ -2,24 +2,15 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Navbar from "@/components/ui/Navbar";
-import Spinner from "@/components/ui/Spinner";
+import ActivityLogsTable from "@/components/activity-logs/ActivityLogsTable";
 
-const ROLE_LABELS = {
-  self_learner: "Self-Learner",
-  institute_student: "Institute Student",
-};
-
-const PROVIDER_LABELS = {
-  claude: "Claude",
-  gemini: "Gemini",
-};
-
-const formatTokens = (input, output) => {
-  if (!input && !output) return "— / —";
-  return `${(input || 0).toLocaleString()} / ${(output || 0).toLocaleString()}`;
+const ENDPOINTS = {
+  students: "/api/self-learners/activity-logs",
+  faculty: "/api/faculty/activity-logs/all",
 };
 
 const ActivityLogsPage = () => {
+  const [tab, setTab] = useState("students");
   const [logs, setLogs] = useState([]);
   const [institutes, setInstitutes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -28,11 +19,11 @@ const ActivityLogsPage = () => {
   const [instituteId, setInstituteId] = useState("");
   const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0 });
 
-  const fetchLogs = async (page = 1, emailFilter = email, instituteFilter = instituteId) => {
+  const fetchLogs = async (nextTab, page = 1, emailFilter = email, instituteFilter = instituteId) => {
     try {
       setLoading(true);
       setError("");
-      const res = await axios.get("/api/self-learners/activity-logs", {
+      const res = await axios.get(ENDPOINTS[nextTab], {
         params: {
           page,
           limit: pagination.limit,
@@ -51,20 +42,30 @@ const ActivityLogsPage = () => {
   };
 
   useEffect(() => {
-    fetchLogs(1, email, instituteId);
+    // "independent" (no institute) only means anything for self-learners —
+    // drop it when switching to the Faculty tab, which has no such concept.
+    const effectiveInstituteId = tab === "faculty" && instituteId === "independent" ? "" : instituteId;
+    if (effectiveInstituteId !== instituteId) setInstituteId(effectiveInstituteId);
+    fetchLogs(tab, 1, email, effectiveInstituteId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab]);
+
+  useEffect(() => {
     axios
       .get("/api/institutes", { params: { limit: 1000 }, withCredentials: true })
       .then((res) => setInstitutes(res.data.data || []))
       .catch(() => {});
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleInstituteChange = (value) => {
     setInstituteId(value);
-    fetchLogs(1, email, value);
+    fetchLogs(tab, 1, email, value);
   };
 
-  const totalPages = Math.ceil(pagination.total / pagination.limit);
+  const handleSearch = (e) => {
+    e.preventDefault();
+    fetchLogs(tab, 1, email, instituteId);
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-[#ff7f10]">
@@ -76,123 +77,75 @@ const ActivityLogsPage = () => {
             <div>
               <h2 className="text-2xl font-bold text-[#ff7f10]">Activity Logs</h2>
               <p className="text-sm text-gray-500 mt-1">
-                MyCareerGuru activity across self-learners and institute students, with AI token usage &amp; cost.
+                {tab === "students"
+                  ? "MyCareerGuru activity across self-learners and institute students, with AI token usage & cost."
+                  : "Faculty AI usage — question paper generation and grading — with token usage & cost."}
               </p>
             </div>
 
-            <div className="flex items-center gap-2 flex-wrap">
-              <select
-                value={instituteId}
-                onChange={(e) => handleInstituteChange(e.target.value)}
-                className="px-3 py-1.5 rounded-md text-sm border text-gray-700"
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setTab("students")}
+                className={`px-3 py-1.5 rounded-md text-sm font-medium transition ${
+                  tab === "students" ? "bg-orange-500 text-white" : "border text-gray-600 hover:bg-gray-100"
+                }`}
               >
-                <option value="">All institutes</option>
-                <option value="independent">Independent (no institute)</option>
-                {institutes.map((inst) => (
-                  <option key={inst.id} value={inst.id}>
-                    {inst.fullName}
-                  </option>
-                ))}
-              </select>
-
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  fetchLogs(1, email, instituteId);
-                }}
-                className="flex items-center gap-2"
+                Students
+              </button>
+              <button
+                onClick={() => setTab("faculty")}
+                className={`px-3 py-1.5 rounded-md text-sm font-medium transition ${
+                  tab === "faculty" ? "bg-orange-500 text-white" : "border text-gray-600 hover:bg-gray-100"
+                }`}
               >
-                <input
-                  type="text"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Search by email"
-                  className="px-3 py-1.5 rounded-md text-sm border text-gray-700"
-                />
-                <button
-                  type="submit"
-                  className="px-3 py-1.5 rounded-md text-sm font-medium bg-orange-500 text-white hover:bg-orange-600 transition"
-                >
-                  Search
-                </button>
-              </form>
+                Faculty
+              </button>
             </div>
           </div>
 
-          {error && <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">{error}</div>}
+          <div className="flex items-center gap-2 flex-wrap mb-6">
+            <select
+              value={instituteId}
+              onChange={(e) => handleInstituteChange(e.target.value)}
+              className="px-3 py-1.5 rounded-md text-sm border text-gray-700"
+            >
+              <option value="">All institutes</option>
+              {tab === "students" && <option value="independent">Independent (no institute)</option>}
+              {institutes.map((inst) => (
+                <option key={inst.id} value={inst.id}>
+                  {inst.fullName}
+                </option>
+              ))}
+            </select>
 
-          {loading ? (
-            <div className="flex justify-center items-center h-64">
-              <Spinner color="#ff7f10" />
-            </div>
-          ) : (
-            <>
-              <div className="overflow-x-auto rounded-xl">
-                <table className="w-full border-collapse text-gray-800">
-                  <thead>
-                    <tr className="bg-orange-100">
-                      <th className="p-3 text-left">Student</th>
-                      <th className="p-3 text-left">Email</th>
-                      <th className="p-3 text-left">Type</th>
-                      <th className="p-3 text-left">Action</th>
-                      <th className="p-3 text-left">Provider</th>
-                      <th className="p-3 text-right">Tokens (In / Out)</th>
-                      <th className="p-3 text-right">Cost (USD)</th>
-                      <th className="p-3 text-left">Timestamp</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {logs.length > 0 ? (
-                      logs.map((log, idx) => (
-                        <tr key={idx} className="border-b hover:bg-gray-50 transition">
-                          <td className="p-3 font-medium">{log.student_name || "—"}</td>
-                          <td className="p-3">{log.student_email || "—"}</td>
-                          <td className="p-3">{ROLE_LABELS[log.student_role] || log.student_role}</td>
-                          <td className="p-3">{log.action}</td>
-                          <td className="p-3">{PROVIDER_LABELS[log.provider] || log.provider}</td>
-                          <td className="p-3 text-right text-sm">
-                            {formatTokens(log.input_tokens, log.output_tokens)}
-                          </td>
-                          <td className="p-3 text-right text-sm">${(log.cost_usd || 0).toFixed(4)}</td>
-                          <td className="p-3 text-sm">
-                            {log.created_at ? new Date(log.created_at).toLocaleString() : "—"}
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan={8} className="text-center py-10 text-gray-500">
-                          No activity recorded yet.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
+            <form onSubmit={handleSearch} className="flex items-center gap-2">
+              <input
+                type="text"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Search by email"
+                className="px-3 py-1.5 rounded-md text-sm border text-gray-700"
+              />
+              <button
+                type="submit"
+                className="px-3 py-1.5 rounded-md text-sm font-medium bg-orange-500 text-white hover:bg-orange-600 transition"
+              >
+                Search
+              </button>
+            </form>
+          </div>
 
-              <div className="flex items-center justify-between gap-4 mt-6">
-                <p className="text-sm text-gray-600">
-                  Page {pagination.page} of {Math.max(totalPages, 1)} · {pagination.total} total
-                </p>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => fetchLogs(pagination.page - 1, email, instituteId)}
-                    disabled={pagination.page === 1}
-                    className="px-4 py-2 border rounded-md text-sm disabled:opacity-50 hover:bg-gray-100 transition"
-                  >
-                    Previous
-                  </button>
-                  <button
-                    onClick={() => fetchLogs(pagination.page + 1, email, instituteId)}
-                    disabled={pagination.page >= totalPages}
-                    className="px-4 py-2 border rounded-md text-sm disabled:opacity-50 hover:bg-gray-100 transition"
-                  >
-                    Next
-                  </button>
-                </div>
-              </div>
-            </>
-          )}
+          <ActivityLogsTable
+            variant={tab}
+            rows={logs}
+            loading={loading}
+            error={error}
+            pagination={pagination}
+            onPrev={() => fetchLogs(tab, pagination.page - 1)}
+            onNext={() => fetchLogs(tab, pagination.page + 1)}
+            showCost
+            accentColor="#ff7f10"
+          />
         </div>
       </div>
     </div>

@@ -25,6 +25,13 @@ const FEATURE_LABELS = {
   rag_embedding: "Course Material Indexing",
   rag_summarize: "Course Material Summarizing",
   rag_retrieve: "Course Material Search",
+  qp_question_bank_extraction: "Question Bank Reading",
+  qp_course_planner_extraction: "Course Planner Reading",
+  qp_generation: "Question Paper Generation",
+  grading_answer_ocr: "Answer Script Reading",
+  grading_answer_evaluation: "Answer Script Grading",
+  grading_transcript_generation: "Answer Transcript Generation",
+  exam_question_paper_extraction: "Question Paper Text Extraction",
 };
 
 const featureLabel = (feature) => FEATURE_LABELS[feature] || feature;
@@ -37,18 +44,27 @@ const PROVIDER_LABELS = {
 const providerLabel = (provider) => PROVIDER_LABELS[provider] || provider;
 
 const DAY_OPTIONS = [7, 30, 90];
+const SCOPE_OPTIONS = [
+  { value: "students", label: "Students" },
+  { value: "faculty", label: "Faculty" },
+  { value: "all", label: "All" },
+];
 
 const AiUsagePage = () => {
   const [days, setDays] = useState(30);
+  const [scope, setScope] = useState("students");
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const fetchUsage = async (selectedDays) => {
+  const fetchUsage = async (selectedDays, selectedScope) => {
     try {
       setLoading(true);
       setError("");
-      const res = await axios.get(`/api/ai-usage?days=${selectedDays}`, { withCredentials: true });
+      const res = await axios.get("/api/ai-usage", {
+        params: { days: selectedDays, scope: selectedScope },
+        withCredentials: true,
+      });
       setData(res.data);
     } catch (err) {
       setError("Failed to load AI usage data");
@@ -58,8 +74,8 @@ const AiUsagePage = () => {
   };
 
   useEffect(() => {
-    fetchUsage(days);
-  }, [days]);
+    fetchUsage(days, scope);
+  }, [days, scope]);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#ff7f10]">
@@ -70,20 +86,38 @@ const AiUsagePage = () => {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
             <h2 className="text-2xl font-bold text-[#ff7f10]">AI Usage — Cost by Feature</h2>
 
-            <div className="flex items-center gap-2">
-              {DAY_OPTIONS.map((opt) => (
-                <button
-                  key={opt}
-                  onClick={() => setDays(opt)}
-                  className={`px-3 py-1.5 rounded-md text-sm font-medium transition ${
-                    days === opt
-                      ? "bg-orange-500 text-white"
-                      : "border text-gray-600 hover:bg-gray-100"
-                  }`}
-                >
-                  Last {opt}d
-                </button>
-              ))}
+            <div className="flex items-center gap-4 flex-wrap">
+              <div className="flex items-center gap-2">
+                {SCOPE_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => setScope(opt.value)}
+                    className={`px-3 py-1.5 rounded-md text-sm font-medium transition ${
+                      scope === opt.value
+                        ? "bg-orange-500 text-white"
+                        : "border text-gray-600 hover:bg-gray-100"
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex items-center gap-2">
+                {DAY_OPTIONS.map((opt) => (
+                  <button
+                    key={opt}
+                    onClick={() => setDays(opt)}
+                    className={`px-3 py-1.5 rounded-md text-sm font-medium transition ${
+                      days === opt
+                        ? "bg-orange-500 text-white"
+                        : "border text-gray-600 hover:bg-gray-100"
+                    }`}
+                  >
+                    Last {opt}d
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
