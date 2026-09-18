@@ -34,6 +34,9 @@ const [pagination, setPagination] = useState({
     const { user ,isLoading} = useContext(AuthContext);
     const [showDeleteModal,setShowDeleteModal] = useState(false);
     const [selectedDepartment, setSelectedDepartment] = useState(null);
+    // Must type the word "delete" before Confirm Delete is enabled — this
+    // action cascades (see backend delete_department) and can't be undone.
+    const [deleteConfirmText, setDeleteConfirmText] = useState("");
 
     const t = useTranslations("programmeDept");
 
@@ -177,10 +180,16 @@ useEffect(() => {
     const openDeleteModal = async(department) => {
         setShowDeleteModal(true);
         setSelectedDepartment(department);
+        setDeleteConfirmText("");
+    }
+
+    const closeDeleteModal = () => {
+        setShowDeleteModal(false);
+        setSelectedDepartment(null);
+        setDeleteConfirmText("");
     }
 
     const deleteDepartment = async (id) => {
-        if (!confirm("Delete this department permanently?")) return;
         try {
             setDeleting(id);
             await axios.delete(
@@ -418,7 +427,7 @@ const handlePrev = () => {
                                                 {/* Delete */}
                                                 <div className="relative group">
                                                     <button
-                                                        onClick={() => openDeleteModal(d.id)}
+                                                        onClick={() => openDeleteModal(d)}
                                                         disabled={deleting === d.id}
                                                         className="p-2 text-red-600 hover:bg-red-100 rounded-xl transition disabled:opacity-50"
                                                     >
@@ -542,7 +551,7 @@ const handlePrev = () => {
                                 </p>
                             </div>
                             <button
-                                onClick={() => setShowDeleteModal(false)}
+                                onClick={closeDeleteModal}
                                 className="text-white/80 hover:text-white text-sm"
                             >
                                 ✕
@@ -552,20 +561,34 @@ const handlePrev = () => {
                         <div className="px-5 py-4">
                             <p className="text-xs text-gray-600 mb-3">
                                 Are you sure you want to delete{" "}
+                                <span className="font-semibold text-gray-800">
+                                    {selectedDepartment?.department_name}
+                                </span>?
                             </p>
                                     {/* WARNING */}
                                     <div className={`rounded-md p-2.5 mb-3 ${user?.color?"bg-green-50 border-green-200":"bg-orange-50 border-orange-200"}`}>
                                         <p className="text-[11px] text-orange-700 font-medium">
-                                            ⚠️ Your data will be permanently deleted:
+                                            ⚠️ Your data will be permanently deleted, including every batch and subject under this department. This cannot be undone.
                                         </p>
                                     </div>
+                                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                                        Type <span className="font-mono font-bold">delete</span> to confirm
+                                    </label>
+                                    <input
+                                        type="text"
+                                        autoFocus
+                                        value={deleteConfirmText}
+                                        onChange={(e) => setDeleteConfirmText(e.target.value)}
+                                        placeholder="delete"
+                                        className="w-full p-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-red-300"
+                                    />
                         </div>
 
                         {/* FOOTER */}
                         <div className="px-5 py-3 bg-gray-50 flex justify-end gap-2">
 
                             <button
-                                onClick={() => setShowDeleteModal(false)}
+                                onClick={closeDeleteModal}
                                 className={`px-3 py-1.5 border rounded-md ${user?.color?"border-green-200 hover:bg-green-50":"border-orange-200 hover:bg-orange-50"} text-xs`}
                                 style={{color: user?.color || "#ff7f10"}}
                             >
@@ -574,11 +597,11 @@ const handlePrev = () => {
 
                             <button
                                 onClick={() => {
-                                    deleteDepartment(selectedDepartment);
-                                    setShowDeleteModal(false);
+                                    deleteDepartment(selectedDepartment?.id);
+                                    closeDeleteModal();
                                 }}
-                                className={`px-4 py-1.5 text-white rounded-md text-xs font-medium ${user?.color?"hover:bg-green-600":"hover:bg-orange-600"}`}
-                                style={user?.color?{backgroundColor:user?.color}:{backgroundColor:"#ff7f10"}}
+                                disabled={deleteConfirmText.trim().toLowerCase() !== "delete"}
+                                className="px-4 py-1.5 text-white rounded-md text-xs font-medium bg-red-600 hover:bg-red-700 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-red-600"
                             >
                                 Confirm Delete
                             </button>
