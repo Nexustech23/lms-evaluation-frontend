@@ -48,8 +48,20 @@ const FIXED_KEYS = [
     "tgpa",
     "cgpa",
     "result_source",
+    "subject_scores",
     "_id",
 ];
+
+/* One subject cell -> { marks, grade }. Prefers the backend's structured
+   subject_scores; falls back to parsing the legacy "84.97 (A)" string. */
+function getSubjectScore(row, sub) {
+    const score = row.subject_scores?.[sub];
+    if (score) return { marks: score.marks, grade: score.grade ?? null };
+    const raw = row[sub];
+    const match = typeof raw === "string" ? raw.match(/^\s*(-?\d+(?:\.\d+)?)\s*\((.+)\)\s*$/) : null;
+    if (match) return { marks: Number(match[1]), grade: match[2] };
+    return { marks: raw, grade: null };
+}
 
 function formatNumber(value, digits = 0) {
     if (value == null || value === "") return "—";
@@ -444,6 +456,11 @@ function ResultTable({ rows, subjects, color, selected }) {
             ? tgpaValues.reduce((sum, tgpa) => sum + tgpa, 0) / tgpaValues.length
             : null;
     const isTranscript = rows.some((row) => row.result_source === "transcript");
+    /* Marks + Grade sub-columns only when the data actually carries subject grades */
+    const splitSubjects = rows.some((row) =>
+        subjects.some((sub) => getSubjectScore(row, sub).grade != null)
+    );
+    const headCell = "px-4 py-3.5 text-center text-sm font-bold text-gray-700 whitespace-nowrap";
 
     return (
         <div className="space-y-4">
@@ -474,11 +491,13 @@ function ResultTable({ rows, subjects, color, selected }) {
                     <thead className="sticky top-0 z-10">
                         <tr className="border-b border-rose-100 bg-rose-50">
                             <th
+                                rowSpan={splitSubjects ? 2 : 1}
                                 className="px-4 py-3.5 text-center text-sm font-bold text-gray-700 sticky left-0 z-20 min-w-[70px] bg-rose-50"
                             >
                                 Rank
                             </th>
                             <th
+                                rowSpan={splitSubjects ? 2 : 1}
                                 className="px-4 py-3.5 text-left text-sm font-bold text-gray-700 sticky left-[70px] z-20 min-w-[130px] bg-rose-50"
                             >
                                 Student ID
@@ -486,29 +505,40 @@ function ResultTable({ rows, subjects, color, selected }) {
                             {subjects.map((sub) => (
                                 <th
                                     key={sub}
-                                    className="px-4 py-3.5 text-center text-sm font-bold text-gray-700 min-w-[130px] whitespace-nowrap"
+                                    colSpan={splitSubjects ? 2 : 1}
+                                    className={`${headCell} ${splitSubjects ? "min-w-[150px]" : "min-w-[130px]"}`}
                                 >
                                     {sub}
                                 </th>
                             ))}
-                            <th className="px-4 py-3.5 text-center text-sm font-bold text-gray-700 min-w-[135px] whitespace-nowrap">
+                            <th rowSpan={splitSubjects ? 2 : 1} className={`${headCell} min-w-[135px]`}>
                                 Overall Total
                             </th>
                             {isTranscript ? (
                                 <>
-                                    <th className="px-4 py-3.5 text-center text-sm font-bold text-gray-700 min-w-[95px] whitespace-nowrap">
+                                    <th rowSpan={splitSubjects ? 2 : 1} className={`${headCell} min-w-[95px]`}>
                                         TGPA
                                     </th>
-                                    <th className="px-4 py-3.5 text-center text-sm font-bold text-gray-700 min-w-[95px] whitespace-nowrap">
+                                    <th rowSpan={splitSubjects ? 2 : 1} className={`${headCell} min-w-[95px]`}>
                                         CGPA
                                     </th>
                                 </>
                             ) : (
-                                <th className="px-4 py-3.5 text-center text-sm font-bold text-gray-700 min-w-[95px] whitespace-nowrap">
+                                <th rowSpan={splitSubjects ? 2 : 1} className={`${headCell} min-w-[95px]`}>
                                     Grade
                                 </th>
                             )}
                         </tr>
+                        {splitSubjects && (
+                            <tr className="border-b border-rose-100 bg-rose-50">
+                                {subjects.map((sub) => (
+                                    <React.Fragment key={sub}>
+                                        <th className="px-3 py-2 text-center text-xs font-semibold text-gray-500 bg-rose-50">Marks</th>
+                                        <th className="px-3 py-2 text-center text-xs font-semibold text-gray-500 bg-rose-50">Grade</th>
+                                    </React.Fragment>
+                                ))}
+                            </tr>
+                        )}
                     </thead>
 
                     <tbody>
@@ -569,11 +599,26 @@ function ResultTable({ rows, subjects, color, selected }) {
                                         {row.student_id}
                                     </td>
 
-                                    {subjects.map((sub) => (
-                                        <td key={sub} className="px-3 py-3 text-center font-medium text-gray-700 tabular-nums">
-                                            {formatNumber(row[sub])}
-                                        </td>
-                                    ))}
+                                    {subjects.map((sub) => {
+                                        if (!splitSubjects) {
+                                            return (
+                                                <td key={sub} className="px-3 py-3 text-center font-medium text-gray-700 tabular-nums">
+                                                    {formatNumber(row[sub])}
+                                                </td>
+                                            );
+                                        }
+                                        const { marks, grade } = getSubjectScore(row, sub);
+                                        return (
+                                            <React.Fragment key={sub}>
+                                                <td className="px-3 py-3 text-center font-medium text-gray-700 tabular-nums">
+                                                    {formatNumber(marks, 2)}
+                                                </td>
+                                                <td className="px-3 py-3 text-center font-semibold text-gray-700">
+                                                    {grade ?? "—"}
+                                                </td>
+                                            </React.Fragment>
+                                        );
+                                    })}
 
                                     <td
                                         className="px-4 py-3 text-center font-extrabold text-red-950 tabular-nums"
