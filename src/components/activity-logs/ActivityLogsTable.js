@@ -18,6 +18,34 @@ const formatTokens = (input, output) => {
   return `${(input || 0).toLocaleString()} / ${(output || 0).toLocaleString()}`;
 };
 
+// created_at comes from the backend as a naive ISO string with NO timezone
+// marker (e.g. "2026-09-28T06:42:55.243000"), even though the underlying
+// value is UTC — MongoDB/pymongo return timezone-aware UTC datetimes as
+// naive Python objects, and .isoformat() on a naive datetime omits any "Z"
+// or offset. Per the JS spec, a date-time string with no timezone marker is
+// parsed as LOCAL time, not UTC — so `new Date(value)` alone silently
+// mis-parses this, showing the raw UTC clock reading as if it were already
+// local (this is the actual cause behind "timing is not indian time": it
+// was displaying the UTC hour unconverted, off by exactly +5:30). Appending
+// "Z" when no timezone marker is present fixes the parse; forcing
+// Asia/Kolkata on the display side then guarantees every viewer sees the
+// same, correct IST time regardless of their own machine's timezone.
+const formatIst = (value) => {
+  if (!value) return "—";
+  const hasTimezoneMarker = /Z$|[+-]\d{2}:?\d{2}$/.test(value);
+  const utcValue = hasTimezoneMarker ? value : `${value}Z`;
+  return new Date(utcValue).toLocaleString("en-IN", {
+    timeZone: "Asia/Kolkata",
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+  });
+};
+
 /**
  * Shared table+pagination shell for the admin/super-admin Activity Logs
  * pages. `variant` picks the name/email field pair (students vs faculty);
@@ -106,7 +134,7 @@ export default function ActivityLogsTable({
                         </td>
                       )}
                       <td className="p-3 text-sm">
-                        {log.created_at ? new Date(log.created_at).toLocaleString() : "—"}
+                        {formatIst(log.created_at)}
                       </td>
                     </tr>
                   ))
