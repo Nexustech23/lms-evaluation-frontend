@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Spinner from "@/components/ui/Spinner";
 
 const ROLE_LABELS = {
@@ -43,6 +43,11 @@ export default function ActivityLogsTable({
   const showType = !isFaculty && showCost;
   const totalPages = Math.ceil((pagination?.total || 0) / (pagination?.limit || 1));
 
+  // Click the Cost header to flip the whole column between USD and INR — a
+  // per-viewer display preference only, so it's fine to reset on reload and
+  // doesn't need a backend round-trip.
+  const [showInr, setShowInr] = useState(false);
+
   return (
     <>
       {error && <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">{error}</div>}
@@ -63,7 +68,15 @@ export default function ActivityLogsTable({
                   <th className="p-3 text-left">Action</th>
                   {showCost && <th className="p-3 text-left">Provider</th>}
                   {showCost && <th className="p-3 text-right">Tokens (In / Out)</th>}
-                  {showCost && <th className="p-3 text-right">Cost (USD)</th>}
+                  {showCost && (
+                    <th
+                      className="p-3 text-right cursor-pointer select-none hover:underline"
+                      onClick={() => setShowInr((prev) => !prev)}
+                      title="Click to switch between USD and INR"
+                    >
+                      Cost ({showInr ? "INR" : "USD"})
+                    </th>
+                  )}
                   <th className="p-3 text-left">Timestamp</th>
                 </tr>
               </thead>
@@ -86,7 +99,11 @@ export default function ActivityLogsTable({
                         </td>
                       )}
                       {showCost && (
-                        <td className="p-3 text-right text-sm">${(log.cost_usd || 0).toFixed(4)}</td>
+                        <td className="p-3 text-right text-sm">
+                          {showInr
+                            ? `₹${(log.cost_inr ?? 0).toFixed(2)}`
+                            : `$${(log.cost_usd || 0).toFixed(4)}`}
+                        </td>
                       )}
                       <td className="p-3 text-sm">
                         {log.created_at ? new Date(log.created_at).toLocaleString() : "—"}
