@@ -220,7 +220,7 @@ export default function FacultyPage() {
         }
     };
     return (
-        <div className="h-screen" style={{ backgroundColor: user.color || "#ff7f10" }}>
+        <div className="min-h-screen" style={{ backgroundColor: user.color || "#ff7f10" }}>
             <Navbar title={t("faculty_title")} />
 
             <div className="p-6 mx-4">

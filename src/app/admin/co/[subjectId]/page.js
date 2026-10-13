@@ -58,7 +58,7 @@ const Page = () => {
   };
 
   return (
-       <div className="h-screen" style={{ backgroundColor: user?.color }}>
+       <div className="min-h-screen" style={{ backgroundColor: user?.color }}>
       <Navbar title={t("title")} />
 
       <div className="mb-4">

@@ -44,7 +44,7 @@ export default function ActivityLogsPage() {
   const accentColor = user?.color || "#ff7f10";
 
   return (
-    <div className="h-screen" style={{ backgroundColor: accentColor }}>
+    <div className="min-h-screen" style={{ backgroundColor: accentColor }}>
       <Navbar title="Activity Logs" />
 
       <div className="p-6 mx-4">
