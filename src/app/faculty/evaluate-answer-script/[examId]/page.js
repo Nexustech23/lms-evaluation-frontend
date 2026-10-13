@@ -12,6 +12,7 @@ import { AuthContext } from "@/app/AuthContext";
 import { FaArrowLeft } from "react-icons/fa";
 import { useTranslations } from "next-intl";
 import { nextPollDelay } from "@/lib/pollBackoff";
+import { fmt2 } from "@/lib/utils";
 
 function withAlpha(hex = "#ff7f10", alpha = 1) {
   const h = hex.replace("#", "");
@@ -148,7 +149,7 @@ export default function SavedResult() {
           stopPolling(answerscriptId);
 
           if (status === "done" && result?.success) {
-            toast.success(`Evaluation completed! Score: ${result.total_ai_marks}/${result.total_max_marks}`);
+            toast.success(`Evaluation completed! Score: ${fmt2(result.total_ai_marks)}/${fmt2(result.total_max_marks)}`);
             setFiles((prev) =>
               prev.map((file) =>
                 file.answer_id === answerscriptId
@@ -433,7 +434,7 @@ export default function SavedResult() {
                           <td className="p-3">
                             {file.total_ai_marks !== 0 && file.total_max_marks !== 0 ? (
                               <span className="font-semibold">
-                                {file.total_final_marks || file.total_ai_marks} / {file.total_max_marks}
+                                {fmt2(file.total_final_marks || file.total_ai_marks)} / {fmt2(file.total_max_marks)}
                               </span>
                             ) : (
                               <span className="text-gray-400">-</span>
@@ -623,7 +624,7 @@ export default function SavedResult() {
                       min: -q.ai_awarded_marks,
                       max: q.max_marks - q.ai_awarded_marks,
                     },
-                    { label: t("finalMarks"), value: q.final_marks ?? q.ai_awarded_marks, disabled: true, extraClass: "bg-green-50 font-semibold" },
+                    { label: t("finalMarks"), value: fmt2(q.final_marks ?? q.ai_awarded_marks), disabled: true, extraClass: "bg-green-50 font-semibold" },
                   ].map(({ label, value, disabled, onChange, min, max, extraClass = "" }) => (
                     <div key={label}>
                       <p className="text-sm font-medium text-gray-600 mb-1">{label}</p>
