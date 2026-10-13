@@ -9,6 +9,7 @@ import toast from "react-hot-toast";
 import { useTranslations } from "next-intl";
 import { useContext } from "react";
 import { AuthContext } from "@/app/AuthContext";
+import { fmt2 } from "@/lib/utils";
 
 /* =========================================================
    HELPERS
@@ -299,9 +300,9 @@ function MarksBadge({ result }) {
         className="inline-block px-2 py-1 rounded-lg text-xs font-bold"
         style={{ backgroundColor: bg, color: textColor }}
       >
-        {result.final_marks}/{result.max_marks}
+        {fmt2(result.final_marks)}/{fmt2(result.max_marks)}
       </span>
-      <span className="text-[10px] text-gray-400">{pct}%</span>
+      <span className="text-[10px] text-gray-400">{fmt2(pct)}%</span>
     </div>
   );
 }
@@ -529,7 +530,7 @@ function StudentResultsGrid({ data, color, loading }) {
                           color: darkenColor(color),
                         }}
                       >
-                        {totalObtained}/{grandMax}
+                        {fmt2(totalObtained)}/{fmt2(grandMax)}
                       </span>
                       <span className="text-[10px] text-gray-400">{totalPct}%</span>
                     </div>
@@ -540,7 +541,7 @@ function StudentResultsGrid({ data, color, loading }) {
                     {student.composite_percentage != null ? (
                       <div className="flex flex-col items-center gap-0.5">
                         <span className="text-sm font-bold text-gray-800">
-                          {student.composite_percentage}%
+                          {fmt2(student.composite_percentage)}%
                         </span>
                         {student.is_partial && (
                           <span
@@ -586,13 +587,13 @@ function StudentResultsGrid({ data, color, loading }) {
                   (s) => s.results[exam.exam_id] !== null
                 );
                 const avg = appeared.length
-                  ? (
+                  ? fmt2(
                     appeared.reduce(
                       (sum, s) =>
                         sum + (s.results[exam.exam_id]?.final_marks || 0),
                       0
                     ) / appeared.length
-                  ).toFixed(1)
+                  )
                   : "—";
 
                 return (
@@ -612,7 +613,7 @@ function StudentResultsGrid({ data, color, loading }) {
               <td className="text-center px-4 py-3">
                 <span className="text-xs font-bold" style={{ color: darkenColor(color) }}>
                   {students.length
-                    ? (
+                    ? fmt2(
                       students.reduce((sum, student) => {
                         const obt = exams.reduce((s, e) => {
                           const r = student.results[e.exam_id];
@@ -620,7 +621,7 @@ function StudentResultsGrid({ data, color, loading }) {
                         }, 0);
                         return sum + (grandMax ? (obt / grandMax) * 100 : 0);
                       }, 0) / students.length
-                    ).toFixed(1) + "%"
+                    ) + "%"
                     : "—"}
                 </span>
               </td>
@@ -633,7 +634,7 @@ function StudentResultsGrid({ data, color, loading }) {
                     if (!graded.length) return "—";
                     const avg =
                       graded.reduce((sum, s) => sum + s.composite_percentage, 0) / graded.length;
-                    return avg.toFixed(1) + "%";
+                    return fmt2(avg) + "%";
                   })()}
                 </span>
               </td>
