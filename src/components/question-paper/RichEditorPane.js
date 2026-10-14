@@ -1213,6 +1213,11 @@ export function RichEditorPane({ editorContent, setEditorContent, showPreview, p
   }, []);
 
   const lastEditorContentRef = useRef(editorContent || "");
+  // Every value this pane has pushed up to the parent. The parent echoes them
+  // back as the `editorContent` prop, possibly one or two renders late; those
+  // echoes must not be mistaken for an outside change (which would reset and
+  // remount every editor page and loop).
+  const emittedContentRef = useRef(new Set());
 
   // Aggregate all pages into one HTML string for parent + preview
   const [aggregatedHtml, setAggregatedHtml] = useState(editorContent || "");
@@ -1220,12 +1225,19 @@ export function RichEditorPane({ editorContent, setEditorContent, showPreview, p
     const combined = pages.map(p => p.html).join("");
     setAggregatedHtml(combined);
     lastEditorContentRef.current = combined;
+    const emitted = emittedContentRef.current;
+    emitted.add(combined);
+    if (emitted.size > 50) emitted.delete(emitted.values().next().value);
     setEditorContent(combined);
   }, [pages, setEditorContent]);
 
   // Sync parent's editorContent back to pages if parent gets diagrams loaded asynchronously
   useEffect(() => {
-    if (editorContent && editorContent !== lastEditorContentRef.current) {
+    if (
+      editorContent &&
+      editorContent !== lastEditorContentRef.current &&
+      !emittedContentRef.current.has(editorContent)
+    ) {
       setPages([{ id: Date.now(), html: editorContent }]);
       lastEditorContentRef.current = editorContent;
     }
