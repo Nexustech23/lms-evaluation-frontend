@@ -18,6 +18,7 @@ import { useDocuments } from "../../../api/Document"
 import { AuthContext } from "@/app/AuthContext";
 import { useContext } from "react";
 
+import { getPageNumbers } from "@/lib/utils";
 export default function SavedResult() {
   const { user} = useContext(AuthContext);
   const [documents ,setDocuments] =useState(null)
@@ -524,10 +525,9 @@ const fetchDocuments = async () => {
       </button>
 
       {/* Pages */}
-      {Array.from(
-        { length: totalPages },
-        (_, i) => i + 1
-      ).map((page) => (
+      {getPageNumbers(currentPage, totalPages).map((page, pageIdx) => page === "…" ? (
+<span key={`gap-${pageIdx}`} className="px-2 text-gray-400 select-none">…</span>
+) : (
         <button
           key={page}
           onClick={() =>

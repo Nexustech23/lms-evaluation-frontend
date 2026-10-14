@@ -12,6 +12,7 @@ import { useDocuments } from "../../../api/Document"
 import { useContext } from "react";
 import { AuthContext } from "@/app/AuthContext";
 
+import { getPageNumbers } from "@/lib/utils";
 export default function page() {
   const { user } = useContext(AuthContext);
   const router = useRouter();
@@ -303,10 +304,9 @@ export default function page() {
                       </button>
 
                       {/* Page Numbers */}
-                      {Array.from(
-                        { length: totalPages },
-                        (_, i) => i + 1
-                      ).map((page) => (
+                      {getPageNumbers(currentPage, totalPages).map((page, pageIdx) => page === "…" ? (
+<span key={`gap-${pageIdx}`} className="px-2 text-gray-400 select-none">…</span>
+) : (
                         <button
                           key={page}
                           onClick={() =>

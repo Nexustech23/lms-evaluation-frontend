@@ -23,6 +23,7 @@ import { AuthContext } from "@/app/AuthContext";
 
 import Filters from "@/components/Filters";
 
+import { getPageNumbers } from "@/lib/utils";
 /** Convert hex + alpha → rgba */
 function withAlpha(
   hex = "#ff7f10",
@@ -389,10 +390,9 @@ export default function SavedResult() {
                   </button>
 
                   {/* Pages */}
-                  {Array.from(
-                    { length: totalPages },
-                    (_, i) => i + 1
-                  ).map((page) => (
+                  {getPageNumbers(currentPage, totalPages).map((page, pageIdx) => page === "…" ? (
+<span key={`gap-${pageIdx}`} className="px-2 text-gray-400 select-none">…</span>
+) : (
                     <button
                       key={page}
                       onClick={() =>

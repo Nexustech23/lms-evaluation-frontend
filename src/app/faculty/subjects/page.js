@@ -10,6 +10,7 @@ import { IconEye } from "@tabler/icons-react";
 import { useTranslations } from "next-intl";
 import Filters from "@/components/Filters";
 
+import { getPageNumbers } from "@/lib/utils";
 function withAlpha(hex = "#ff7f10", alpha = 1) {
   const h = hex.replace("#", "");
   const r = parseInt(h.substring(0, 2), 16);
@@ -266,10 +267,9 @@ export default function SubjectsPage() {
                       Prev
                     </button>
 
-                    {Array.from(
-                      { length: totalPages },
-                      (_, i) => i + 1
-                    ).map((page) => (
+                    {getPageNumbers(currentPage, totalPages).map((page, pageIdx) => page === "…" ? (
+<span key={`gap-${pageIdx}`} className="px-2 text-gray-400 select-none">…</span>
+) : (
                       <button
                         key={page}
                         onClick={() => setCurrentPage(page)}
