@@ -10,6 +10,7 @@ import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
 import axios from "axios";
 
+import { getPageNumbers } from "@/lib/utils";
 export default function SavedResult() {
   const [filters, setFilters] = useState({
     selectedSchool: "",
@@ -338,10 +339,9 @@ export default function SavedResult() {
                     </button>
 
                     {/* Page Numbers */}
-                    {Array.from(
-                      { length: totalPages },
-                      (_, i) => i + 1
-                    ).map((page) => (
+                    {getPageNumbers(currentPage, totalPages).map((page, pageIdx) => page === "…" ? (
+<span key={`gap-${pageIdx}`} className="px-2 text-gray-400 select-none">…</span>
+) : (
                       <button
                         key={page}
                         onClick={() =>
