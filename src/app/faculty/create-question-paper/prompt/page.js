@@ -17,7 +17,7 @@ import { AuthContext } from "@/app/AuthContext";
 import { STAGES } from "@/lib/question-paper/constants";
 import { withAlpha, darkenColor } from "@/lib/question-paper/colorHelpers";
 import { buildPreviewHtml } from "@/lib/question-paper/previewBuilder";
-import { nextPollDelay } from "@/lib/pollBackoff";
+import { startRecoverablePolling } from "@/lib/pollBackoff";
 
 import Navbar from "@/components/ui/Navbar";
 import FilterBar from "@/components/question-paper/FilterBar";
@@ -51,6 +51,13 @@ export default function QuestionPaperGenerator() {
   const [isDragging, setIsDragging] = useState(false);
   const [coursePlannerFile, setCoursePlannerFile] = useState(null);
   const [isCoursePlannerDragging, setIsCoursePlannerDragging] = useState(false);
+  const generationPollRef = useRef(null);
+  const generationStartingRef = useRef(false);
+  const generationMountedRef = useRef(true);
+  useEffect(() => {
+    generationMountedRef.current = true;
+    return () => { generationMountedRef.current = false; generationPollRef.current?.(); };
+  }, []);
   const fileInputRef = useRef(null);
   const coursePlannerInputRef = useRef(null);
 
@@ -438,6 +445,7 @@ export default function QuestionPaperGenerator() {
 
   // ── Generate ──────────────────────────────────────────────────────────────
   const handleGenerate = async () => {
+    if (generationStartingRef.current) return;
     if (!sectionPercentValid) {
       toast.error(
         totalSectionPercent !== 100
@@ -447,6 +455,7 @@ export default function QuestionPaperGenerator() {
       return;
     }
 
+    generationStartingRef.current = true;
     setStage(STAGES.GENERATING);
     setGenerationStep("starting");
 
@@ -500,47 +509,17 @@ export default function QuestionPaperGenerator() {
         );
       }
 
-      // Polling loop — exponential backoff (Phase 5.2), 5-minute wall-clock
-      // deadline (was 120 * 2.5s fixed).
+      if (!generationMountedRef.current) return;
       const result = await new Promise((resolve, reject) => {
-        const startedAt = Date.now();
-        let delay = 0;
-        const schedule = () => {
-          delay = nextPollDelay(delay);
-          setTimeout(tick, delay);
-        };
-        const tick = async () => {
-          if (Date.now() - startedAt > 300000) {
-            reject(new Error("Generation timed out."));
-            return;
-          }
-          try {
-            const pollRes = await axios.get(
-              `/api/question-paper/generate-ai/status/${jobId}`,
-              { withCredentials: true },
-            );
-            const job = pollRes.data;
-            if (job.step) setGenerationStep(job.step);
-            if (job.status === "completed") {
-              resolve(job);
-            } else if (job.status === "failed") {
-              reject(new Error(job.error || "Generation failed."));
-            } else {
-              schedule();
-            }
-          } catch (pollErr) {
-            if (
-              pollErr?.response?.status >= 400 &&
-              pollErr?.response?.status < 500
-            ) {
-              reject(pollErr);
-              return;
-            }
-            // transient (5xx / network) — keep polling
-            schedule();
-          }
-        };
-        schedule();
+        generationPollRef.current?.();
+        generationPollRef.current = startRecoverablePolling({
+          request: async (signal) => (await axios.get(`/api/question-paper/generate-ai/status/${jobId}`,
+            { withCredentials: true, signal, timeout: 20000 })).data,
+          onProgress: (job) => { if (job.step) setGenerationStep(job.step); },
+          onReconnect: () => setGenerationStep("Connection interrupted. Reconnecting to the same job..."),
+          onDone: resolve,
+          onError: reject,
+        });
       });
 
       const {
@@ -758,6 +737,7 @@ export default function QuestionPaperGenerator() {
       );
       setStage(STAGES.INPUT);
     } finally {
+      generationStartingRef.current = false;
       setGenerationStep("");
     }
   };

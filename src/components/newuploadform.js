@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import Spinner from "@/components/ui/Spinner";
 
 import { cn } from "@/lib/utils";
+import { examDateTimeInput } from "@/lib/examDateTime";
 
 import { AuthContext } from "@/app/AuthContext";
 
@@ -424,10 +425,8 @@ export function ExamDetailsForm() {
         subjectcode: folder.subject_code || "",
         examdetails: folder.exam_title || "",
         examtype: folder.exam_type || "",
-        examdate: folder.exam_date
-          ? new Date(folder.exam_date).toISOString().slice(0, 16)
-          : "",
-        weightage: folder.weightage || "",
+        examdate: examDateTimeInput(folder.exam_date),
+        weightage: folder.weightage ?? "",
         is_course_exit_summary: folder.is_course_exit_summary ?? false,
       });
     };
@@ -470,6 +469,9 @@ export function ExamDetailsForm() {
     ["school", "programme", "batch", "semester", "subject_id", "examdetails", "examtype", "examdate"].forEach((field) => {
       if (!formData[field]?.toString().trim()) errors[field] = "This field is required";
     });
+    if (formData.weightage !== "" && (!Number.isFinite(Number(formData.weightage)) || Number(formData.weightage) < 0 || Number(formData.weightage) > 100)) {
+      errors.weightage = "Weightage must be between 0 and 100";
+    }
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -514,6 +516,7 @@ export function ExamDetailsForm() {
     } catch (error) {
       toast.error(
         error?.response?.data?.error ||
+        (typeof error?.response?.data?.detail === "string" ? error.response.data.detail : null) ||
         `Failed to ${isEditMode ? "update" : "save"} exam details. Please try again.`
       );
     } finally {
@@ -763,7 +766,7 @@ export function ExamDetailsForm() {
                       {fieldErrors.examdate && <p className="text-sm text-red-500 mt-1">{fieldErrors.examdate}</p>}
                     </LabelInputContainer>
 
-                    <LabelInputContainer>
+                    <LabelInputContainer error={fieldErrors.weightage} touched={touchedFields.weightage}>
                       <Label htmlFor="weightage">{t("weightage")}</Label>
                       <Input
                         id="weightage"
@@ -771,10 +774,12 @@ export function ExamDetailsForm() {
                         type="number"
                         min="0"
                         max="100"
+                        step="any"
                         value={formData.weightage}
                         onChange={handleInputChange}
-                        className="border-gray-300 bg-white"
+                        className={`${fieldErrors.weightage ? "border-red-500" : "border-gray-300"} bg-white`}
                       />
+                      {fieldErrors.weightage && <p className="text-sm text-red-500 mt-1">{fieldErrors.weightage}</p>}
                     </LabelInputContainer>
 
                     <LabelInputContainer>

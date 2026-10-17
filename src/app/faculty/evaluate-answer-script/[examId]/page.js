@@ -11,7 +11,7 @@ import { useContext } from "react";
 import { AuthContext } from "@/app/AuthContext";
 import { FaArrowLeft } from "react-icons/fa";
 import { useTranslations } from "next-intl";
-import { nextPollDelay } from "@/lib/pollBackoff";
+import { startRecoverablePolling } from "@/lib/pollBackoff";
 import { fmt2 } from "@/lib/utils";
 
 function withAlpha(hex = "#ff7f10", alpha = 1) {
@@ -55,10 +55,16 @@ export default function SavedResult() {
 
   const [evaluatingStates, setEvaluatingStates] = useState({});
   const pollingRefs = useRef({});
-  const pollDelayRefs = useRef({});
+  const startingRefs = useRef(new Set());
+  const mountedRef = useRef(true);
 
   useEffect(() => {
-    return () => { Object.values(pollingRefs.current).forEach(clearTimeout); };
+    const polls = pollingRefs.current;
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      Object.entries(polls).forEach(([id, cancel]) => { cancel(); delete polls[id]; });
+    };
   }, []);
 
   // ─── helpers ─────────────────────────────────────────────────────────────────
@@ -78,19 +84,64 @@ export default function SavedResult() {
 
   const stopPolling = (answerId) => {
     if (pollingRefs.current[answerId]) {
-      clearTimeout(pollingRefs.current[answerId]);
+      pollingRefs.current[answerId]();
       delete pollingRefs.current[answerId];
     }
-    delete pollDelayRefs.current[answerId];
+
   };
 
   // ─── data fetching ────────────────────────────────────────────────────────────
+
+  const pendingKey = `lms:evaluations:${folderId}`;
+  const rememberJob = (answerId, jobId) => {
+    try {
+      const pending = JSON.parse(sessionStorage.getItem(pendingKey) || "{}");
+      if (jobId) pending[answerId] = jobId;
+      else delete pending[answerId];
+      sessionStorage.setItem(pendingKey, JSON.stringify(pending));
+    } catch { /* Polling still works without browser storage. */ }
+  };
+
+  const startPolling = (answerId, jobId) => {
+    stopPolling(answerId);
+    rememberJob(answerId, jobId);
+    setEvalState(answerId, { isEvaluating: true, jobId, step: "Checking evaluation..." });
+    pollingRefs.current[answerId] = startRecoverablePolling({
+      request: async (signal) => (await axios.get(`/api/evaluate-answer-script/status/${jobId}`,
+        { withCredentials: true, signal, timeout: 20000 })).data,
+      onProgress: (job) => setEvalState(answerId, { progress: job.progress ?? 0, step: job.step || "Processing..." }),
+      onReconnect: () => setEvalState(answerId, { step: "Connection interrupted. Reconnecting to the same job..." }),
+      onDone: (job) => {
+        stopPolling(answerId);
+        rememberJob(answerId, null);
+        clearEvalState(answerId);
+        if (!job.result?.success) { toast.error("Evaluation returned no result. Refresh the answer list."); return; }
+        setFiles((prev) => prev.map((file) => file.answer_id === answerId ? { ...file, ...job.result, content: true } : file));
+        toast.success(`Evaluation completed! Score: ${fmt2(job.result.total_ai_marks)}/${fmt2(job.result.total_max_marks)}`);
+      },
+      onError: (error) => {
+        stopPolling(answerId);
+        rememberJob(answerId, null);
+        clearEvalState(answerId);
+        toast.error(error?.response?.data?.error || error?.message || "Unable to read job status");
+      },
+    });
+  };
 
   const fetchDetails = async () => {
     try {
       setLoading(true);
       const res = await axios.get(`/api/get-answer-scripts/${folderId}`, { withCredentials: true });
-      setFiles(res.data.answer_scripts || []);
+      if (!mountedRef.current) return;
+      const scripts = res.data.answer_scripts || [];
+      setFiles(scripts);
+      try {
+        const pending = JSON.parse(sessionStorage.getItem(pendingKey) || "{}");
+        for (const script of scripts) {
+          const jobId = pending[script.answer_id];
+          if (typeof jobId === "string" && !pollingRefs.current[script.answer_id]) startPolling(script.answer_id, jobId);
+        }
+      } catch { /* No resumable browser state. */ }
       setSelectedFolder(res.data.foldername || "Evaluated Answer Sheets");
     } catch {
       toast.error("Failed to load folder");
@@ -104,7 +155,8 @@ export default function SavedResult() {
   // ─── evaluate single ─────────────────────────────────────────────────────────
 
   const handleEvaluate = async (answerscriptId) => {
-    if (evaluatingStates[answerscriptId]?.isEvaluating) return;
+    if (startingRefs.current.has(answerscriptId) || pollingRefs.current[answerscriptId]) return;
+    startingRefs.current.add(answerscriptId);
 
     setEvalState(answerscriptId, { isEvaluating: true, progress: 0, step: "Starting evaluation…", jobId: null });
 
@@ -127,54 +179,14 @@ export default function SavedResult() {
 
       setEvalState(answerscriptId, { jobId, progress: 5, step: "Job queued…" });
 
-      // Recursive setTimeout with exponential backoff (Phase 5.2) — an
-      // "Evaluate All" burst no longer fires one request per script every 4s
-      // for the whole (minutes-long) run. Timer id still lives in
-      // pollingRefs so stopPolling / unmount cleanup cancel it.
-      const pollOnce = async () => {
-        try {
-          const statusRes = await axios.get(
-            `/api/evaluate-answer-script/status/${jobId}`,
-            { withCredentials: true }
-          );
-          const { status, progress, step, result, message } = statusRes.data;
-
-          if (status === "processing") {
-            setEvalState(answerscriptId, { progress: progress ?? 0, step: step ?? "Processing…" });
-            pollDelayRefs.current[answerscriptId] = nextPollDelay(pollDelayRefs.current[answerscriptId]);
-            pollingRefs.current[answerscriptId] = setTimeout(pollOnce, pollDelayRefs.current[answerscriptId]);
-            return;
-          }
-
-          stopPolling(answerscriptId);
-
-          if (status === "done" && result?.success) {
-            toast.success(`Evaluation completed! Score: ${fmt2(result.total_ai_marks)}/${fmt2(result.total_max_marks)}`);
-            setFiles((prev) =>
-              prev.map((file) =>
-                file.answer_id === answerscriptId
-                  ? { ...file, ...result, content: true }
-                  : file
-              )
-            );
-            setEvalState(answerscriptId, { progress: 100, step: "Done!" });
-            setTimeout(() => clearEvalState(answerscriptId), 800);
-          } else {
-            throw new Error(message || "Evaluation failed");
-          }
-        } catch (pollErr) {
-          stopPolling(answerscriptId);
-          clearEvalState(answerscriptId);
-          toast.error(pollErr?.response?.data?.error || pollErr?.message || "Evaluation failed");
-        }
-      };
-
-      pollDelayRefs.current[answerscriptId] = nextPollDelay(0);
-      pollingRefs.current[answerscriptId] = setTimeout(pollOnce, pollDelayRefs.current[answerscriptId]);
+      rememberJob(answerscriptId, jobId);
+      if (mountedRef.current) startPolling(answerscriptId, jobId);
     } catch (err) {
       stopPolling(answerscriptId);
       clearEvalState(answerscriptId);
-      toast.error(err?.response?.data?.error || "Failed to start evaluation");
+      toast.error(err?.response?.data?.error || err?.response?.data?.detail || "Failed to start evaluation");
+    } finally {
+      startingRefs.current.delete(answerscriptId);
     }
   };
 
@@ -182,7 +194,8 @@ export default function SavedResult() {
 
   const handleEvaluateAll = async () => {
     const unevaluated = files.filter(
-      (f) => !evaluatingStates[f.answer_id]?.isEvaluating
+      (f) => !evaluatingStates[f.answer_id]?.isEvaluating && !startingRefs.current.has(f.answer_id)
+        && !f.reviewed_by_professor && !f.evaluated_at && !f.evaluated_report_url
     );
 
     if (unevaluated.length === 0) {
@@ -245,7 +258,8 @@ export default function SavedResult() {
       toast.success("Self evaluation saved successfully ✅");
       setOpen(false);
     } catch (err) {
-      toast.error(err?.response?.data?.error || "Failed to save self evaluation");
+      const detail = err?.response?.data?.detail;
+      toast.error(err?.response?.data?.error || (typeof detail === "string" ? detail : null) || "Failed to save self evaluation");
     } finally {
       setLoading(false);
     }
@@ -281,7 +295,8 @@ export default function SavedResult() {
   // ─── derived state ────────────────────────────────────────────────────────────
 
   const anyEvaluating = Object.values(evaluatingStates).some((s) => s.isEvaluating);
-  const unevaluatedCount = files.filter((f) => !evaluatingStates[f.answer_id]?.isEvaluating).length;
+  const unevaluatedCount = files.filter((f) => !evaluatingStates[f.answer_id]?.isEvaluating && !startingRefs.current.has(f.answer_id)
+        && !f.reviewed_by_professor && !f.evaluated_at && !f.evaluated_report_url).length;
 
   // ─── render ───────────────────────────────────────────────────────────────────
 
@@ -434,7 +449,7 @@ export default function SavedResult() {
                           <td className="p-3">
                             {file.total_ai_marks !== 0 && file.total_max_marks !== 0 ? (
                               <span className="font-semibold">
-                                {fmt2(file.total_final_marks || file.total_ai_marks)} / {fmt2(file.total_max_marks)}
+                                {fmt2(file.total_final_marks ?? file.total_ai_marks)} / {fmt2(file.total_max_marks)}
                               </span>
                             ) : (
                               <span className="text-gray-400">-</span>
@@ -677,7 +692,7 @@ export default function SavedResult() {
                                 />
                               </td>
                               <td className="border p-2 text-center font-semibold text-green-600">
-                                {co.final_co_marks || co.ai_marks}
+                                {co.final_co_marks ?? co.ai_marks}
                               </td>
                               <td className="border p-2 text-gray-600">{co.remarks}</td>
                             </tr>
