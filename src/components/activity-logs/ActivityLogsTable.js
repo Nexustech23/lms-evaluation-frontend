@@ -123,12 +123,12 @@ export default function ActivityLogsTable({
                       )}
                       {showCost && (
                         <td className="p-3 text-right text-sm">
-                          {formatTokens(log.input_tokens, log.output_tokens)}
+                          {log.usage_status === "unknown" ? "Unknown" : formatTokens(log.input_tokens, log.output_tokens)}
                         </td>
                       )}
                       {showCost && (
                         <td className="p-3 text-right text-sm">
-                          {showInr
+                          {log.usage_status === "unknown" || log.cost_status === "unknown" ? "Unknown" : showInr
                             ? `₹${(log.cost_inr ?? 0).toFixed(2)}`
                             : `$${(log.cost_usd || 0).toFixed(4)}`}
                         </td>

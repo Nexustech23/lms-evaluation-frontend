@@ -20,3 +20,50 @@ export function nextPollDelay(current) {
   if (!current || current < POLL_START_MS) return POLL_START_MS;
   return Math.min(Math.round(current * POLL_FACTOR), POLL_MAX_MS);
 }
+
+export function isRetryablePollError(error) {
+  const status = error?.response?.status;
+  const jobStatus = error?.response?.data?.status;
+  if (jobStatus === "failed" || jobStatus === "error") return false;
+  return !status || [408, 425, 429].includes(status) || status >= 500;
+}
+
+export function startRecoverablePolling({ request, onProgress, onDone, onError, onReconnect,
+  schedule = setTimeout, unschedule = clearTimeout }) {
+  let stopped = false;
+  let delay = 0;
+  let timer;
+  let controller;
+  const again = () => {
+    if (!stopped) timer = schedule(tick, (delay = nextPollDelay(delay)));
+  };
+  const tick = async () => {
+    if (stopped) return;
+    controller = new AbortController();
+    try {
+      const job = await request(controller.signal);
+      if (stopped) return;
+      if (["queued", "processing", "running"].includes(job.status)) {
+        onProgress?.(job);
+        again();
+      } else if (["done", "completed"].includes(job.status)) {
+        stopped = true;
+        onDone(job);
+      } else {
+        stopped = true;
+        onError(new Error(job.user_message || job.message || job.error || "Job failed"));
+      }
+    } catch (error) {
+      if (stopped) return;
+      if (isRetryablePollError(error)) {
+        onReconnect?.();
+        again();
+      } else {
+        stopped = true;
+        onError(error);
+      }
+    }
+  };
+  again();
+  return () => { stopped = true; unschedule(timer); controller?.abort(); };
+}

@@ -9,6 +9,7 @@ import toast from "react-hot-toast";
 import { FaArrowLeft } from "react-icons/fa";
 import { useTranslations } from "next-intl";
 import { AuthContext } from "@/app/AuthContext";
+import { mergeCoImport } from "@/lib/coImport";
 
 // Lazy-load SheetJS (~500KB) — only when the user uploads a CO spreadsheet (Phase 5.3).
 let _xlsxPromise;
@@ -134,57 +135,18 @@ const Page = () => {
           return;
         }
 
-        // ── Parse header row ─────────────────────────────────────────────────
-        // Expected:  co_code | co_description | PO1 | PO2 | PO3 | ...
-        // Column names are flexible — first col = CO code, second = description,
-        // rest = PO columns whose headers must match po_code values.
-        const headerRow = rows[0].map((h) => String(h).trim());
-
-        // Find PO columns — any header that is not col-0 or col-1
-        // We match them against programmePOs if available; otherwise use as-is.
-        const poColumnsInExcel = headerRow.slice(2); // ["PO1","PO2","PO3",...]
-
-        // ── Parse data rows ──────────────────────────────────────────────────
-        const newCoList = [];
-        const newMatrix = {};
-
-        for (let r = 1; r < rows.length; r++) {
-          const row = rows[r];
-
-          const coCode = String(row[0] || "").trim();
-          const coDesc = String(row[1] || "").trim();
-
-          if (!coCode) continue; // skip empty rows
-
-          newCoList.push({ co_code: coCode, description: coDesc, threshold: 0 });
-
-          // Build matrix row for this CO
-          newMatrix[coCode] = {};
-          poColumnsInExcel.forEach((poHeader, colIdx) => {
-            const cellVal  = row[2 + colIdx];
-            const numVal   = Number(cellVal);
-            const safeVal  = isNaN(numVal) ? 0 : Math.min(3, Math.max(0, numVal));
-            newMatrix[coCode][poHeader] = safeVal;
-          });
-        }
-
-        if (newCoList.length === 0) {
-          toast.error("No valid CO rows found. Check your Excel format.");
-          setParsing(false);
-          return;
-        }
-
-        setCoList(newCoList);
-        setMatrix(newMatrix);
+        const imported = mergeCoImport(rows, coList, matrix, programmePOs);
+        setCoList(imported.coList);
+        setMatrix(imported.matrix);
         setShowMatrix(true);
 
         toast.success(
-          `Imported ${newCoList.length} COs with ${poColumnsInExcel.length} PO columns.`
+          `Imported ${imported.importedCount} COs. Existing mappings kept; supplied PO values applied.`
         );
 
       } catch (err) {
         console.error(err);
-        toast.error("Failed to parse Excel file. Check the format and try again.");
+        toast.error(err?.message || "Failed to parse Excel file. Check the format and try again.");
       } finally {
         setParsing(false);
       }
@@ -275,16 +237,10 @@ const Page = () => {
     );
   }
 
-  // Determine which PO columns to show in the matrix table.
-  // If we imported from Excel, use the keys from the first CO row.
-  // Otherwise fall back to programmePOs from the API.
-  const matrixPOKeys = (() => {
-    const firstCoKey = Object.keys(matrix)[0];
-    if (firstCoKey && Object.keys(matrix[firstCoKey] || {}).length > 0) {
-      return Object.keys(matrix[firstCoKey]);
-    }
-    return programmePOs.map((po) => po.po_code);
-  })();
+  const matrixPOKeys = [...new Set([
+    ...programmePOs.map((po) => po.po_code),
+    ...Object.values(matrix).flatMap((row) => Object.keys(row || {})),
+  ])];
 
   return (
     <div className="min-h-screen " style={{ backgroundColor: user?.color || "#cc6600", minHeight: "100vh" }}>
@@ -328,6 +284,9 @@ const Page = () => {
                 </code>
                 &nbsp;{t("importNote2")}
               </p>
+              <p className="text-sm text-gray-600 mt-2">
+                Import updates or adds COs and keeps existing mappings. Blank PO cells keep the saved value; enter 0 to clear a mapping.
+              </p>
             </div>
 
             {/* Hidden file input */}
@@ -341,7 +300,7 @@ const Page = () => {
 
             <button
               onClick={() => excelInputRef.current?.click()}
-              disabled={parsing}
+              disabled={parsing || saving}
                style={{ backgroundColor: user?.color || "#cc6600",}}
               className="flex items-center rounded gap-2 px-4 py-2 text-white text-sm font-semibold hover:bg-orange-600 disabled:opacity-50 transition"
             >
@@ -368,12 +327,14 @@ const Page = () => {
             <div key={index} className="border p-3 rounded bg-gray-50 relative">
               <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                 <input
+                  disabled={parsing || saving}
                   placeholder={t("coCode")}
                   value={co.co_code}
                   onChange={(e) => handleCoChange(index, "co_code", e.target.value)}
                   className="p-2 border rounded w-full"
                 />
                 <input
+                  disabled={parsing || saving}
                   placeholder={t("coDescription")}
                   value={co.description}
                   onChange={(e) => handleCoChange(index, "description", e.target.value)}
@@ -382,6 +343,7 @@ const Page = () => {
               </div>
               {coList.length > 1 && (
                 <button
+                  disabled={parsing || saving}
                   onClick={() => removeCo(index)}
                   className="absolute top-2 right-2 text-red-500"
                 >
@@ -394,6 +356,7 @@ const Page = () => {
 
         {/* Add CO */}
         <button
+          disabled={parsing || saving}
           onClick={addMoreCo}
           className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
         >
@@ -403,6 +366,7 @@ const Page = () => {
         {/* Generate Matrix Button */}
         <div className="mt-8">
           <button
+            disabled={parsing || saving}
             onClick={generateMatrix}
             className="bg-green-600 text-white px-5 py-2 rounded"
           >
@@ -431,6 +395,7 @@ const Page = () => {
                       {matrixPOKeys.map((poKey) => (
                         <td key={poKey} className="border p-2 text-center">
                           <input
+                            disabled={parsing || saving}
                             type="number"
                             min={0}
                             max={3}
@@ -458,7 +423,7 @@ const Page = () => {
             {tc("cancel")}
           </button>
           <button
-            disabled={saving}
+            disabled={saving || parsing}
             onClick={handleSave}
               style={{ backgroundColor: user?.color || "#cc6600",}}
             className=" text-white px-6 py-2 rounded"
