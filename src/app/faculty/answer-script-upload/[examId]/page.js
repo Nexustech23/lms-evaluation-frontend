@@ -40,13 +40,6 @@ export default function SavedResult() {
 
   const router = useRouter();
 
-  /* ---------------- IMAGEKIT ---------------- */
-  const authenticator = async () => {
-    const res = await fetch(`/api/imagekit-auth`, { credentials: "include" });
-    if (!res.ok) throw new Error("ImageKit auth failed");
-    return res.json();
-  };
-
   /* ---------------- FETCH ---------------- */
   const fetchDetails = async () => {
     try {
@@ -91,20 +84,14 @@ export default function SavedResult() {
         [tempId]: { name: file.name, progress: 0 },
       }));
 
-      const authData = await authenticator();
-
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("publicKey", authData.publicKey);
-      formData.append("signature", authData.signature);
-      formData.append("expire", authData.expire);
-      formData.append("token", authData.token);
-      formData.append("fileName", file.name);
 
       const response = await axios.post(
-        `https://upload.imagekit.io/api/v1/files/upload`,
+        `/api/answer-script-file/${folderId}`,
         formData,
         {
+          withCredentials: true,
           onUploadProgress: (progressEvent) => {
             const percentCompleted = Math.round(
               (progressEvent.loaded * 100) / progressEvent.total
@@ -212,11 +199,17 @@ export default function SavedResult() {
 
   const confirmDelete = async () => {
     try {
-      await axios.delete(`/api/delete-file`, {
+      const response = await axios.delete(`/api/delete-file`, {
         data: { answer_id: selectedId },
         withCredentials: true,
       });
-      toast.success("File deleted");
+      if (response.data.errors?.length) {
+        toast("Removed from exam, but stored files could not be deleted.");
+      } else if (response.data.retained_unverified_files?.length) {
+        toast("Removed from exam; the original stored files were retained.");
+      } else {
+        toast.success("File deleted");
+      }
       fetchDetails(folderId);
     } catch {
       toast.error("Delete failed");

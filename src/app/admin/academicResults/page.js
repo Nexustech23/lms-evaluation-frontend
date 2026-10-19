@@ -290,6 +290,10 @@ function MarksBadge({ result }) {
     );
   }
 
+  if (result.status === "pending" || result.percentage == null) {
+    return <span className="text-xs font-medium text-amber-700">Pending evaluation</span>;
+  }
+
   const pct = result.percentage ?? 0;
   const bg = pct >= 75 ? "rgba(34,197,94,0.12)" : pct >= 50 ? "rgba(234,179,8,0.12)" : "rgba(239,68,68,0.12)";
   const textColor = pct >= 75 ? "#15803d" : pct >= 50 ? "#a16207" : "#b91c1c";
@@ -530,9 +534,9 @@ function StudentResultsGrid({ data, color, loading }) {
                           color: darkenColor(color),
                         }}
                       >
-                        {fmt2(totalObtained)}/{fmt2(grandMax)}
+                        {student.composite_percentage == null ? "Pending" : `${fmt2(totalObtained)}/${fmt2(grandMax)}`}
                       </span>
-                      <span className="text-[10px] text-gray-400">{totalPct}%</span>
+                      {student.composite_percentage != null && <span className="text-[10px] text-gray-400">{totalPct}%</span>}
                     </div>
                   </td>
 
@@ -554,7 +558,7 @@ function StudentResultsGrid({ data, color, loading }) {
                         )}
                       </div>
                     ) : (
-                      <span className="text-gray-300 text-xs">—</span>
+                      <span className="text-amber-700 text-xs">Pending evaluation</span>
                     )}
                   </td>
 
