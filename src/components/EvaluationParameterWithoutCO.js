@@ -279,6 +279,9 @@ export default function EvaluationParameterWithoutCO() {
         });
       }
     });
+    const questionTotal = questionInputs.reduce((sum, q) => sum + Number(q.maxMarks || 0), 0);
+    if (Math.abs(questionTotal - Number(totalMarks)) > 1e-7)
+      errors.push("Question maximum marks must add up to the exam total marks");
     return errors.length ? errors : null;
   };
 
@@ -312,6 +315,7 @@ export default function EvaluationParameterWithoutCO() {
     } catch (error) {
       toast.error(
         error?.response?.data?.error ||
+        (typeof error?.response?.data?.detail === "string" ? error.response.data.detail : null) ||
           "Failed to save evaluation details. Please try again."
       );
     } finally {

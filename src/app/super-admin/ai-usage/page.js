@@ -150,6 +150,11 @@ const AiUsagePage = () => {
                   <div className="bg-orange-50 rounded-lg p-4">
                     <p className="text-xs text-gray-500 font-medium">Estimated Cost</p>
                     <p className="text-xl font-bold text-gray-800 mt-1">${data.totals.cost_usd.toFixed(2)}</p>
+                    {data.totals.unknown_cost_calls > 0 && (
+                      <p className="text-xs text-amber-700 mt-1">
+                        Known cost only. Usage or pricing unavailable for {data.totals.unknown_cost_calls} attempt(s).
+                      </p>
+                    )}
                   </div>
                 </div>
               )}
@@ -162,7 +167,7 @@ const AiUsagePage = () => {
                       <div key={row.provider} className="bg-orange-50 rounded-lg p-4 border border-orange-100">
                         <div className="flex items-center justify-between mb-2">
                           <p className="text-sm font-bold text-gray-800">{providerLabel(row.provider)}</p>
-                          <p className="text-sm font-semibold text-gray-800">${row.cost_usd.toFixed(4)}</p>
+                          <p className="text-sm font-semibold text-gray-800">${row.cost_usd.toFixed(4)}{row.unknown_cost_calls > 0 && ` + ${row.unknown_cost_calls} unknown`}</p>
                         </div>
                         <div className="grid grid-cols-3 gap-2 text-xs text-gray-600">
                           <div>
@@ -205,7 +210,7 @@ const AiUsagePage = () => {
                           <td className="p-3 text-right">{row.distinct_users.toLocaleString()}</td>
                           <td className="p-3 text-right">{row.input_tokens.toLocaleString()}</td>
                           <td className="p-3 text-right">{row.output_tokens.toLocaleString()}</td>
-                          <td className="p-3 text-right font-semibold">${row.cost_usd.toFixed(4)}</td>
+                          <td className="p-3 text-right font-semibold">${row.cost_usd.toFixed(4)}{row.unknown_cost_calls > 0 && ` + ${row.unknown_cost_calls} unknown`}</td>
                         </tr>
                       ))
                     ) : (

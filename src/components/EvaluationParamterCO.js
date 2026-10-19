@@ -522,17 +522,20 @@ export default function EvaluationParameterCO() {
             errors.push(`Question ${n}: Marks required for ${co.co_code}`);
         });
 
-        // Each CO's marks are an independent cap on the question, not a
-        // shared pool — a 10-mark question tagged with 2 COs can validly
-        // award up to 10 for each, so this checks each CO on its own rather
-        // than summing them against the question's max.
+        // CO allocations share the question's marks, matching grading/review.
         const maxMarks = Number(q.maxMarks) || 0;
         q.cos.forEach((co) => {
           if (maxMarks > 0 && Number(co.marks) > maxMarks)
             errors.push(`Question ${n}: ${co.co_code} marks (${co.marks}) exceed the question's max marks (${maxMarks})`);
         });
+        const coTotal = q.cos.reduce((sum, co) => sum + Number(co.marks || 0), 0);
+        if (Math.abs(coTotal - maxMarks) > 1e-7)
+          errors.push(`Question ${n}: CO marks must total ${maxMarks} (current: ${coTotal})`);
       }
     });
+    const questionTotal = questionInputs.reduce((sum, q) => sum + Number(q.maxMarks || 0), 0);
+    if (Math.abs(questionTotal - Number(totalMarks)) > 1e-7)
+      errors.push("Question maximum marks must add up to the exam total marks");
     return errors.length ? errors : null;
   };
 
@@ -565,6 +568,7 @@ export default function EvaluationParameterCO() {
     } catch (error) {
       toast.error(
         error?.response?.data?.error ||
+        (typeof error?.response?.data?.detail === "string" ? error.response.data.detail : null) ||
         "Failed to save evaluation details. Please try again."
       );
     } finally {
