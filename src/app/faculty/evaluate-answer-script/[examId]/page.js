@@ -425,6 +425,7 @@ export default function SavedResult() {
                             <div className="flex items-center gap-2">
                               📄 <span className="font-medium">{file.filename}</span>
                             </div>
+                            {file.report_is_draft && <p className="text-xs text-amber-700">Stored PDF is the earlier AI draft. Faculty-reviewed final marks are shown here.</p>}
                           </td>
 
                           {/* Status */}
@@ -436,18 +437,18 @@ export default function SavedResult() {
                               </span>
                             ) : (
                               <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                                file.evaluated_report_url
+                                file.evaluated_report_url && file.evaluation_status !== "pending_review"
                                   ? "bg-green-100 text-green-700"
                                   : "bg-yellow-100 text-yellow-700"
                               }`}>
-                                {file.evaluated_report_url ? `✓ ${t("evaluated")}` : `⏳ ${t("pending")}`}
+                                {file.evaluation_status === "pending_review" ? "Faculty review required" : (file.total_final_marks != null ? `✓ ${t("evaluated")}` : `⏳ ${t("pending")}`)}
                               </span>
                             )}
                           </td>
 
                           {/* Score */}
                           <td className="p-3">
-                            {file.total_ai_marks !== 0 && file.total_max_marks !== 0 ? (
+                            {file.evaluation_status === "pending_review" ? <span className="text-amber-700">Pending faculty review</span> : file.total_final_marks != null && file.total_max_marks > 0 ? (
                               <span className="font-semibold">
                                 {fmt2(file.total_final_marks ?? file.total_ai_marks)} / {fmt2(file.total_max_marks)}
                               </span>
@@ -621,6 +622,17 @@ export default function SavedResult() {
                 <h3 className="font-semibold mb-3 text-lg">
                   {tcw("question")} {q.question_no} (Max {q.max_marks} marks)
                 </h3>
+                {q.flags?.needs_review && (
+                  <div className="mb-4 border border-amber-300 bg-amber-50 p-3">
+                    <p className="font-semibold">Provisional marks - inspect the original answer sheet before confirming.</p>
+                    <a className="underline" href={files.find((f) => f.answer_id === selectedAnswerscriptId)?.answer_script_url} target="_blank" rel="noopener noreferrer">Open original answer sheet</a>
+                    <p>{q.reasoning}</p>
+                    <label className="block my-2">
+                      <input type="checkbox" checked={q.review_confirmed === true} onChange={(e) => setSelectedEvaluation((prev) => prev.map((item, i) => i === idx ? {...item, review_confirmed: e.target.checked} : item))} /> I checked the original and confirmed the final marks for this question.
+                    </label>
+                    <textarea className="w-full border p-2" placeholder="Explain your decision, including a confirmed zero if applicable" value={q.review_note || ""} onChange={(e) => setSelectedEvaluation((prev) => prev.map((item, i) => i === idx ? {...item, review_note: e.target.value} : item))} />
+                  </div>
+                )}
 
                 <div className="grid grid-cols-3 gap-4 mb-4">
                   {[

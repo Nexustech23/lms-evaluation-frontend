@@ -687,7 +687,7 @@ const fetchDocuments = async () => {
                         // script involved), so evaluated_report_url alone can't tell
                         // "evaluated" from "pending" — total_final_marks is set by
                         // both the AI-grading and manual-entry paths, so check that too.
-                        const isEvaluated = Boolean(file.evaluated_report_url) || file.total_final_marks != null;
+                        const isEvaluated = file.evaluation_status !== "pending_review" && file.total_final_marks != null;
                         return (
                         <tr
                           key={file.answer_id}
@@ -695,6 +695,7 @@ const fetchDocuments = async () => {
                         >
                           <td className="p-3">
                             📄 {file.filename || `File ${index + 1}`}
+                            {file.report_is_draft && <p className="text-xs text-amber-700">Stored PDF: earlier AI draft</p>}
                           </td>
                           <td className="p-3 text-center">
                             <span
@@ -703,7 +704,7 @@ const fetchDocuments = async () => {
                                 : "bg-gray-100 text-gray-700"
                                 }`}
                             >
-                              {isEvaluated
+                              {file.evaluation_status === "pending_review" ? "Faculty review required" : isEvaluated
                                 ? t("evaluated")
                                 : t("evaluationPending")}
                             </span>
