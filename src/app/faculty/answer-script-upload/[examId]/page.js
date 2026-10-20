@@ -109,7 +109,7 @@ export default function SavedResult() {
         {
           url: response.data.url,
           fileId: response.data.fileId,
-          name: file.name,
+          name: response.data.name,
         },
       ]);
 
