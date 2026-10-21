@@ -117,7 +117,11 @@ export default function SavedResult() {
         clearEvalState(answerId);
         if (!job.result?.success) { toast.error("Evaluation returned no result. Refresh the answer list."); return; }
         setFiles((prev) => prev.map((file) => file.answer_id === answerId ? { ...file, ...job.result, content: true } : file));
-        toast.success(`Evaluation completed! Score: ${fmt2(job.result.total_ai_marks)}/${fmt2(job.result.total_max_marks)}`);
+        if (job.result.evaluation_status === "pending_review") {
+          toast("Evaluation draft saved. Faculty review is required before marks are final.");
+        } else {
+          toast.success(`Evaluation completed! Score: ${fmt2(job.result.total_ai_marks)}/${fmt2(job.result.total_max_marks)}`);
+        }
       },
       onError: (error) => {
         stopPolling(answerId);
