@@ -4,7 +4,7 @@ WORKDIR /app
 
 # Install dependencies
 COPY package*.json ./
-RUN npm i
+RUN npm ci --no-audit --no-fund
 
 # Copy source
 COPY . .
@@ -15,9 +15,13 @@ COPY . .
 # Must be supplied as a build arg so it's present during `npm run build`.
 ARG API_URL
 ENV API_URL=$API_URL
+ARG NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY
+ARG NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT
+ENV NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY=$NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY
+ENV NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT=$NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT
 
 # Build Next.js app
-RUN npm run build
+RUN test -n "$API_URL" && npm run build
 
 
 # ---------- Production stage ----------
@@ -26,15 +30,14 @@ FROM node:20-alpine
 WORKDIR /app
 
 ENV NODE_ENV=production
+ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
 
-# Copy only required files from builder
-COPY --from=builder /app/package.json ./
-COPY --from=builder /app/package-lock.json ./
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/.next ./.next
+# The traced bundle includes server.js and only runtime dependencies.
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/next.config.mjs ./next.config.mjs
 
 EXPOSE 3000
 
-CMD ["npm", "run", "start"]
+CMD ["node", "server.js"]

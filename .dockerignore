@@ -1,0 +1,17 @@
+node_modules
+.next
+.git
+.env
+.env.*
+!.env.example
+npm-debug.log*
+*.log
+coverage
+tests
+__tests__
+test-results
+playwright-report
+tmp
+output
+.vscode
+.idea
