@@ -42,6 +42,8 @@ export default function SavedResult() {
   const [open, setOpen] = useState(false);
   const [selectedEvaluation, setSelectedEvaluation] = useState(null);
   const [selectedAnswerscriptId, setSelectedAnswerscriptId] = useState(null);
+  const [selectedResultRevision, setSelectedResultRevision] = useState(0);
+  const [selectedOptionalReview, setSelectedOptionalReview] = useState(false);
   const [loadExcel, setLoadExcel] = useState(false);
   const [total, setTotal] = useState(0);
   const [isEvaluatingAll, setIsEvaluatingAll] = useState(false);
@@ -253,13 +255,17 @@ export default function SavedResult() {
           max_marks: co.max_marks, final_co_marks: (co.ai_marks || 0) + (co.grace_marks || 0), remarks: co.remarks,
         })),
       }));
-      await axios.post(
+      const response = await axios.post(
         `/api/save-self-evaluation`,
-        { answer_id: selectedAnswerscriptId, questionwise_marking: payload },
+        { answer_id: selectedAnswerscriptId, questionwise_marking: payload, result_revision: selectedResultRevision },
         { withCredentials: true }
       );
       await fetchDetails();
-      toast.success("Self evaluation saved successfully ✅");
+      if (response.data?.transcript_refresh === "pending") {
+        toast("Marks and evaluation PDF saved. Academic transcript refresh is pending.");
+      } else {
+        toast.success("Official marks and evaluation report updated successfully.");
+      }
       setOpen(false);
     } catch (err) {
       const detail = err?.response?.data?.detail;
@@ -470,6 +476,8 @@ export default function SavedResult() {
                               onClick={() => {
                                 setSelectedEvaluation(file.questionwise_marking);
                                 setSelectedAnswerscriptId(file.answer_id);
+                                setSelectedResultRevision(file.result_revision ?? 0);
+                                setSelectedOptionalReview(file.review_policy === "official_ai_optional_review_v1");
                                 setTotal(file.total_max_marks);
                                 setOpen(true);
                               }}
@@ -628,9 +636,11 @@ export default function SavedResult() {
                 </h3>
                 {q.flags?.needs_review && (
                   <div className="mb-4 border border-amber-300 bg-amber-50 p-3">
-                    <p className="font-semibold">Provisional marks - inspect the original answer sheet before confirming.</p>
+                    <p className="font-semibold">{selectedOptionalReview ? "Pending review - optional faculty verification" : "Pending review - earlier evaluation draft"}</p>
+                    <p className="text-sm">{selectedOptionalReview ? "AI marks are official. Review this question if you want to verify or adjust its marks." : "Confirm the marks in this earlier draft before publishing them as official results."}</p>
                     <a className="underline" href={files.find((f) => f.answer_id === selectedAnswerscriptId)?.answer_script_url} target="_blank" rel="noopener noreferrer">Open original answer sheet</a>
                     <p>{q.reasoning}</p>
+                    {q.review_reasons?.map((reason, i) => <p key={i} className="text-sm mt-1">{reason}</p>)}
                     <label className="block my-2">
                       <input type="checkbox" checked={q.review_confirmed === true} onChange={(e) => setSelectedEvaluation((prev) => prev.map((item, i) => i === idx ? {...item, review_confirmed: e.target.checked} : item))} /> I checked the original and confirmed the final marks for this question.
                     </label>
