@@ -2,6 +2,7 @@
 
 import { createContext, useEffect, useState } from "react";
 import axios from "axios";
+import "@/lib/clientDiagnostics";
 
 export const AuthContext = createContext(null);
 
