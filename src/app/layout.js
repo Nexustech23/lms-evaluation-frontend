@@ -8,6 +8,7 @@ import ReactQueryProvider from "./ReactQueryProvider";
 // import Navbar from "@/components/navbar/navbar";
 // import Footer from "@/components/footer/footer"
 import ProtectedRoute from "@/components/ProtectedRoute";
+import DiagnosticNavigation from "@/components/DiagnosticNavigation";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,6 +40,7 @@ export default async function RootLayout({ children }) {
         <NextIntlClientProvider locale={locale} messages={messages}>
           <ReactQueryProvider>
             <AuthProvider>
+              <DiagnosticNavigation />
 
               {/* GLOBAL ROUTE PROTECTION */}
               <ProtectedRoute>

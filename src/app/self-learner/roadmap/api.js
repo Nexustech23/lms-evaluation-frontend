@@ -1,10 +1,12 @@
 import axios from "axios";
+import { traceAxiosClient } from "@/lib/clientDiagnostics";
 
 const BASE_URL = "/api/self-learner/roadmap";
 
 const roadmapClient = axios.create({
   withCredentials: true,
 });
+traceAxiosClient(roadmapClient);
 
 function normalizeError(error) {
   if (error?.response?.status === 401) {
