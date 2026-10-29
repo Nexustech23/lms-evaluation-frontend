@@ -37,3 +37,30 @@ export function applyRubricSuggestion(current, suggestion, { includeCOs = false 
   }
   return next;
 }
+
+/** Prepare all edits before updating React state; unresolved questions stay intact. */
+export function applyRubricSuggestions(current, suggestions, options = {}) {
+  if (!Array.isArray(suggestions) || suggestions.length !== current.length ||
+      suggestions.some((q, index) => q.question_no !== index + 1)) {
+    throw new Error("The question count or order changed. Reload before filling parameters.");
+  }
+  const warnings = {};
+  let appliedCount = 0;
+  const questions = current.map((question, index) => {
+    const draft = suggestions[index];
+    const notes = [...(draft.notes || [])];
+    if (draft.status !== "draft_ready") {
+      warnings[index] = [...notes, "Complete this question manually; AI could not resolve its requirements."].join(" ");
+      return question;
+    }
+    const updated = applyRubricSuggestion(question, draft, options);
+    appliedCount += 1;
+    if (options.includeCOs) {
+      if (!updated.cos.length) notes.push("Select the course outcome manually; no available printed CO was found.");
+      if (updated.cos.some((co) => co.marks === "")) notes.push("Allocate marks between the course outcomes manually.");
+    }
+    if (notes.length) warnings[index] = notes.join(" ");
+    return updated;
+  });
+  return { questions, warnings, appliedCount };
+}

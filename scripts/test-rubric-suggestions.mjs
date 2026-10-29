@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
 const source = await readFile(new URL("../src/lib/rubricSuggestions.js", import.meta.url), "utf8");
-const { applyRubricSuggestion, savedRubricRows } = await import(`data:text/javascript;base64,${Buffer.from(source).toString("base64")}`);
+const { applyRubricSuggestion, applyRubricSuggestions, savedRubricRows } = await import(`data:text/javascript;base64,${Buffer.from(source).toString("base64")}`);
 const draft = () => ({ status: "draft_ready", min_marks: 0, max_marks: 5,
   parameters: [{ name: "Correct method", percentage: 100, isCustom: true }],
   guidelines: "Credit valid steps.", co_tags: [{ co_code: "CO1", eligible: true, description: "Methods" }] });
@@ -74,4 +74,58 @@ for (const [name, change] of [
   const current = { maxMarks: 2 };
   assert.throws(() => applyRubricSuggestion(current, row));
   assert.deepEqual(current, { maxMarks: 2 });
+});
+
+test("fill all questions in one edit and retain unrelated fields", () => {
+  const current = [{ custom: "keep", maxMarks: 2 }, { custom: "also keep", maxMarks: 3 }];
+  const snapshot = structuredClone(current);
+  const rows = [1, 2].map((question_no) => ({ ...draft(), question_no }));
+  const result = applyRubricSuggestions(current, rows, { includeCOs: true });
+  assert.equal(result.appliedCount, 2);
+  assert.deepEqual(result.questions.map((q) => q.maxMarks), [5, 5]);
+  assert.deepEqual(result.questions.map((q) => q.cos[0].marks), [5, 5]);
+  assert.equal(result.questions[0].custom, "keep");
+  assert.deepEqual(current, snapshot);
+});
+
+test("clarification preserves that question and puts its warning beside its index", () => {
+  const current = [{ maxMarks: 2 }, { maxMarks: 7, guidelines: "Faculty work" }];
+  const rows = [{ ...draft(), question_no: 1 },
+    { question_no: 2, status: "needs_clarification", notes: ["Missing classifier figure."] }];
+  const result = applyRubricSuggestions(current, rows);
+  assert.equal(result.appliedCount, 1);
+  assert.equal(result.questions[1], current[1]);
+  assert.match(result.warnings[1], /Missing classifier figure/);
+});
+
+test("one invalid ready draft rejects the batch without changing any inputs", () => {
+  const current = [{ maxMarks: 2 }, { maxMarks: 3 }];
+  const snapshot = structuredClone(current);
+  const rows = [{ ...draft(), question_no: 1 }, { ...draft(), question_no: 2, max_marks: null }];
+  assert.throws(() => applyRubricSuggestions(current, rows));
+  assert.deepEqual(current, snapshot);
+});
+
+test("wrong count, order and duplicate question labels cannot fill the wrong questions", () => {
+  for (const numbers of [[1], [2, 1], [1, 1]]) {
+    assert.throws(() => applyRubricSuggestions([{}, {}], numbers.map((question_no) => ({ ...draft(), question_no }))));
+  }
+});
+
+test("missing and multiple CO mappings show actionable warnings", () => {
+  const multiple = { ...draft(), question_no: 1 };
+  multiple.co_tags.push({ co_code: "CO2", eligible: true });
+  const missing = { ...draft(), question_no: 2, co_tags: [] };
+  const result = applyRubricSuggestions([{}, {}], [multiple, missing], { includeCOs: true });
+  assert.match(result.warnings[0], /Allocate marks/);
+  assert.match(result.warnings[1], /Select the course outcome/);
+  assert.deepEqual(result.questions[0].cos.map((co) => co.marks), ["", ""]);
+});
+
+test("all unresolved questions return warnings without applied credit or data changes", () => {
+  const current = [{ maxMarks: 2 }];
+  const result = applyRubricSuggestions(current, [{ question_no: 1, status: "needs_clarification" }]);
+  assert.equal(result.appliedCount, 0);
+  assert.equal(result.questions[0], current[0]);
+  assert.match(result.warnings[0], /Complete this question manually/);
 });
