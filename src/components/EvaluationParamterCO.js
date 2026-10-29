@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter, useParams, usePathname } from "next/navigation";
 import axios from "axios";
 import Navbar from "@/components/ui/Navbar";
@@ -10,7 +10,7 @@ import { useTranslations } from "next-intl";
 import { useContext } from "react";
 import { AuthContext } from "@/app/AuthContext";
 import RubricSuggestionPanel from "@/components/RubricSuggestionPanel";
-import { applyRubricSuggestion, savedRubricRows } from "@/lib/rubricSuggestions";
+import { applyRubricSuggestions, savedRubricRows } from "@/lib/rubricSuggestions";
 
 const MARK_PARAMETERS = [
   "Accuracy of answer",
@@ -216,11 +216,25 @@ export default function EvaluationParameterCO() {
   const [questionInputs, setQuestionInputs] = useState([]);
   const [suggestionSourceId, setSuggestionSourceId] = useState(null);
 
-  const applySuggestion = (index, draft, sourceId) => {
-    if (!questionInputs[index]) throw new Error("Question no longer exists. Reload the editor.");
-    const updated = applyRubricSuggestion(questionInputs[index], draft, { includeCOs: true });
-    setQuestionInputs((previous) => previous.map((q, i) => i === index ? updated : q));
-    setSuggestionSourceId(sourceId);
+  const [suggestionWarnings, setSuggestionWarnings] = useState({});
+  const initialForm = useRef(null);
+  useEffect(() => {
+    if (!loading && initialForm.current === null) {
+      initialForm.current = JSON.stringify({ questionInputs, totalMarks });
+    }
+  }, [loading, questionInputs, totalMarks]);
+
+  const applySuggestion = (drafts, sourceId) => {
+    const prepared = applyRubricSuggestions(questionInputs, drafts, { includeCOs: true });
+    const changed = initialForm.current !== JSON.stringify({ questionInputs, totalMarks });
+    if (prepared.appliedCount && (hasExistingEval || changed) &&
+        !window.confirm("Replace the current question fields with AI parameters? Your saved parameters stay unchanged until you click Save.")) {
+      return false;
+    }
+    setQuestionInputs(prepared.questions);
+    setSuggestionWarnings(prepared.warnings);
+    if (prepared.appliedCount) setSuggestionSourceId(sourceId);
+    return prepared.appliedCount;
   };
 
   // COs filtered to only those covered in this exam
@@ -668,6 +682,7 @@ export default function EvaluationParameterCO() {
                     </div>
 
                     {/* Min / Max marks */}
+                    {suggestionWarnings[qIndex] && <p role="status" className="mb-3 text-sm text-amber-800">{suggestionWarnings[qIndex]}</p>}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
