@@ -96,21 +96,15 @@ export default function RubricSuggestionPanel({ folderId, disabled, questionCoun
 
   const running = ["queued", "processing"].includes(job?.status);
   return (
-    <section className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4" aria-label="AI evaluation parameters">
-      <h3 className="font-semibold text-gray-900">Fill evaluation parameters with AI</h3>
-      <p className="mt-1 text-sm text-gray-700">
-        Fill the editable fields below, review and change anything, then Save. Generating new parameters uses AI credits.
-      </p>
-      <div className="mt-3 flex flex-wrap items-center gap-3">
+    <section className="mb-6" aria-label="AI evaluation parameters">
+      <div className="flex flex-wrap items-center gap-3">
         <button type="button" onClick={generate} disabled={disabled || busy || running || !questionCount}
           className="rounded bg-blue-700 px-4 py-2 text-sm text-white disabled:opacity-50">
-          {busy ? "Filling parameters…" : running ? "Generating parameters…" : job?.status === "failed" ? "Retry generation (uses credits)" :
-            job?.status === "disconnected" ? "Reconnect to parameters" : job?.status === "completed" ? "Fill from saved AI parameters (no credits)" : "Generate parameters (uses credits)"}
+          {busy ? "Filling parameters…" : running ? "Generating parameters…" : "Generate parameters"}
         </button>
       </div>
       {message && <p role="status" className="mt-3 text-sm text-blue-800">{message}</p>}
       {error && <p role="alert" className="mt-3 text-sm text-red-700">{error}</p>}
-      {job?.error && <p role="status" className="mt-2 text-sm text-amber-800">{job.error}</p>}
     </section>
   );
 }

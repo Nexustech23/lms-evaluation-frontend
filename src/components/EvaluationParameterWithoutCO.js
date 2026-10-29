@@ -369,17 +369,6 @@ className="flex items-center mb-4 px-4 ml-36 py-2 text-sm bg-white rounded hover
 style={{ color: user?.color || "#ff7f10" }}>
              {t("evaluationParameters")}
             </h2>
-            {!loading && (
-              <span
-                className={`text-xs font-semibold px-2 py-1 rounded-full ${
-                  hasExistingEval
-                    ? "bg-blue-100 text-blue-700"
-                    : "bg-green-100 text-green-700"
-                }`}
-              >
-                {hasExistingEval ? "Edit Mode" : "Create Mode"}
-              </span>
-            )}
           </div>
 
           {!loading && <RubricSuggestionPanel key={folderId} folderId={folderId}

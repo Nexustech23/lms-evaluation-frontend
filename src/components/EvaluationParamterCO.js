@@ -624,11 +624,6 @@ export default function EvaluationParameterCO() {
             <h2 className="text-xl font-bold" style={{ color: themeColor }}>
               {t("evaluationParameters")}
             </h2>
-            {!loading && (
-              <span className={`text-xs font-semibold px-2 py-1 rounded-full ${hasExistingEval ? "bg-blue-100 text-blue-700" : "bg-green-100 text-green-700"}`}>
-                {hasExistingEval ? "Edit Mode" : "Create Mode"}
-              </span>
-            )}
             {/* Show available covered COs as informational tags only */}
             {!loading && coveredCOs.length > 0 && (
               <div className="ml-auto flex gap-1 flex-wrap justify-end items-center">
