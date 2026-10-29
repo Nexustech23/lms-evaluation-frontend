@@ -9,6 +9,8 @@ import { FaArrowLeft } from "react-icons/fa";
 import { useTranslations } from "next-intl";
 import { useContext } from "react";
 import { AuthContext } from "@/app/AuthContext";
+import RubricSuggestionPanel from "@/components/RubricSuggestionPanel";
+import { applyRubricSuggestion, savedRubricRows } from "@/lib/rubricSuggestions";
 
 const MARK_PARAMETERS = [
   "Accuracy of answer",
@@ -19,24 +21,12 @@ const MARK_PARAMETERS = [
   "Logical arguments and conclusion",
 ];
 
-// Faculty otherwise had to add all 6 parameters + type a percentage for
-// every single question, every time — this prefills a valid (sums to 100)
-// starting table they can edit/remove/re-weight before saving.
-const DEFAULT_PARAMETERS = () => {
-  const base = Math.floor(100 / MARK_PARAMETERS.length);
-  const remainder = 100 - base * MARK_PARAMETERS.length;
-  return MARK_PARAMETERS.map((name, i) => ({
-    name,
-    percentage: base + (i < remainder ? 1 : 0),
-    isCustom: false,
-  }));
-};
-
 const EMPTY_QUESTION = (maxMarks = "", cos = []) => ({
   minMarks: 0,
   maxMarks,
-  parameters: DEFAULT_PARAMETERS(),
-  cos, // [{ co_code, description, marks }]
+  guidelines: "",
+  parameters: [],
+  cos,
 });
 
 // Pulls each question's marks (e.g. "Q1. ... [5 Marks] [CO1]") from the raw
@@ -217,12 +207,21 @@ export default function EvaluationParameterCO() {
     null;
 
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
   const [folderData, setFolderData] = useState(null);
   const [hasExistingEval, setHasExistingEval] = useState(false);
   const [questionInputs, setQuestionInputs] = useState([]);
+  const [suggestionSourceId, setSuggestionSourceId] = useState(null);
+
+  const applySuggestion = (index, draft, sourceId) => {
+    if (!questionInputs[index]) throw new Error("Question no longer exists. Reload the editor.");
+    const updated = applyRubricSuggestion(questionInputs[index], draft, { includeCOs: true });
+    setQuestionInputs((previous) => previous.map((q, i) => i === index ? updated : q));
+    setSuggestionSourceId(sourceId);
+  };
 
   // COs filtered to only those covered in this exam
   const [coveredCOs, setCoveredCOs] = useState([]); // [{ co_code, description }]
@@ -257,30 +256,28 @@ export default function EvaluationParameterCO() {
       }
     );
     setTotalMarks(res?.data?.evaluation?.totalMarks)
-    return res.data?.evaluation?.questionEvaluationDetails || null;
+    return savedRubricRows(res.data);
   }, [folderId]);
 
   // ─── Init ──────────────────────────────────────────────────────────────────
 
   useEffect(() => {
-    if (!folderId) {
-      toast.error("No folder ID found in URL");
-      setLoading(false);
-      return;
-    }
+    if (!folderId) return;
 
     const init = async () => {
       setLoading(true);
+      setLoadError("");
       try {
         const [folderSettled, evalSettled] = await Promise.allSettled([
           fetchFolderDetails(),
           fetchEvaluationDetails(),
         ]);
 
+        if (evalSettled.status === "rejected") throw evalSettled.reason;
         const folder = folderSettled.status === "fulfilled" ? folderSettled.value : null;
         const evalResult = evalSettled.status === "fulfilled" ? evalSettled.value : null;
 
-        if (!folder) { toast.error("Failed to load exam folder"); return; }
+        if (!folder) throw new Error("Could not load this exam. Reload before editing.");
         setFolderData(folder);
 
         // ── 1. Parse covered_cos — backend returns JSON string e.g. "[\"CO1\",\"CO2\"]" ──
@@ -320,6 +317,7 @@ export default function EvaluationParameterCO() {
             evalResult.map((q) => ({
               minMarks: q.minMarks ?? 0,
               maxMarks: q.maxMarks ?? "",
+              guidelines: q.guidelines ?? "",
               parameters: Array.isArray(q.parameters) ? q.parameters : [],
               cos: Array.isArray(q.cos) ? q.cos : [],
             }))
@@ -342,8 +340,7 @@ export default function EvaluationParameterCO() {
           setQuestionInputs(
             Array.from({ length: Number(count) }, (_, i) => {
               const qMaxMarks = parsedMarks[i] ?? "";
-              // Each tagged CO gets the question's full marks, not a split —
-              // e.g. a 10-mark question tagged [CO3, CO4] prefills both at 10.
+              // A tag does not specify a multiple-CO mark split.
               const prefilledCOs = (parsedCOs[i] || [])
                 .map((code) => {
                   const co = filteredCOs.find((c) => c.co_code === code);
@@ -351,7 +348,8 @@ export default function EvaluationParameterCO() {
                   return co;
                 })
                 .filter(Boolean)
-                .map((co) => ({ co_code: co.co_code, description: co.description, marks: qMaxMarks }));
+                .map((co, _index, tagged) => ({ co_code: co.co_code, description: co.description,
+                  marks: tagged.length === 1 ? qMaxMarks : "" }));
               return EMPTY_QUESTION(qMaxMarks, prefilledCOs);
             })
           );
@@ -366,8 +364,7 @@ export default function EvaluationParameterCO() {
           }
         }
       } catch (err) {
-        toast.error("An unexpected error occurred while loading data");
-        console.error(err);
+        setLoadError(err?.response?.data?.detail || err.message || "Could not load this exam. Reload before editing.");
       } finally {
         setLoading(false);
       }
@@ -505,7 +502,7 @@ export default function EvaluationParameterCO() {
       // Parameter percentage check
       if (q.parameters.length > 0) {
         const total = getTotalPercentage(q.parameters);
-        if (total !== 100)
+        if (Math.abs(total - 100) > 1e-7)
           errors.push(`Question ${n}: Percentages must add up to 100 (current: ${total})`);
         q.parameters.forEach((p) => {
           if (!p.name?.trim())
@@ -554,7 +551,8 @@ export default function EvaluationParameterCO() {
     try {
       await axios.post(
         `/api/evaluation-details/${folderId}`,
-        { questionEvaluationDetails: questionInputs, totalMarks: totalMarks },
+        { questionEvaluationDetails: questionInputs, totalMarks,
+          ...(suggestionSourceId ? { suggestion_source_id: suggestionSourceId } : {}) },
         {
           withCredentials: true,
         }
@@ -577,6 +575,17 @@ export default function EvaluationParameterCO() {
   };
 
   // ─── Render ────────────────────────────────────────────────────────────────
+
+  if (loadError || !folderId) return (
+    <div className="min-h-screen bg-white p-6">
+      <Navbar title={t("title")} />
+      <div role="alert" className="mt-6 rounded border border-red-200 bg-red-50 p-4 text-red-800">
+        <p>{loadError || "No exam ID found in the page URL."}</p>
+        <button type="button" onClick={() => window.location.reload()}
+          className="mt-3 rounded border px-3 py-2">Reload evaluation parameters</button>
+      </div>
+    </div>
+  );
 
   return (
    <div className="min-h-screen" style={{ backgroundColor: themeColor }}>
@@ -619,6 +628,8 @@ export default function EvaluationParameterCO() {
             )}
           </div>
 
+          {!loading && <RubricSuggestionPanel key={folderId} folderId={folderId}
+            disabled={isSubmitting} questionCount={questionInputs.length} onApply={applySuggestion} />}
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20 gap-3">
               <Spinner />
@@ -685,6 +696,15 @@ export default function EvaluationParameterCO() {
                       </div>
                     </div>
 
+                    <div className="mb-5">
+                      <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor={`guidelines-${qIndex}`}>
+                        Credit guidelines
+                      </label>
+                      <textarea id={`guidelines-${qIndex}`} rows={4} value={input.guidelines || ""}
+                        onChange={(event) => handleInputChange(qIndex, "guidelines", event.target.value)}
+                        className="w-full rounded border p-2 text-sm"
+                        placeholder="Describe full, partial and zero credit for each parameter." />
+                    </div>
                     <div className="grid grid-cols-2 gap-4">
                       {/* ── Parameters section ── */}
                       <div className="mt-5 border-t pt-4">

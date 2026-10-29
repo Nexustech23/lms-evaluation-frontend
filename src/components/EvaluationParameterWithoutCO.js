@@ -9,6 +9,8 @@ import { useTranslations } from "next-intl";
 import { FaArrowLeft } from "react-icons/fa";
 import { useContext } from "react";
 import { AuthContext } from "@/app/AuthContext";
+import RubricSuggestionPanel from "@/components/RubricSuggestionPanel";
+import { applyRubricSuggestion, savedRubricRows } from "@/lib/rubricSuggestions";
 
 const MARK_PARAMETERS = [
   "Accuracy of answer",
@@ -18,20 +20,6 @@ const MARK_PARAMETERS = [
   "Correctness of formulae",
   "Logical arguments and conclusion",
 ];
-
-// Faculty otherwise had to add all 6 parameters + type a percentage for
-// every single question, every time — this prefills a valid (sums to 100)
-// starting table they can edit/remove/re-weight before saving. Mirrors
-// EvaluationParamterCO.js's DEFAULT_PARAMETERS.
-const DEFAULT_PARAMETERS = () => {
-  const base = Math.floor(100 / MARK_PARAMETERS.length);
-  const remainder = 100 - base * MARK_PARAMETERS.length;
-  return MARK_PARAMETERS.map((name, i) => ({
-    name,
-    percentage: base + (i < remainder ? 1 : 0),
-    isCustom: false,
-  }));
-};
 
 // Pulls each question's marks (e.g. "Q1. ... [5 Marks]") from the raw
 // question-paper text, in order, so maxMarks can be prefilled instead of
@@ -50,7 +38,7 @@ const EMPTY_QUESTION = (maxMarks = "") => ({
   minMarks: 0,
   maxMarks,
   guidelines: "",
-  parameters: DEFAULT_PARAMETERS(),
+  parameters: [],
 });
 
 export default function EvaluationParameterWithoutCO() {
@@ -70,6 +58,7 @@ export default function EvaluationParameterWithoutCO() {
     null;
 
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   // Folder metadata (used for question count fallback)
@@ -78,6 +67,14 @@ export default function EvaluationParameterWithoutCO() {
   const [hasExistingEval, setHasExistingEval] = useState(false);
  const [totalMarks, setTotalMarks] = useState()
   const [questionInputs, setQuestionInputs] = useState([]);
+  const [suggestionSourceId, setSuggestionSourceId] = useState(null);
+
+  const applySuggestion = (index, draft, sourceId) => {
+    if (!questionInputs[index]) throw new Error("Question no longer exists. Reload the editor.");
+    const updated = applyRubricSuggestion(questionInputs[index], draft);
+    setQuestionInputs((previous) => previous.map((q, i) => i === index ? updated : q));
+    setSuggestionSourceId(sourceId);
+  };
 
   const fetchFolderDetails = useCallback(async () => {
     const res = await axios.get(
@@ -98,35 +95,32 @@ export default function EvaluationParameterWithoutCO() {
     );
     // Return null if no evaluation exists yet (404 / empty)
      setTotalMarks(res?.data?.evaluation?.totalMarks)
-    return res.data?.evaluation?.questionEvaluationDetails || null;
+    return savedRubricRows(res.data);
   }, [folderId]);
 
   // ─── Initialise ───────────────────────────────────────────────────────────
 
   useEffect(() => {
-    if (!folderId) {
-      toast.error("No folder ID found in URL");
-      setLoading(false);
-      return;
-    }
+    if (!folderId) return;
 
     const init = async () => {
       setLoading(true);
+      setLoadError("");
       try {
-        // Run both requests concurrently; evaluation 404 is non-fatal
+        // A failed rubric read must not be treated as a new empty rubric.
         const [folder, evalDetails] = await Promise.allSettled([
           fetchFolderDetails(),
           fetchEvaluationDetails(),
         ]);
 
+        if (evalDetails.status === "rejected") throw evalDetails.reason;
         const folderResult =
           folder.status === "fulfilled" ? folder.value : null;
         const evalResult =
           evalDetails.status === "fulfilled" ? evalDetails.value : null;
 
         if (!folderResult) {
-          toast.error("Failed to load exam folder");
-          return;
+          throw new Error("Could not load this exam. Reload before editing.");
         }
 
         setFolderData(folderResult);
@@ -163,8 +157,7 @@ export default function EvaluationParameterWithoutCO() {
           );
         }
       } catch (err) {
-        toast.error("An unexpected error occurred while loading data");
-        console.error(err);
+        setLoadError(err?.response?.data?.detail || err.message || "Could not load this exam. Reload before editing.");
       } finally {
         setLoading(false);
       }
@@ -264,7 +257,7 @@ export default function EvaluationParameterWithoutCO() {
 
       if (q.parameters.length > 0) {
         const total = getTotalPercentage(q.parameters);
-        if (total !== 100)
+        if (Math.abs(total - 100) > 1e-7)
           errors.push(
             `Question ${n}: Percentages must add up to 100 (current: ${total})`
           );
@@ -300,7 +293,8 @@ export default function EvaluationParameterWithoutCO() {
     try {
       await axios.post(
         `/api/evaluation-details/${folderId}`,
-        { questionEvaluationDetails: questionInputs ,totalMarks: totalMarks },
+        { questionEvaluationDetails: questionInputs, totalMarks,
+          ...(suggestionSourceId ? { suggestion_source_id: suggestionSourceId } : {}) },
         {
             withCredentials: true, 
        
@@ -324,6 +318,17 @@ export default function EvaluationParameterWithoutCO() {
   };
 
   // ─── Render ───────────────────────────────────────────────────────────────
+
+  if (loadError || !folderId) return (
+    <div className="min-h-screen bg-white p-6">
+      <Navbar title={t("title")} />
+      <div role="alert" className="mt-6 rounded border border-red-200 bg-red-50 p-4 text-red-800">
+        <p>{loadError || "No exam ID found in the page URL."}</p>
+        <button type="button" onClick={() => window.location.reload()}
+          className="mt-3 rounded border px-3 py-2">Reload evaluation parameters</button>
+      </div>
+    </div>
+  );
 
   return (
     
@@ -363,6 +368,8 @@ style={{ color: user?.color || "#ff7f10" }}>
             )}
           </div>
 
+          {!loading && <RubricSuggestionPanel key={folderId} folderId={folderId}
+            disabled={isSubmitting} questionCount={questionInputs.length} onApply={applySuggestion} />}
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20 gap-3">
               <Spinner />
@@ -443,8 +450,8 @@ style={{ color: user?.color || "#ff7f10" }}>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         {t("guideline")}
                       </label>
-                      <input
-                        type="text"
+                      <textarea
+                        rows={4}
                         placeholder={t("guidelinePlaceholder")}
                         value={input.guidelines}
                         onChange={(e) =>
