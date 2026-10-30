@@ -1,4 +1,13 @@
 /** Only an explicit null means no saved rubric; malformed responses are errors. */
+export function sequentialPaperBlocks(text, count) {
+  if (typeof text !== "string") return [];
+  const matches = [...text.matchAll(/^\s*Q(\d+)[.)]\s*(?!\d)/gm)];
+  // Prefilling is only a convenience for legacy sequential papers. All other
+  // layouts use the server's verified mapping; never shift marks/COs by index.
+  if (matches.length !== count || matches.some((match, i) => Number(match[1]) !== i + 1)) return [];
+  return matches.map((match, i) => text.slice(match.index, matches[i + 1]?.index ?? text.length));
+}
+
 export function savedRubricRows(data) {
   if (data?.success !== true) throw new Error("Could not load saved evaluation parameters.");
   if (data.evaluation === null) return null;
@@ -25,6 +34,9 @@ export function applyRubricSuggestion(current, suggestion, { includeCOs = false 
   const next = { ...current, minMarks: suggestion.min_marks, maxMarks: suggestion.max_marks,
     guidelines: suggestion.guidelines,
     parameters: suggestion.parameters.map((p) => ({ ...p, isCustom: true })) };
+  for (const key of ["question_id", "question_label", "section", "question_text"]) {
+    if (typeof suggestion[key] === "string") next[key] = suggestion[key];
+  }
   if (includeCOs) {
     const tags = (suggestion.co_tags || []).filter((tag) => tag.eligible);
     next.cos = tags.map((tag) => ({ co_code: tag.co_code, description: tag.description,
@@ -51,7 +63,9 @@ export function applyRubricSuggestions(current, suggestions, options = {}) {
     const notes = [...(draft.notes || [])];
     if (draft.status !== "draft_ready") {
       warnings[index] = [...notes, "Complete this question manually; AI could not resolve its requirements."].join(" ");
-      return question;
+      if (!draft.question_id) return question;
+      return { ...question, question_id: draft.question_id, question_label: draft.question_label,
+        section: draft.section, question_text: draft.question_text };
     }
     const updated = applyRubricSuggestion(question, draft, options);
     appliedCount += 1;

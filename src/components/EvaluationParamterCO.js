@@ -10,7 +10,7 @@ import { useTranslations } from "next-intl";
 import { useContext } from "react";
 import { AuthContext } from "@/app/AuthContext";
 import RubricSuggestionPanel from "@/components/RubricSuggestionPanel";
-import { applyRubricSuggestions, savedRubricRows } from "@/lib/rubricSuggestions";
+import { applyRubricSuggestions, savedRubricRows, sequentialPaperBlocks } from "@/lib/rubricSuggestions";
 
 const MARK_PARAMETERS = [
   "Accuracy of answer",
@@ -32,9 +32,9 @@ const EMPTY_QUESTION = (maxMarks = "", cos = []) => ({
 // Pulls each question's marks (e.g. "Q1. ... [5 Marks] [CO1]") from the raw
 // question-paper text, in order, so maxMarks can be prefilled instead of
 // left blank — teacher can still edit it, this is just a starting value.
-const parseQuestionMarksFromPaperText = (text) => {
+const parseQuestionMarksFromPaperText = (text, count) => {
   if (!text || typeof text !== "string") return [];
-  const blocks = text.split(/(?=^Q\d+[.)])/m).filter((b) => /^Q\d+[.)]/.test(b));
+  const blocks = sequentialPaperBlocks(text, count);
   return blocks.map((block) => {
     const match = block.match(/\[(\d+)\s*Marks?\]/i);
     return match ? Number(match[1]) : "";
@@ -43,9 +43,9 @@ const parseQuestionMarksFromPaperText = (text) => {
 
 // Pulls each question's CO tag(s) (e.g. "[CO1]" or "[CO2, CO3]") from the
 // raw question-paper text, in order — mirrors the marks parser above.
-const parseQuestionCOsFromPaperText = (text) => {
+const parseQuestionCOsFromPaperText = (text, count) => {
   if (!text || typeof text !== "string") return [];
-  const blocks = text.split(/(?=^Q\d+[.)])/m).filter((b) => /^Q\d+[.)]/.test(b));
+  const blocks = sequentialPaperBlocks(text, count);
   return blocks.map((block) => {
     const match = block.match(/\[\s*(CO\d+(?:\s*,\s*CO\d+)*)\s*\]/i);
     if (!match) return [];
@@ -329,6 +329,10 @@ export default function EvaluationParameterCO() {
           setHasExistingEval(true);
           setQuestionInputs(
             evalResult.map((q) => ({
+              question_id: q.question_id,
+              question_label: q.question_label,
+              section: q.section,
+              question_text: q.question_text,
               minMarks: q.minMarks ?? 0,
               maxMarks: q.maxMarks ?? "",
               guidelines: q.guidelines ?? "",
@@ -348,8 +352,8 @@ export default function EvaluationParameterCO() {
           if (!count) toast.error("Could not determine number of questions from folder");
 
           const paperText = folder?.question_paper?.text;
-          const parsedMarks = parseQuestionMarksFromPaperText(paperText);
-          const parsedCOs = parseQuestionCOsFromPaperText(paperText);
+          const parsedMarks = parseQuestionMarksFromPaperText(paperText, Number(count));
+          const parsedCOs = parseQuestionCOsFromPaperText(paperText, Number(count));
           const droppedTags = []; // { qNo, code } — paper-tagged COs not in this exam's covered_cos
           setQuestionInputs(
             Array.from({ length: Number(count) }, (_, i) => {
@@ -660,7 +664,7 @@ export default function EvaluationParameterCO() {
                   <div key={qIndex} className="mb-8 border rounded-lg p-4">
                     {/* Question header */}
                     <div className="flex items-center justify-between mb-4">
-                      <h3 className="font-semibold text-gray-800">{twc("question")} {qIndex + 1}</h3>
+                      <h3 className="font-semibold text-gray-800">{input.question_label ? `${input.section ? `${input.section} · ` : ""}${input.question_label}` : `${twc("question")} ${qIndex + 1}`}</h3>
                       <div className="flex items-center gap-2">
                         {/* Simple informational CO count badge — no required/missing pressure */}
                         {input.cos.length > 0 && (
