@@ -14,13 +14,13 @@ const compiled = transformSync(source, {
   presets: [["next/babel", { "preset-env": { modules: "commonjs" }, "preset-react": { runtime: "automatic" } }]],
 }).code;
 
-function load(error = "") {
+function load(error = "", job = null) {
   let hook = 0;
   const sandboxModule = { exports: {} };
   const mockRequire = (name) => {
     if (name === "react") return { ...React, useState: (initial) => {
       const index = hook++;
-      return React.useState(index === 2 ? error : initial);
+      return React.useState(index === 0 ? job : index === 2 ? error : initial);
     } };
     if (name === "axios") return {};
     if (name === "@/lib/pollBackoff") return { startRecoverablePolling() { throw new Error("No network in rendering tests"); } };
@@ -30,8 +30,8 @@ function load(error = "") {
   return sandboxModule.exports;
 }
 
-function render(error = "") {
-  return renderToStaticMarkup(React.createElement(load(error).default, {
+function render(error = "", job = null) {
+  return renderToStaticMarkup(React.createElement(load(error, job).default, {
     folderId: "exam", questionCount: 2, onApply() {}, disabled: false,
   }));
 }
@@ -65,4 +65,17 @@ test("ordinary errors retain extraction and stale-paper instructions", () => {
   assert.equal(parameterErrorMessage(new Error("The paper changed. Reload before filling parameters.")),
     "The paper changed. Reload before filling parameters.");
   assert.equal(parameterErrorMessage({}, "Parameters unavailable."), "Parameters unavailable.");
+});
+
+test("partial drafts identify uncertain question and display unconfirmed AI values safely", () => {
+  const html = render("", { status: "completed", result: { questions: [{
+    question_no: 2, question_label: "8(a)", section: "SECTION C", status: "needs_clarification",
+    notes: ["Confirm the printed maximum."], review_draft: { max_marks: 9, max_quote: "[5]",
+      parameters: [{ name: "Correct method", percentage: 100 }], guidelines: "<script>not executable</script>" },
+  }] } });
+  assert.match(html, /8\(a\) — review AI draft/);
+  assert.match(html, /AI-proposed maximum \(unconfirmed\): 9/);
+  assert.match(html, /These values were not applied/);
+  assert.match(html, /Correct method: 100%/);
+  assert.doesNotMatch(html, /<script>/);
 });
