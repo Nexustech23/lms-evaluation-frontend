@@ -67,15 +67,13 @@ test("ordinary errors retain extraction and stale-paper instructions", () => {
   assert.equal(parameterErrorMessage({}, "Parameters unavailable."), "Parameters unavailable.");
 });
 
-test("partial drafts identify uncertain question and display unconfirmed AI values safely", () => {
+test("partial drafts do not add an AI preview to the simple generation panel", () => {
   const html = render("", { status: "completed", result: { questions: [{
     question_no: 2, question_label: "8(a)", section: "SECTION C", status: "needs_clarification",
     notes: ["Confirm the printed maximum."], review_draft: { max_marks: 9, max_quote: "[5]",
       parameters: [{ name: "Correct method", percentage: 100 }], guidelines: "<script>not executable</script>" },
   }] } });
-  assert.match(html, /8\(a\) — review AI draft/);
-  assert.match(html, /AI-proposed maximum \(unconfirmed\): 9/);
-  assert.match(html, /These values were not applied/);
-  assert.match(html, /Correct method: 100%/);
-  assert.doesNotMatch(html, /<script>/);
+  assert.equal((html.match(/<button\b/g) || []).length, 1);
+  assert.match(html, />Generate parameters<\/button>/);
+  assert.doesNotMatch(html, /<details|<summary|AI-proposed|Quoted source|Correct method|<script>/);
 });
