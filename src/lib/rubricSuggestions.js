@@ -50,6 +50,30 @@ export function applyRubricSuggestion(current, suggestion, { includeCOs = false 
   return next;
 }
 
+const UNVERIFIED_NOTE =
+  "Unverified AI draft: check the marks, parameters and guidelines, then Save.";
+
+/**
+ * A question the server could not verify still carries the AI's proposal in
+ * review_draft. Offer it as an editable, clearly flagged starting point, but
+ * only when it has a usable maximum; otherwise the question stays untouched.
+ */
+function usableReviewDraft(draft) {
+  const proposal = draft.review_draft;
+  if (!proposal || !Number.isFinite(proposal.max_marks) || proposal.max_marks <= 0) return null;
+  const minMarks = Number.isFinite(proposal.min_marks) && proposal.min_marks >= 0 &&
+    proposal.min_marks <= proposal.max_marks ? proposal.min_marks : 0;
+  return { ...proposal, min_marks: minMarks };
+}
+
+function mappingFields(draft) {
+  const fields = {};
+  for (const key of ["question_id", "question_label", "section", "question_text"]) {
+    if (typeof draft[key] === "string") fields[key] = draft[key];
+  }
+  return fields;
+}
+
 /** Prepare all edits before updating React state; unresolved questions stay intact. */
 export function applyRubricSuggestions(current, suggestions, options = {}) {
   if (!Array.isArray(suggestions) || suggestions.length !== current.length ||
@@ -62,6 +86,20 @@ export function applyRubricSuggestions(current, suggestions, options = {}) {
     const draft = suggestions[index];
     const notes = [...(draft.notes || [])];
     if (draft.status !== "draft_ready") {
+      const proposal = usableReviewDraft(draft);
+      if (proposal) {
+        const mapping = mappingFields(draft);
+        let filled;
+        try {
+          filled = applyRubricSuggestion(question, { ...proposal, ...mapping, status: "draft_ready" }, options);
+        } catch {
+          // Parameters or guidelines are missing or invalid: keep only the AI's marks.
+          filled = { ...question, minMarks: proposal.min_marks, maxMarks: proposal.max_marks, ...mapping };
+        }
+        appliedCount += 1;
+        warnings[index] = [...notes, UNVERIFIED_NOTE].join(" ");
+        return filled;
+      }
       warnings[index] = [...notes, "Complete this question manually; AI could not resolve its requirements."].join(" ");
       if (!draft.question_id) return question;
       return { ...question, question_id: draft.question_id, question_label: draft.question_label,
