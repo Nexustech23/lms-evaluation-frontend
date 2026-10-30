@@ -157,3 +157,66 @@ test("clarification retains printed mapping while preserving faculty criteria", 
   assert.equal(result.questions[0].guidelines, "Faculty criteria");
   assert.equal(current[0].question_label, undefined);
 });
+
+// ── Unverified AI drafts (review_draft) are offered as flagged, editable starting points ──
+const flagged = (extra = {}) => ({ question_no: 1, status: "needs_clarification",
+  notes: ["Question Q1: Confirm maximum marks: AI proposed 5, quoting '5'. The printed maximum could not be verified."],
+  question_id: "id-1", question_label: "Q1", section: "SECTION A", question_text: "Q1. Explain. 5", ...extra });
+
+test("unverified but complete AI draft fills marks, parameters and guidelines and keeps the warning", () => {
+  const row = flagged({ review_draft: { ...draft(), status: "needs_clarification" } });
+  const result = applyRubricSuggestions([{ custom: "keep" }], [row]);
+  assert.equal(result.appliedCount, 1);
+  assert.equal(result.questions[0].maxMarks, 5);
+  assert.equal(result.questions[0].parameters.length, 1);
+  assert.equal(result.questions[0].guidelines, "Credit valid steps.");
+  assert.equal(result.questions[0].custom, "keep");
+  assert.equal(result.questions[0].question_label, "Q1");
+  assert.match(result.warnings[0], /Confirm maximum marks/);
+  assert.match(result.warnings[0], /Unverified AI draft/);
+});
+
+test("unverified draft without parameters or guidelines fills only the marks and keeps the rest", () => {
+  const row = flagged({ review_draft: { status: "needs_clarification", min_marks: 0, max_marks: 3, parameters: [], guidelines: "" } });
+  const current = [{ minMarks: 1, maxMarks: "", guidelines: "Faculty work", parameters: [{ name: "Mine", percentage: 100 }] }];
+  const result = applyRubricSuggestions(current, [row]);
+  assert.equal(result.appliedCount, 1);
+  assert.equal(result.questions[0].maxMarks, 3);
+  assert.equal(result.questions[0].minMarks, 0);
+  assert.equal(result.questions[0].guidelines, "Faculty work");
+  assert.deepEqual(result.questions[0].parameters, current[0].parameters);
+  assert.equal(result.questions[0].question_id, "id-1");
+});
+
+test("unverified draft with percentages not totalling 100 falls back to marks only", () => {
+  const bad = { ...draft(), status: "needs_clarification", parameters: [{ name: "A", percentage: 60 }] };
+  const result = applyRubricSuggestions([{ guidelines: "Keep" }], [flagged({ review_draft: bad })]);
+  assert.equal(result.questions[0].maxMarks, 5);
+  assert.deepEqual(result.questions[0].parameters ?? [], []);
+  assert.equal(result.questions[0].guidelines, "Keep");
+});
+
+for (const [name, proposal] of [["null maximum", { max_marks: null }], ["zero maximum", { max_marks: 0 }],
+  ["non-numeric maximum", { max_marks: "5" }], ["no proposal", undefined]]) {
+  test(`unverified draft with ${name} leaves the question untouched`, () => {
+    const current = [{ maxMarks: 2 }];
+    const row = flagged(proposal ? { review_draft: { ...draft(), status: "needs_clarification", ...proposal } } : {});
+    const result = applyRubricSuggestions(current, [row]);
+    assert.equal(result.appliedCount, 0);
+    assert.equal(result.questions[0].maxMarks, 2);
+    assert.match(result.warnings[0], /Complete this question manually/);
+  });
+}
+
+test("an invalid minimum in an unverified draft becomes zero instead of blocking the fill", () => {
+  const row = flagged({ review_draft: { ...draft(), status: "needs_clarification", min_marks: 9 } });
+  assert.equal(applyRubricSuggestions([{}], [row]).questions[0].minMarks, 0);
+});
+
+test("unverified draft never mutates its inputs", () => {
+  const current = [{ maxMarks: 2 }];
+  const row = flagged({ review_draft: { ...draft(), status: "needs_clarification" } });
+  const before = structuredClone({ current, row });
+  applyRubricSuggestions(current, [row]);
+  assert.deepEqual({ current, row }, before);
+});
