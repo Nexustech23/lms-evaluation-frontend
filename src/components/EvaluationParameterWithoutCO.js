@@ -10,7 +10,7 @@ import { FaArrowLeft } from "react-icons/fa";
 import { useContext } from "react";
 import { AuthContext } from "@/app/AuthContext";
 import RubricSuggestionPanel from "@/components/RubricSuggestionPanel";
-import { applyRubricSuggestions, savedRubricRows } from "@/lib/rubricSuggestions";
+import { applyRubricSuggestions, savedRubricRows, sequentialPaperBlocks } from "@/lib/rubricSuggestions";
 
 const MARK_PARAMETERS = [
   "Accuracy of answer",
@@ -25,9 +25,9 @@ const MARK_PARAMETERS = [
 // question-paper text, in order, so maxMarks can be prefilled instead of
 // left blank — teacher can still edit it, this is just a starting value.
 // Mirrors EvaluationParamterCO.js's identical helper.
-const parseQuestionMarksFromPaperText = (text) => {
+const parseQuestionMarksFromPaperText = (text, count) => {
   if (!text || typeof text !== "string") return [];
-  const blocks = text.split(/(?=^Q\d+[.)])/m).filter((b) => /^Q\d+[.)]/.test(b));
+  const blocks = sequentialPaperBlocks(text, count);
   return blocks.map((block) => {
     const match = block.match(/\[(\d+)\s*Marks?\]/i);
     return match ? Number(match[1]) : "";
@@ -144,6 +144,10 @@ export default function EvaluationParameterWithoutCO() {
           setHasExistingEval(true);
           setQuestionInputs(
             evalResult.map((q) => ({
+              question_id: q.question_id,
+              question_label: q.question_label,
+              section: q.section,
+              question_text: q.question_text,
               minMarks: q.minMarks ?? "",
               maxMarks: q.maxMarks ?? "",
               guidelines: q.guidelines ?? "",
@@ -165,7 +169,7 @@ export default function EvaluationParameterWithoutCO() {
           }
 
           const paperText = folderResult?.question_paper?.text;
-          const parsedMarks = parseQuestionMarksFromPaperText(paperText);
+          const parsedMarks = parseQuestionMarksFromPaperText(paperText, Number(count));
           setQuestionInputs(
             Array.from({ length: Number(count) }, (_, i) => EMPTY_QUESTION(parsedMarks[i] ?? ""))
           );
@@ -397,7 +401,7 @@ style={{ color: user?.color || "#ff7f10" }}>
                     {/* Question header */}
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="font-semibold text-gray-800">
-                        {t("question")} {qIndex + 1}
+                        {input.question_label ? `${input.section ? `${input.section} · ` : ""}${input.question_label}` : `${t("question")} ${qIndex + 1}`}
                       </h3>
                       {input.parameters.length > 0 && (
                         <span

@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
 const source = await readFile(new URL("../src/lib/rubricSuggestions.js", import.meta.url), "utf8");
-const { applyRubricSuggestion, applyRubricSuggestions, savedRubricRows } = await import(`data:text/javascript;base64,${Buffer.from(source).toString("base64")}`);
+const { applyRubricSuggestion, applyRubricSuggestions, savedRubricRows, sequentialPaperBlocks } = await import(`data:text/javascript;base64,${Buffer.from(source).toString("base64")}`);
 const draft = () => ({ status: "draft_ready", min_marks: 0, max_marks: 5,
   parameters: [{ name: "Correct method", percentage: 100, isCustom: true }],
   guidelines: "Credit valid steps.", co_tags: [{ co_code: "CO1", eligible: true, description: "Methods" }] });
@@ -12,6 +12,15 @@ test("create mode requires an explicit successful no-rubric response", () => {
   assert.equal(savedRubricRows({ success: true, evaluation: null }), null);
   const rows = [{ maxMarks: 2 }];
   assert.equal(savedRubricRows({ success: true, evaluation: { questionEvaluationDetails: rows } }), rows);
+});
+
+test("legacy prefill only accepts complete sequential labels", () => {
+  const paper = "Q1. First [2 Marks]\nQ2. Second [3 Marks]";
+  assert.equal(sequentialPaperBlocks(paper, 2).length, 2);
+  assert.deepEqual(sequentialPaperBlocks(paper, 3), []);
+  assert.deepEqual(sequentialPaperBlocks("SECTION A\nQ1. First\nSECTION B\nQ1. Second", 2), []);
+  assert.deepEqual(sequentialPaperBlocks("Q1. First\nQ3. Third", 2), []);
+  assert.deepEqual(sequentialPaperBlocks("1(i) First\n1(ii) Second", 2), []);
 });
 
 for (const data of [undefined, { success: false }, { success: true },
@@ -128,4 +137,23 @@ test("all unresolved questions return warnings without applied credit or data ch
   assert.equal(result.appliedCount, 0);
   assert.equal(result.questions[0], current[0]);
   assert.match(result.warnings[0], /Complete this question manually/);
+});
+
+test("printed labels, section and stable source IDs survive applying a draft", () => {
+  const row = { ...draft(), question_no: 1, question_id: "stable-source-id",
+    question_label: "8(a)", section: "SECTION C", question_text: "8(a) Explain work. [5 Marks]" };
+  const result = applyRubricSuggestions([{}], [row]);
+  assert.equal(result.questions[0].question_label, "8(a)");
+  assert.equal(result.questions[0].question_id, "stable-source-id");
+  assert.equal(result.questions[0].section, "SECTION C");
+  assert.equal(result.questions[0].question_text, row.question_text);
+});
+
+test("clarification retains printed mapping while preserving faculty criteria", () => {
+  const current = [{ maxMarks: 5, guidelines: "Faculty criteria" }];
+  const result = applyRubricSuggestions(current, [{ question_no: 1, status: "needs_clarification",
+    question_id: "id", question_label: "1(ii)", section: "SECTION A", question_text: "1(ii) Explain" }]);
+  assert.equal(result.questions[0].question_label, "1(ii)");
+  assert.equal(result.questions[0].guidelines, "Faculty criteria");
+  assert.equal(current[0].question_label, undefined);
 });
