@@ -14,20 +14,24 @@ const compiled = transformSync(source, {
   presets: [["next/babel", { "preset-env": { modules: "commonjs" }, "preset-react": { runtime: "automatic" } }]],
 }).code;
 
-function render(mapping = null, boundaries = []) {
+function load(error = "") {
   let hook = 0;
-  const module = { exports: {} };
+  const sandboxModule = { exports: {} };
   const mockRequire = (name) => {
     if (name === "react") return { ...React, useState: (initial) => {
       const index = hook++;
-      return React.useState(index === 4 ? mapping : index === 5 ? boundaries : initial);
+      return React.useState(index === 2 ? error : initial);
     } };
     if (name === "axios") return {};
     if (name === "@/lib/pollBackoff") return { startRecoverablePolling() { throw new Error("No network in rendering tests"); } };
     return require(name);
   };
-  vm.runInNewContext(compiled, { module, exports: module.exports, require: mockRequire, AbortController });
-  return renderToStaticMarkup(React.createElement(module.exports.default, {
+  vm.runInNewContext(compiled, { module: sandboxModule, exports: sandboxModule.exports, require: mockRequire, AbortController });
+  return sandboxModule.exports;
+}
+
+function render(error = "") {
+  return renderToStaticMarkup(React.createElement(load(error).default, {
     folderId: "exam", questionCount: 2, onApply() {}, disabled: false,
   }));
 }
@@ -38,16 +42,27 @@ test("normal layout stays a single Generate parameters button", () => {
   assert.doesNotMatch(html, /Confirm question mapping|uses credits|Edit Mode|Create Mode/);
 });
 
-test("ambiguous layout shows source choices and faculty confirmation", () => {
-  const mapping = { question_count: 2, candidates: [], lines: [
-    { start: 10, text: "8(a) Define work", section: "SECTION C" },
-    { start: 40, text: "8(b) Explain heat", section: "SECTION C" },
-  ] };
-  const html = render(mapping, [{ start: 10, question_label: "8(a)" }, { start: 40, question_label: "8(b)" }]);
-  assert.match(html, /Confirm question mapping/);
-  assert.match(html, /This step uses no AI credits/);
-  assert.match(html, /value="10" selected/);
-  assert.match(html, /8\(a\) Define work/);
-  assert.match(html, />Confirm mapping<\/button>/);
-  assert.match(html, /disabled=""[^>]*>Generate parameters/);
+test("mapping failure keeps the single-button UI and shows a short actionable error", () => {
+  const { parameterErrorMessage } = load();
+  const error = parameterErrorMessage({ response: { data: { detail: {
+    code: "QUESTION_MAPPING_REQUIRED", question_count: 38,
+    message: "Confirm which printed questions correspond to the evaluation rows.",
+    lines: [{ start: 10, text: "Private extracted paper content" }],
+  } } } });
+  const html = render(error);
+  assert.match(html, /role="alert"/);
+  assert.match(html, /Could not identify all questions automatically/);
+  assert.match(html, /Your existing parameters were kept/);
+  assert.equal((html.match(/<button\b/g) || []).length, 1);
+  assert.doesNotMatch(html, /Confirm question mapping|Confirm mapping|<select|<input|Private extracted paper content/);
+  assert.doesNotMatch(html, /disabled=""/);
+});
+
+test("ordinary errors retain extraction and stale-paper instructions", () => {
+  const { parameterErrorMessage } = load();
+  assert.equal(parameterErrorMessage({ response: { data: { detail: "Wait for question-paper text extraction." } } }),
+    "Wait for question-paper text extraction.");
+  assert.equal(parameterErrorMessage(new Error("The paper changed. Reload before filling parameters.")),
+    "The paper changed. Reload before filling parameters.");
+  assert.equal(parameterErrorMessage({}, "Parameters unavailable."), "Parameters unavailable.");
 });
