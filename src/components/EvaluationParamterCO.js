@@ -217,6 +217,8 @@ export default function EvaluationParameterCO() {
   const [hasExistingEval, setHasExistingEval] = useState(false);
   const [questionInputs, setQuestionInputs] = useState([]);
   const [choiceGroups, setChoiceGroups] = useState([]);
+  const [groupNotes, setGroupNotes] = useState([]);
+  const [suggestingGroups, setSuggestingGroups] = useState(false);
   const [suggestionSourceId, setSuggestionSourceId] = useState(null);
 
   const [suggestionWarnings, setSuggestionWarnings] = useState({});
@@ -500,6 +502,27 @@ export default function EvaluationParameterCO() {
 
   // ─── Validation ────────────────────────────────────────────────────────────
 
+  // Suggestions come from the paper's own wording ("Answer any two..."); nothing is saved until Save.
+  const suggestGroups = async () => {
+    setSuggestingGroups(true);
+    try {
+      const res = await axios.get(`/api/evaluation-details/${folderId}/choice-group-suggestions`,
+        { params: { rows: questionInputs.length }, withCredentials: true });
+      const suggested = loadGroups(res.data?.groups);
+      setGroupNotes(res.data?.notes || []);
+      if (!suggested.length) {
+        toast("The paper does not say \"answer any N\" for separate questions. Add a group by hand if you need one.");
+        return;
+      }
+      if (choiceGroups.length && !window.confirm("Replace the current choice groups with the suggestions? Nothing is saved until you click Save.")) return;
+      setChoiceGroups(suggested);
+    } catch (error) {
+      toast.error(typeof error?.response?.data?.detail === "string" ? error.response.data.detail : "Could not read suggestions from the paper.");
+    } finally {
+      setSuggestingGroups(false);
+    }
+  };
+
   const validateBeforeSubmit = () => {
     const errors = [];
     if (!totalMarks) {
@@ -651,7 +674,8 @@ export default function EvaluationParameterCO() {
           {!loading && <RubricSuggestionPanel key={folderId} folderId={folderId}
             disabled={isSubmitting} questionCount={questionInputs.length} onApply={applySuggestion} />}
           {!loading && questionInputs.length > 0 && <ChoiceGroupsPanel rows={questionInputs} groups={choiceGroups}
-            onChange={setChoiceGroups} totalMarks={totalMarks} disabled={isSubmitting} color={themeColor} />}
+            onChange={setChoiceGroups} totalMarks={totalMarks} disabled={isSubmitting} color={themeColor}
+            onSuggest={suggestGroups} suggesting={suggestingGroups} notes={groupNotes} />}
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20 gap-3">
               <Spinner />
