@@ -12,6 +12,8 @@ import { AuthContext } from "@/app/AuthContext";
 import RubricSuggestionPanel from "@/components/RubricSuggestionPanel";
 import { applyRubricSuggestions, savedRubricRows, sequentialPaperBlocks } from "@/lib/rubricSuggestions";
 import ChoiceGroupsPanel from "@/components/ChoiceGroupsPanel";
+import QuestionPartsEditor from "@/components/QuestionPartsEditor";
+import { loadParts, partErrors } from "@/lib/questionParts";
 import { loadGroups, countedMax, groupErrors, groupBadges } from "@/lib/choiceGroups";
 
 const MARK_PARAMETERS = [
@@ -344,6 +346,7 @@ export default function EvaluationParameterCO() {
               guidelines: q.guidelines ?? "",
               parameters: Array.isArray(q.parameters) ? q.parameters : [],
               cos: Array.isArray(q.cos) ? q.cos : [],
+              ...loadParts(q),
             }))
           );
         } else {
@@ -531,6 +534,11 @@ export default function EvaluationParameterCO() {
     }
     questionInputs.forEach((q, i) => {
       const n = i + 1;
+      if (q.parts?.length) {
+        partErrors(q.parts).forEach((message) => errors.push(`Question ${n}: ${message}`));
+        groupErrors(q.parts, q.partGroups || []).forEach((message) => errors.push(`Question ${n}: ${message}`));
+        if (q.parameters?.length) errors.push(`Question ${n}: a question with parts cannot also have parameters; give each part its own guidelines`);
+      }
       const maxMarks = Number(q.maxMarks);
 
       // NOTE: minMarks defaults to 0, a valid value — `== null` (not a plain
@@ -737,11 +745,16 @@ export default function EvaluationParameterCO() {
                           type="number"
                           placeholder={twc("maxMarks")}
                           value={input.maxMarks}
+                          readOnly={Boolean(input.parts?.length)}
+                          title={input.parts?.length ? "Set by the parts below" : undefined}
                           onChange={(e) => handleInputChange(qIndex, "maxMarks", e.target.value)}
                           className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#ff7f10]"
                         />
                       </div>
                     </div>
+
+                    <QuestionPartsEditor row={input} disabled={isSubmitting} color={themeColor}
+                      onChange={(next) => setQuestionInputs((prev) => prev.map((r, i) => (i === qIndex ? next : r)))} />
 
                     <div className="mb-5">
                       <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor={`guidelines-${qIndex}`}>

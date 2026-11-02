@@ -12,6 +12,8 @@ import { AuthContext } from "@/app/AuthContext";
 import RubricSuggestionPanel from "@/components/RubricSuggestionPanel";
 import { applyRubricSuggestions, savedRubricRows, sequentialPaperBlocks } from "@/lib/rubricSuggestions";
 import ChoiceGroupsPanel from "@/components/ChoiceGroupsPanel";
+import QuestionPartsEditor from "@/components/QuestionPartsEditor";
+import { loadParts, partErrors } from "@/lib/questionParts";
 import { loadGroups, countedMax, groupErrors, groupBadges } from "@/lib/choiceGroups";
 
 const MARK_PARAMETERS = [
@@ -158,6 +160,7 @@ export default function EvaluationParameterWithoutCO() {
               maxMarks: q.maxMarks ?? "",
               guidelines: q.guidelines ?? "",
               parameters: Array.isArray(q.parameters) ? q.parameters : [],
+              ...loadParts(q),
             }))
           );
         } else {
@@ -295,6 +298,11 @@ export default function EvaluationParameterWithoutCO() {
     const errors = [];
     questionInputs.forEach((q, i) => {
       const n = i + 1;
+      if (q.parts?.length) {
+        partErrors(q.parts).forEach((message) => errors.push(`Question ${n}: ${message}`));
+        groupErrors(q.parts, q.partGroups || []).forEach((message) => errors.push(`Question ${n}: ${message}`));
+        if (q.parameters?.length) errors.push(`Question ${n}: a question with parts cannot also have parameters; give each part its own guidelines`);
+      }
       const minMissing = q.minMarks == null || q.minMarks === "";
       const maxMissing = q.maxMarks == null || q.maxMarks === "";
       if (minMissing || maxMissing)
@@ -477,6 +485,8 @@ style={{ color: user?.color || "#ff7f10" }}>
                           type="number"
                           placeholder="Max Marks"
                           value={input.maxMarks}
+                          readOnly={Boolean(input.parts?.length)}
+                          title={input.parts?.length ? "Set by the parts below" : undefined}
                           onChange={(e) =>
                             handleInputChange(qIndex, "maxMarks", e.target.value)
                           }
@@ -486,6 +496,9 @@ style={{ color: user?.color || "#ff7f10" }}>
                         />
                       </div>
                     </div>
+
+                    <QuestionPartsEditor row={input} disabled={isSubmitting} color={user?.color || "#ff7f10"}
+                      onChange={(next) => setQuestionInputs((prev) => prev.map((r, i) => (i === qIndex ? next : r)))} />
 
                     {/* Guidelines */}
                     <div className="mt-4">
