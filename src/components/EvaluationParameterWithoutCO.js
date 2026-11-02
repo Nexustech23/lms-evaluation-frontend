@@ -11,6 +11,8 @@ import { useContext } from "react";
 import { AuthContext } from "@/app/AuthContext";
 import RubricSuggestionPanel from "@/components/RubricSuggestionPanel";
 import { applyRubricSuggestions, savedRubricRows, sequentialPaperBlocks } from "@/lib/rubricSuggestions";
+import ChoiceGroupsPanel from "@/components/ChoiceGroupsPanel";
+import { loadGroups, countedMax, groupErrors, groupBadges } from "@/lib/choiceGroups";
 
 const MARK_PARAMETERS = [
   "Accuracy of answer",
@@ -67,6 +69,7 @@ export default function EvaluationParameterWithoutCO() {
   const [hasExistingEval, setHasExistingEval] = useState(false);
  const [totalMarks, setTotalMarks] = useState()
   const [questionInputs, setQuestionInputs] = useState([]);
+  const [choiceGroups, setChoiceGroups] = useState([]);
   const [suggestionSourceId, setSuggestionSourceId] = useState(null);
 
   const [suggestionWarnings, setSuggestionWarnings] = useState({});
@@ -108,7 +111,8 @@ export default function EvaluationParameterWithoutCO() {
       }
     );
     // Return null if no evaluation exists yet (404 / empty)
-     setTotalMarks(res?.data?.evaluation?.totalMarks)
+     setTotalMarks(res?.data?.evaluation?.totalMarks);
+    setChoiceGroups(loadGroups(res?.data?.evaluation?.choiceGroups))
     return savedRubricRows(res.data);
   }, [folderId]);
 
@@ -290,9 +294,12 @@ export default function EvaluationParameterWithoutCO() {
         });
       }
     });
-    const questionTotal = questionInputs.reduce((sum, q) => sum + Number(q.maxMarks || 0), 0);
+    errors.push(...groupErrors(questionInputs, choiceGroups));
+    const questionTotal = countedMax(questionInputs, choiceGroups);
     if (Math.abs(questionTotal - Number(totalMarks)) > 1e-7)
-      errors.push("Question maximum marks must add up to the exam total marks");
+      errors.push(choiceGroups.length
+        ? "Required questions plus the counted marks of each choice group must add up to the exam total marks"
+        : "Question maximum marks must add up to the exam total marks");
     return errors.length ? errors : null;
   };
 
@@ -311,7 +318,7 @@ export default function EvaluationParameterWithoutCO() {
     try {
       await axios.post(
         `/api/evaluation-details/${folderId}`,
-        { questionEvaluationDetails: questionInputs, totalMarks,
+        { questionEvaluationDetails: questionInputs, totalMarks, choiceGroups,
           ...(suggestionSourceId ? { suggestion_source_id: suggestionSourceId } : {}) },
         {
             withCredentials: true, 
@@ -377,6 +384,8 @@ style={{ color: user?.color || "#ff7f10" }}>
 
           {!loading && <RubricSuggestionPanel key={folderId} folderId={folderId}
             disabled={isSubmitting} questionCount={questionInputs.length} onApply={applySuggestion} />}
+          {!loading && questionInputs.length > 0 && <ChoiceGroupsPanel rows={questionInputs} groups={choiceGroups}
+            onChange={setChoiceGroups} totalMarks={totalMarks} disabled={isSubmitting} color={user?.color || "#ff7f10"} />}
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20 gap-3">
               <Spinner />
@@ -402,6 +411,7 @@ style={{ color: user?.color || "#ff7f10" }}>
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="font-semibold text-gray-800">
                         {input.question_label ? `${input.section ? `${input.section} · ` : ""}${input.question_label}` : `${t("question")} ${qIndex + 1}`}
+                        {groupBadges(choiceGroups)[qIndex + 1] && <span className="ml-2 align-middle text-xs px-2 py-1 rounded-full font-medium bg-blue-100 text-blue-700">{groupBadges(choiceGroups)[qIndex + 1]}</span>}
                       </h3>
                       {input.parameters.length > 0 && (
                         <span
