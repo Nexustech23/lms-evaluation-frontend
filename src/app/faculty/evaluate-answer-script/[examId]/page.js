@@ -13,6 +13,7 @@ import { FaArrowLeft } from "react-icons/fa";
 import { useTranslations } from "next-intl";
 import { startRecoverablePolling } from "@/lib/pollBackoff";
 import { fmt2 } from "@/lib/utils";
+import { isCounted, reselectCounted } from "@/lib/choiceGroups";
 
 function withAlpha(hex = "#ff7f10", alpha = 1) {
   const h = hex.replace("#", "");
@@ -41,6 +42,9 @@ export default function SavedResult() {
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [selectedEvaluation, setSelectedEvaluation] = useState(null);
+  // Choice groups: only the best N answers of a group count, and that can change as marks are adjusted.
+  const reviewRows = reselectCounted(selectedEvaluation || []);
+  const countedRows = reviewRows.filter(isCounted);
   const [selectedAnswerscriptId, setSelectedAnswerscriptId] = useState(null);
   const [selectedResultRevision, setSelectedResultRevision] = useState(0);
   const [selectedOptionalReview, setSelectedOptionalReview] = useState(false);
@@ -633,6 +637,11 @@ export default function SavedResult() {
               <div key={idx} className="border rounded mb-4 p-4 bg-gray-50">
                 <h3 className="font-semibold mb-3 text-lg">
                   {tcw("question")} {q.question_no} (Max {q.max_marks} marks)
+                  {q.choice_group && (
+                    <span className={`ml-2 align-middle text-xs px-2 py-1 rounded-full font-medium ${reviewRows[idx]?.counted === false ? "bg-gray-200 text-gray-600" : "bg-blue-100 text-blue-700"}`}>
+                      {reviewRows[idx]?.counted === false ? "Not counted (choice)" : "Counted (choice)"}
+                    </span>
+                  )}
                 </h3>
                 {q.flags?.needs_review && (
                   <div className="mb-4 border border-amber-300 bg-amber-50 p-3">
@@ -772,9 +781,9 @@ export default function SavedResult() {
             {/* Summary Footer */}
             <div className="grid grid-cols-4 gap-4 bg-gray-800 text-white p-4 rounded">
               {[
-                { label: t("aiMarks"),    value: selectedEvaluation?.reduce((s, q) => s + (Number(q.ai_awarded_marks) || 0), 0), cls: "" },
-                { label: t("adjustment"), value: selectedEvaluation?.reduce((s, q) => s + (Number(q.grace_marks) || 0), 0),       cls: "" },
-                { label: t("finalScore"), value: selectedEvaluation?.reduce((s, q) => s + (Number(q.ai_awarded_marks) || 0) + (Number(q.grace_marks) || 0), 0), cls: "text-green-400" },
+                { label: t("aiMarks"),    value: countedRows.reduce((s, q) => s + (Number(q.ai_awarded_marks) || 0), 0), cls: "" },
+                { label: t("adjustment"), value: countedRows.reduce((s, q) => s + (Number(q.grace_marks) || 0), 0),       cls: "" },
+                { label: t("finalScore"), value: countedRows.reduce((s, q) => s + (Number(q.ai_awarded_marks) || 0) + (Number(q.grace_marks) || 0), 0), cls: "text-green-400" },
                 { label: t("totalMarks"), value: total, cls: "" },
               ].map(({ label, value, cls }) => (
                 <div key={label} className="text-center">
