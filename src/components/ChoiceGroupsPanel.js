@@ -8,7 +8,7 @@ import {
  * Lets the faculty say "the student answers N of these questions" (including "1 of Q4 and Q5").
  * The backend counts the student's best N answers in each group.
  */
-export default function ChoiceGroupsPanel({ rows, groups, onChange, totalMarks, disabled = false, color = "#ff7f10" }) {
+export default function ChoiceGroupsPanel({ rows, groups, onChange, totalMarks, disabled = false, color = "#ff7f10", onSuggest, suggesting = false, notes = [] }) {
   const errors = groupErrors(rows, groups);
   const counted = countedMax(rows, groups);
   const totalKnown = totalMarks !== undefined && totalMarks !== "" && totalMarks !== null;
@@ -24,11 +24,24 @@ export default function ChoiceGroupsPanel({ rows, groups, onChange, totalMarks, 
             The student&apos;s best answers in each group count.
           </p>
         </div>
-        <button type="button" disabled={disabled} onClick={() => onChange(addGroup(groups))}
-          className="shrink-0 rounded px-3 py-1.5 text-sm text-white disabled:opacity-50" style={{ backgroundColor: color }}>
-          + Add choice group
-        </button>
+        <div className="flex shrink-0 gap-2">
+          {onSuggest && (
+            <button type="button" disabled={disabled || suggesting} onClick={onSuggest}
+              className="rounded border px-3 py-1.5 text-sm disabled:opacity-50" style={{ borderColor: color, color }}>
+              {suggesting ? "Reading the paper…" : "Suggest from paper"}
+            </button>
+          )}
+          <button type="button" disabled={disabled} onClick={() => onChange(addGroup(groups))}
+            className="rounded px-3 py-1.5 text-sm text-white disabled:opacity-50" style={{ backgroundColor: color }}>
+            + Add choice group
+          </button>
+        </div>
       </div>
+      {notes.length > 0 && (
+        <ul role="status" className="mt-3 list-disc pl-5 text-xs text-amber-800">
+          {notes.map((note) => <li key={note}>{note}</li>)}
+        </ul>
+      )}
 
       {groups.map((group, index) => {
         const taken = takenByOthers(groups, group.id);
