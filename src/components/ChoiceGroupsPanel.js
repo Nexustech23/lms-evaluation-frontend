@@ -8,7 +8,8 @@ import {
  * Lets the faculty say "the student answers N of these questions" (including "1 of Q4 and Q5").
  * The backend counts the student's best N answers in each group.
  */
-export default function ChoiceGroupsPanel({ rows, groups, onChange, totalMarks, disabled = false, color = "#ff7f10", onSuggest, suggesting = false, notes = [] }) {
+export default function ChoiceGroupsPanel({ rows, groups, onChange, totalMarks, disabled = false, color = "#ff7f10", onSuggest, suggesting = false, notes = [],
+  heading = "Choice groups", hint, labelFor = (row, n) => `Q${n}` }) {
   const errors = groupErrors(rows, groups);
   const counted = countedMax(rows, groups);
   const totalKnown = totalMarks !== undefined && totalMarks !== "" && totalMarks !== null;
@@ -18,10 +19,10 @@ export default function ChoiceGroupsPanel({ rows, groups, onChange, totalMarks, 
     <div className="mb-6 border rounded-lg p-4" data-testid="choice-groups-panel">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h3 className="font-semibold text-gray-800">Choice groups</h3>
+          <h3 className="font-semibold text-gray-800">{heading}</h3>
           <p className="text-xs text-gray-500">
-            Use this when the paper says &ldquo;answer any N&rdquo; or offers a choice between separate questions.
-            The student&apos;s best answers in each group count.
+            {hint || <>Use this when the paper says &ldquo;answer any N&rdquo; or offers a choice between separate questions.
+            The student&apos;s best answers in each group count.</>}
           </p>
         </div>
         <div className="flex shrink-0 gap-2">
@@ -61,7 +62,7 @@ export default function ChoiceGroupsPanel({ rows, groups, onChange, totalMarks, 
                   <label key={n} className={`flex items-center gap-1 rounded border bg-white px-2 py-1 text-xs ${blocked ? "opacity-40" : "cursor-pointer"}`}>
                     <input type="checkbox" checked={checked} disabled={disabled || blocked}
                       onChange={() => onChange(toggleQuestion(groups, group.id, n))} />
-                    Q{n}{row.maxMarks !== "" && row.maxMarks != null ? ` (${row.maxMarks})` : ""}
+                    {labelFor(row, n)}{row.maxMarks !== "" && row.maxMarks != null ? ` (${row.maxMarks})` : ""}
                   </label>
                 );
               })}
@@ -71,7 +72,7 @@ export default function ChoiceGroupsPanel({ rows, groups, onChange, totalMarks, 
               <input type="number" min={1} value={group.answerN} disabled={disabled}
                 onChange={(e) => onChange(setAnswerN(groups, group.id, e.target.value))}
                 className="w-16 rounded border px-2 py-1" aria-label={`Number of questions to answer in group ${index + 1}`} />
-              <span>of the {group.questions.length} chosen questions. The best answers count.</span>
+              <span>of the {group.questions.length} chosen. The best answers count.</span>
             </div>
           </div>
         );

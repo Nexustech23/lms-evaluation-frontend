@@ -657,6 +657,24 @@ export default function SavedResult() {
                   </div>
                 )}
 
+                {q.parts?.length > 0 && (
+                  <div className="mb-4 rounded border bg-white p-3">
+                    <p className="mb-2 text-sm font-semibold text-gray-700">Part marks (the AI&apos;s; adjust the question total below)</p>
+                    <table className="w-full text-sm">
+                      <thead><tr className="text-left text-gray-500"><th className="pr-3">Part</th><th className="pr-3">Marks</th><th>Reasoning</th></tr></thead>
+                      <tbody>
+                        {q.parts.map((part, i) => (
+                          <tr key={i} className={part.counted === false ? "text-gray-400" : ""}>
+                            <td className="pr-3 align-top">{part.label}</td>
+                            <td className="pr-3 align-top whitespace-nowrap">{fmt2(part.ai_awarded_marks)} / {fmt2(part.max_marks)}{part.counted === false ? " (not counted)" : ""}</td>
+                            <td className="align-top">{part.reasoning}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
                 <div className="grid grid-cols-3 gap-4 mb-4">
                   {[
                     { label: t("aiMarks"), value: q.ai_awarded_marks, disabled: true },
