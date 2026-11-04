@@ -12,6 +12,7 @@ import { AuthContext } from "@/app/AuthContext";
 import RubricSuggestionPanel from "@/components/RubricSuggestionPanel";
 import { applyRubricSuggestions, savedRubricRows, sequentialPaperBlocks } from "@/lib/rubricSuggestions";
 import ChoiceGroupsPanel from "@/components/ChoiceGroupsPanel";
+import MarkingTechniqueSelect, { loadTechnique } from "@/components/MarkingTechniqueSelect";
 import QuestionPartsEditor from "@/components/QuestionPartsEditor";
 import { loadParts, partErrors } from "@/lib/questionParts";
 import { loadGroups, countedMax, groupErrors, groupBadges } from "@/lib/choiceGroups";
@@ -219,6 +220,7 @@ export default function EvaluationParameterCO() {
   const [hasExistingEval, setHasExistingEval] = useState(false);
   const [questionInputs, setQuestionInputs] = useState([]);
   const [choiceGroups, setChoiceGroups] = useState([]);
+  const [markingTechnique, setMarkingTechnique] = useState("standard");
   const [groupNotes, setGroupNotes] = useState([]);
   const [suggestingGroups, setSuggestingGroups] = useState(false);
   const [suggestionSourceId, setSuggestionSourceId] = useState(null);
@@ -278,6 +280,7 @@ export default function EvaluationParameterCO() {
     );
     setTotalMarks(res?.data?.evaluation?.totalMarks);
     setChoiceGroups(loadGroups(res?.data?.evaluation?.choiceGroups))
+    setMarkingTechnique(loadTechnique(res?.data?.evaluation?.markingTechnique))
     return savedRubricRows(res.data);
   }, [folderId]);
 
@@ -607,7 +610,7 @@ export default function EvaluationParameterCO() {
     try {
       await axios.post(
         `/api/evaluation-details/${folderId}`,
-        { questionEvaluationDetails: questionInputs, totalMarks, choiceGroups,
+        { questionEvaluationDetails: questionInputs, totalMarks, choiceGroups, markingTechnique,
           ...(suggestionSourceId ? { suggestion_source_id: suggestionSourceId } : {}) },
         {
           withCredentials: true,
@@ -681,6 +684,8 @@ export default function EvaluationParameterCO() {
 
           {!loading && <RubricSuggestionPanel key={folderId} folderId={folderId}
             disabled={isSubmitting} questionCount={questionInputs.length} onApply={applySuggestion} />}
+          {!loading && questionInputs.length > 0 && <MarkingTechniqueSelect value={markingTechnique}
+            onChange={setMarkingTechnique} disabled={isSubmitting} color={themeColor} />}
           {!loading && questionInputs.length > 0 && <ChoiceGroupsPanel rows={questionInputs} groups={choiceGroups}
             onChange={setChoiceGroups} totalMarks={totalMarks} disabled={isSubmitting} color={themeColor}
             onSuggest={suggestGroups} suggesting={suggestingGroups} notes={groupNotes} />}
