@@ -91,6 +91,10 @@ export default function QuestionPaperGenerator() {
   // ── Editor / output ───────────────────────────────────────────────────────
   const [editorContent, setEditorContent] = useState("");
   const [docxBase64, setDocxBase64] = useState("");
+  // Ask the AI to solve every question after writing the paper and flag any that look wrong.
+  const [checkAnswers, setCheckAnswers] = useState(true);
+  // Flags and the answer key for the faculty (not part of the paper).
+  const [reviewNotes, setReviewNotes] = useState(null);
   const [docxFilename, setDocxFilename] = useState("question_paper.docx");
   const [generationMeta, setGenerationMeta] = useState({});
   const [generationStep, setGenerationStep] = useState("");
@@ -394,6 +398,7 @@ export default function QuestionPaperGenerator() {
     setUploadedFile(null);
     setEditorContent("");
     setDocxBase64("");
+    setReviewNotes(null);
     setDocxFilename("question_paper.docx");
     setGenerationMeta({});
     setIsSaved(false);
@@ -480,6 +485,7 @@ export default function QuestionPaperGenerator() {
 
       // ── Send full sections array (including bloom levels) as JSON ──────────
       formData.append("sections", JSON.stringify(sections));
+      formData.append("checkAnswers", String(checkAnswers));
 
       if (inputMode === "pdf" && uploadedFile) {
         formData.append("questionBank", uploadedFile);
@@ -535,6 +541,9 @@ export default function QuestionPaperGenerator() {
         duration: resDuration,
         generationSource,
         tokenUsage,
+        answerKey,
+        reviewFlags,
+        answerCheck,
       } = result;
       console.log(result);
       if (!paperText)
@@ -578,7 +587,7 @@ export default function QuestionPaperGenerator() {
 
           const escaped = escapeHtml(trimmed);
           if (!escaped) return "<p><br/></p>";
-          if (/^SECTION\s+[A-Z]/i.test(escaped)) return `<h2>${escaped}</h2>`;
+          if (/^SECTION\s+[A-Z0-9]/i.test(escaped)) return `<h2>${escaped}</h2>`;
           if (/^(Q\d+[\.\)]|\d+\.)/i.test(escaped))
             return renderQuestionLine(escaped);
           if (escaped.startsWith("```")) return "";
@@ -700,6 +709,11 @@ export default function QuestionPaperGenerator() {
         });
 
       setDocxBase64(b64 || "");
+      setReviewNotes({
+        answerKey: answerKey || [],
+        reviewFlags: reviewFlags || [],
+        answerCheck: answerCheck || "skipped",
+      });
       setDocxFilename(filename || "question_paper.docx");
       setGenerationMeta({
         instituteName: instituteName || selectedSchool?.name || "",
@@ -746,6 +760,35 @@ export default function QuestionPaperGenerator() {
   const handleDownloadDocx = async () => {
     setIsDownloading(true);
     try {
+      if (editorContent && editorContent.trim()) {
+        try {
+          const res = await axios.post(
+            `/api/question-paper/export-docx`,
+            {
+              editorContent,
+              instituteName: previewMeta.instituteName,
+              departmentName: previewMeta.departmentName,
+              examType: previewMeta.examType,
+              subjectName: previewMeta.subjectName,
+              semester: previewMeta.semester,
+              academicYear: previewMeta.academicYear,
+              duration: previewMeta.duration,
+              totalMarks: previewMeta.totalMarks,
+            },
+            { withCredentials: true, responseType: "blob" },
+          );
+          const url = URL.createObjectURL(res.data);
+          Object.assign(document.createElement("a"), {
+            href: url,
+            download: docxFilename,
+          }).click();
+          URL.revokeObjectURL(url);
+          toast.success("DOCX downloaded!");
+          return;
+        } catch {
+          // The editor export failed: fall back to the file made when the paper was generated.
+        }
+      }
       if (docxBase64) {
         const bytes = Uint8Array.from(atob(docxBase64), (c) => c.charCodeAt(0));
         const blob = new Blob([bytes], {
@@ -1004,6 +1047,8 @@ export default function QuestionPaperGenerator() {
                 // Sections — fully controlled from this parent
                 sections={sections}
                 setSections={setSections}
+                checkAnswers={checkAnswers}
+                setCheckAnswers={setCheckAnswers}
                 onBack={handleReset}
                 onGenerate={handleGenerate}
                 t={t}
@@ -1033,6 +1078,7 @@ export default function QuestionPaperGenerator() {
             docxBase64={docxBase64}
             generationMeta={generationMeta}
             docxFilename={docxFilename}
+            reviewNotes={reviewNotes}
             isDownloading={isDownloading}
             isSaving={isSaving}
             isSaved={isSaved}

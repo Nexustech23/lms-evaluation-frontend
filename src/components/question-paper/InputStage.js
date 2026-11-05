@@ -118,6 +118,8 @@ export default function InputStage({
   // Sections — must be controlled from parent (page.js) so they survive re-renders
   sections,
   setSections,
+  checkAnswers,
+  setCheckAnswers,
   onBack,
   onGenerate,
   t,
@@ -653,6 +655,20 @@ export default function InputStage({
             )}
           </div>
         </div>
+
+        {/* ── Answer check ── */}
+        <label className="flex items-start gap-2 mb-3 text-sm text-gray-700 cursor-pointer">
+          <input
+            type="checkbox"
+            className="mt-1"
+            checked={!!checkAnswers}
+            onChange={(e) => setCheckAnswers?.(e.target.checked)}
+          />
+          <span>
+            <strong>Check answers</strong> (recommended) — a second AI pass solves every question and flags any that
+            look wrong. Adds one extra AI call.
+          </span>
+        </label>
 
         {/* ── Generate button ── */}
         <button
