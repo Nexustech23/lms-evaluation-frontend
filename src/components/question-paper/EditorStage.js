@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { withAlpha, darkenColor } from "@/lib/question-paper/colorHelpers";
 import { useState } from "react";
+import ReviewNotes from "./ReviewNotes";
 
 // RichEditorPane pulls in tiptap + lexical (~200KB+). It only mounts once
 // the user reaches the editor stage of question-paper creation — load it
@@ -26,6 +27,7 @@ export default function EditorStage({
   docxBase64,
   generationMeta,
   docxFilename,
+  reviewNotes,
   isDownloading,
   isSaving,
   isSaved,
@@ -53,6 +55,8 @@ export default function EditorStage({
         onSave={onSave}
         t={t}
       />
+
+      <ReviewNotes notes={reviewNotes} />
 
       {/* ── Save info strip ── */}
       <div
