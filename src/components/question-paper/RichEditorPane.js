@@ -6,7 +6,7 @@ import {
   Bold, Italic, Underline, List, ListOrdered,
   Undo, Redo, Table, AlignLeft, AlignCenter,
   AlignRight, AlignJustify, Link2, Eraser, Palette,
-  Rows3, Columns3, Maximize2, Plus, Scissors,
+  Rows3, Columns3, Maximize2, Plus, Scissors, Sigma,
 } from "lucide-react";
 
 import DOMPurify from "dompurify";
@@ -55,6 +55,8 @@ import {
 
 import axios from "axios";
 import toast from "react-hot-toast";
+
+import { EquationNode, EquationDialogProvider, EquationDialogCtx } from "./EquationNode";
 
 // ─── A4 at 96 dpi ───
 const A4_WIDTH_PX = 794;
@@ -395,6 +397,7 @@ function Sep() {
 // ═══════════════════════════════════════════════════════════
 function SharedToolbar({ pageStyle, setPageStyle, onAddPage }) {
   const { ref: activeEditorRef, toolbarState } = useContext(ActiveEditorCtx);
+  const { openEquation } = useContext(EquationDialogCtx);
   const [showLinkModal, setShowLinkModal] = useState(false);
   const [showLayoutModal, setShowLayoutModal] = useState(false);
   const [linkUrl, setLinkUrl] = useState("");
@@ -524,6 +527,7 @@ function SharedToolbar({ pageStyle, setPageStyle, onAddPage }) {
         <Btn onClick={() => { update(() => { const s = $getSelection(); if ($isRangeSelection(s)) $setBlocksType(s, () => $createParagraphNode()); }); activeEditorRef.current?.dispatchCommand(INSERT_TABLE_COMMAND, { columns: "2", rows: "2", includeHeaders: { rows: true, columns: false } }); }} title="Insert Table"><Table size={14} /></Btn>
         <Btn onClick={() => update(() => { try { $insertTableRow__EXPERIMENTAL(false); } catch (e) { } })} title="Add Row"><Rows3 size={14} /></Btn>
         <Btn onClick={() => update(() => { try { $insertTableColumn__EXPERIMENTAL(false); } catch (e) { } })} title="Add Column"><Columns3 size={14} /></Btn>
+        <Btn onClick={() => { const editor = activeEditorRef.current; if (!editor) { toast("Click inside the paper where the equation should go"); return; } openEquation({ editor }); }} title="Insert Equation"><Sigma size={14} /></Btn>
         <Sep />
         <Btn onClick={() => update(() => { const s = $getSelection(); if (!$isRangeSelection(s)) return; $patchStyleText(s, { color: "", "background-color": "", "font-size": "", "font-family": "", "text-decoration": "" }); $setBlocksType(s, () => $createParagraphNode()); })} title="Clear Formatting" danger><Eraser size={14} /></Btn>
         <Btn onClick={() => dispatch(UNDO_COMMAND)(undefined)} title="Undo"><Undo size={14} /></Btn>
@@ -728,7 +732,7 @@ const PAGE_EDITOR_CONFIG = (id) => ({
     list: { ul: "qp-ul", ol: "qp-ol", listitem: "qp-li" },
     table: "qp-table", tableCell: "qp-td", tableCellHeader: "qp-th",
   },
-  nodes: [HeadingNode, ListNode, ListItemNode, TableNode, TableCellNode, TableRowNode, ImageNode],
+  nodes: [HeadingNode, ListNode, ListItemNode, TableNode, TableCellNode, TableRowNode, ImageNode, EquationNode],
   onError(e) { console.error("[Page]", e); },
 });
 
@@ -1294,6 +1298,7 @@ export function RichEditorPane({ editorContent, setEditorContent, showPreview, p
 
   return (
     <ActiveEditorCtx.Provider value={{ ref: activeEditorRef, toolbarState, setToolbarState }}>
+      <EquationDialogProvider>
       <div style={{ display: "flex", flexDirection: "column", height: "calc(100vh - 140px)", overflow: "hidden" }}>
         {showPreview ? (
           <ResizableSplitPane
@@ -1311,6 +1316,7 @@ export function RichEditorPane({ editorContent, setEditorContent, showPreview, p
           editorWithToolbar
         )}
       </div>
+      </EquationDialogProvider>
 
       <style>{`
         /* ── Editor text styles ── */
@@ -1353,6 +1359,8 @@ export function RichEditorPane({ editorContent, setEditorContent, showPreview, p
         .preview-body table th { background: #eff6ff; color: #1d4ed8; font-weight: 700; border: 1px solid #bfdbfe; padding: 8px 10px; text-align: left; }
         .preview-body table td { border: 1px solid #e2e8f0; padding: 7px 10px; }
         .preview-body img { max-width: 100%; display: block; margin: 14px auto; border-radius: 6px; border: 1px solid #e5e7eb; }
+        .preview-body img.lms-eq { max-width: none; display: inline-block; margin: 0 .1em; border: none; border-radius: 0; }
+        .preview-body img.lms-eq[data-display="1"] { display: block; margin: 10px auto; }
         .preview-body blockquote { border-left: 4px solid #bfdbfe; padding-left: 12px; color: #475569; margin: 12px 0; font-style: italic; }
         .preview-body pre  { background: #f8fafc; border: 1px solid #e5e7eb; padding: 12px; border-radius: 6px; overflow-x: auto; }
         .preview-body code { font-family: Consolas, monospace; font-size: 13px; }
