@@ -2,6 +2,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { DecoratorNode, $getNodeByKey, $getSelection, $isRangeSelection, $getRoot, $createParagraphNode } from "lexical";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import axios from "axios";
 import { EQUATION_PALETTE, insertSnippet, renderEquation, styleForEquation } from "@/lib/equation";
 
 // ═══════════════════════════════════════════════════════════
@@ -134,6 +135,12 @@ function EquationDialog({ request, onClose }) {
   const [preview, setPreview] = useState({ status: existing ? "loading" : "idle" });
   const textareaRef = useRef(null);
   const runId = useRef(0);
+  // "Describe it": the AI writes the LaTeX; it is only accepted once it draws.
+  const [describe, setDescribe] = useState("");
+  const [writing, setWriting] = useState(false);
+  const [aiNote, setAiNote] = useState("");
+  const alive = useRef(true);
+  useEffect(() => () => { alive.current = false; }, []);
 
   // Draw the equation 250 ms after typing stops; ignore answers that arrive late.
   useEffect(() => {
@@ -149,6 +156,43 @@ function EquationDialog({ request, onClose }) {
   }, [latex, display]);
 
   useEffect(() => { textareaRef.current?.focus(); }, []);
+
+  const writeFromDescription = async () => {
+    const description = describe.trim();
+    if (description.length < 3 || writing) return;
+    setWriting(true);
+    setAiNote("");
+    let note = "";
+    try {
+      let previous = null; // the first answer that did not draw, sent back once so the AI can correct it
+      for (let attempt = 0; attempt < 2; attempt += 1) {
+        const { data } = await axios.post(
+          "/api/question-paper/equation/from-text",
+          { description, ...(previous ? { previousLatex: previous.latex, previousError: previous.error } : {}) },
+          { withCredentials: true },
+        );
+        if (!data.latex) {
+          note = data.note || "That does not look like an equation. Try describing it differently.";
+          break;
+        }
+        try {
+          await renderEquation(data.latex, display); // it must draw before it is put in the box
+          if (alive.current) setLatex(data.latex);
+          note = "Written by AI. Check the equation before you insert it.";
+          break;
+        } catch (error) {
+          previous = { latex: data.latex, error: error.message };
+        }
+      }
+      if (!note) note = "The AI could not write that one correctly. Try describing it differently, or type the LaTeX.";
+    } catch (error) {
+      note = error?.response?.data?.error || "The AI could not write that equation right now. Try again or type it.";
+    }
+    if (alive.current) {
+      setAiNote(note);
+      setWriting(false);
+    }
+  };
 
   const addSnippet = (snippet) => {
     const box = textareaRef.current;
@@ -213,6 +257,22 @@ function EquationDialog({ request, onClose }) {
             </button>
           ))}
         </div>
+
+        <label htmlFor="equation-describe" style={{ fontSize: 12, color: "#6b7280", display: "block", marginBottom: 4 }}>
+          Describe it in words and the AI writes the equation
+        </label>
+        <div style={{ display: "flex", gap: 8, marginBottom: aiNote ? 4 : 12 }}>
+          <input id="equation-describe" value={describe} maxLength={500} disabled={writing}
+            placeholder="for example: kinetic energy is half mass times velocity squared"
+            onChange={(e) => setDescribe(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter" && !e.ctrlKey && !e.metaKey) { e.preventDefault(); writeFromDescription(); } }}
+            style={{ flex: 1, height: 38, border: "1px solid #cbd5e1", borderRadius: 10, padding: "0 12px", fontSize: 14, background: "#f8fafc", boxSizing: "border-box" }} />
+          <button type="button" disabled={writing || describe.trim().length < 3} onClick={writeFromDescription}
+            style={{ ...button, height: 38, padding: "0 14px", whiteSpace: "nowrap", cursor: writing || describe.trim().length < 3 ? "not-allowed" : "pointer", background: "#eff6ff", color: "#1d4ed8", border: "1px solid #bfdbfe" }}>
+            {writing ? "Writing…" : "Write it"}
+          </button>
+        </div>
+        {aiNote && <p role="status" data-testid="ai-note" style={{ fontSize: 12, color: "#6b7280", margin: "0 0 12px" }}>{aiNote}</p>}
 
         <label htmlFor="equation-latex" style={{ fontSize: 12, color: "#6b7280", display: "block", marginBottom: 4 }}>
           Equation (LaTeX, for example \frac{"{a}{b}"} or x^2)
