@@ -14,10 +14,6 @@ const nextConfig = {
     domains: ["assets.aceternity.com"],
   },
 
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-
   experimental: {
     // Next's rewrite proxy defaults to a 10MB request body cap, which silently
     // truncates larger course-material uploads before they reach FastAPI,

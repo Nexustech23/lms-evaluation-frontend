@@ -118,7 +118,7 @@ export default function SavedResult() {
         rememberJob(answerId, null);
         clearEvalState(answerId);
         if (!job.result?.success) { toast.error("Evaluation returned no result. Refresh the answer list."); return; }
-        setFiles((prev) => prev.map((file) => file.answer_id === answerId ? { ...file, ...job.result, content: true } : file));
+        setFiles((prev) => prev.map((file) => file.answer_id === answerId ? { ...file, ...job.result, active_evaluation: null, content: true } : file));
         if (job.result.evaluation_status === "pending_review") {
           toast("Evaluation draft saved. Faculty review is required before marks are final.");
         } else {
@@ -144,7 +144,7 @@ export default function SavedResult() {
       try {
         const pending = JSON.parse(sessionStorage.getItem(pendingKey) || "{}");
         for (const script of scripts) {
-          const jobId = pending[script.answer_id];
+          const jobId = pending[script.answer_id] || script.active_evaluation?.job_id;
           if (typeof jobId === "string" && !pollingRefs.current[script.answer_id]) startPolling(script.answer_id, jobId);
         }
       } catch { /* No resumable browser state. */ }
@@ -159,6 +159,24 @@ export default function SavedResult() {
   useEffect(() => { fetchDetails(); }, []);
 
   // ─── evaluate single ─────────────────────────────────────────────────────────
+
+  const handleRecover = async (answerId) => {
+    try {
+      const url = `/api/evaluate-answer-script/recover/${answerId}`;
+      let response = await axios.post(url, {}, { withCredentials: true });
+      if (response.data.confirmation_required) {
+        if (!window.confirm(response.data.message)) return;
+        response = await axios.post(url, { acknowledge_new_evaluation_cost: true }, { withCredentials: true });
+      }
+      stopPolling(answerId);
+      rememberJob(answerId, null);
+      clearEvalState(answerId);
+      toast.success(response.data.recovered ? "Saved evaluation recovered. No new AI call was made." : response.data.message);
+      await fetchDetails();
+    } catch (error) {
+      toast.error(error?.response?.data?.error || "Recovery could not be confirmed. Refresh and try again.");
+    }
+  };
 
   const handleEvaluate = async (answerscriptId) => {
     if (startingRefs.current.has(answerscriptId) || pollingRefs.current[answerscriptId]) return;
@@ -188,6 +206,10 @@ export default function SavedResult() {
       rememberJob(answerscriptId, jobId);
       if (mountedRef.current) startPolling(answerscriptId, jobId);
     } catch (err) {
+      if (err?.response?.data?.job_id) {
+        startPolling(answerscriptId, err.response.data.job_id);
+        return;
+      }
       stopPolling(answerscriptId);
       clearEvalState(answerscriptId);
       toast.error(err?.response?.data?.error || err?.response?.data?.detail || "Failed to start evaluation");
@@ -558,6 +580,13 @@ export default function SavedResult() {
                                 <IconEye size={20} />
                               </button>
 
+                              {file.active_evaluation?.job_id && (
+                                <button onClick={() => handleRecover(file.answer_id)}
+                                  className="px-3 py-2 rounded border border-amber-500 text-amber-800 text-sm"
+                                  title="Check interrupted processing and recover saved results before retrying">
+                                  Recover
+                                </button>
+                              )}
                               {/* Evaluate / Re-evaluate button */}
                               <div className="relative">
                                 <button

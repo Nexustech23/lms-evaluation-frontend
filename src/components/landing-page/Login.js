@@ -6,6 +6,7 @@ import { Mail, Lock, X } from "lucide-react";
 import Spinner from "@/components/ui/Spinner";
 import { AuthContext } from "@/app/AuthContext";
 import { useTranslations } from "next-intl";
+import { readApiResponse } from "@/lib/apiResponse";
 
 const Login = ({ close }) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -33,7 +34,7 @@ const Login = ({ close }) => {
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await response.json();
+      const data = await readApiResponse(response);
 
       if (!response.ok || data?.error) {
         setError(data?.error || t("invalidCredentials"));
@@ -55,7 +56,7 @@ const Login = ({ close }) => {
       }
     } catch (err) {
       console.error("Error during Login:", err);
-      setError(err?.message || t("loginError"));
+      setError(err?.userMessage || t("loginError"));
     } finally {
       setLoading(false);
     }
