@@ -26,10 +26,10 @@ function Footer() {
           {/* Logo + Description */}
           <div className="lg:col-span-3 flex flex-col gap-5">
             <Image
-              src="/pics/Logo11.png"  
-              width={150}
-              height={60}
-              alt="company_logo"
+              src="/pics/futtor_logo.png"
+              width={185}
+              height={62}
+              alt="grAdelytIcs logo"
               className="object-contain"
             />
 

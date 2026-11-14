@@ -5,138 +5,75 @@ import { useRouter } from "next/navigation";
 import Navbar from "./navbar";
 import Footer from "./footer";
 
-const testimonials = [
-  {
-    quote:
-      "grAdelytics has changed how our faculty evaluate answer scripts. Once the rubrics are set, grading becomes faster, clearer, and much easier to review.",
-    name: "Armando Fox",
-    school: "UC Berkeley",
-    image: "https://randomuser.me/api/portraits/men/32.jpg",
-  },
-  {
-    quote:
-      "I think grAdelytics has been a joy to use and it has saved the evaluation team several days of work.",
-    name: "Henry Gardner",
-    school: "Australian National University",
-    fallback: true,
-  },
-  {
-    quote:
-      "grAdelytics has transformed our exam workflow. It makes grading, reviewing, and exporting reports much easier.",
-    name: "Ileana Blade",
-    school: "University of Barcelona",
-    image: "https://randomuser.me/api/portraits/women/68.jpg",
-  },
-];
-
-const Avatar = ({ image, fallback, className = "" }) => (
-  <div
-    className={`mx-auto h-[148px] w-[148px] overflow-hidden rounded-full bg-[#356f76] shadow-sm ${className}`}
-  >
-    {fallback ? (
-      <div className="relative h-full w-full">
-        <div className="absolute left-1/2 top-11 h-11 w-11 -translate-x-1/2 rounded-full border-2 border-white" />
-        <div className="absolute bottom-0 left-1/2 h-[62px] w-[54px] -translate-x-1/2 rounded-t-full bg-[#76c6fb]" />
-      </div>
-    ) : (
-      <img src={image} alt="" className="h-full w-full object-cover" />
-    )}
-  </div>
-);
-
-const QuoteCard = ({ item }) => (
-  <div className="relative">
-    <div className="bg-[#f0f4f4] px-8 py-12 text-left rounded-2xl">
-      <p className="text-[18px] font-[500] leading-[1.45] tracking-[0.04em] text-[#003c46]">
-        "{item.quote}"
-      </p>
-
-      <div className="mt-[50px]">
-        <p className="text-[18px] font-bold text-[#343434]">{item.name}</p>
-
-        <p className="text-[18px] font-light text-[#343434]">{item.school}</p>
-      </div>
-    </div>
-
-    <Avatar image={item.image} fallback={item.fallback} className="-mt-3" />
-  </div>
-);
-
 const Demo = () => {
   const router = useRouter();
 
   const [activeVideoTab, setActiveVideoTab] = useState("institute");
 
-const videoData = {
-  institute: [
-    {
-      url: "/videos/video1.mp4",
-      title: "CO-PO Analytics",
-      description:
-        "Automatically generate CO-PO mappings, attainment reports, and outcome-based insights for accreditation and academic planning.",
-    },
+  const videoData = {
+    institute: [
+      {
+        url: "/videos/video1.mp4",
+        title: "CO-PO Analytics",
+        description:
+          "Automatically generate CO-PO mappings, attainment reports, and outcome-based insights for accreditation and academic planning.",
+      },
+      {
+        url: "/videos/video2.mp4",
+        title: "AI Evaluation System",
+        description:
+          "Evaluate answer sheets instantly using AI-powered grading with dynamic rubrics, feedback generation, and smart moderation tools.",
+      },
+      {
+        url: "/videos/video3.mp4",
+        title: "Question Paper Generator",
+        description:
+          "Create balanced question papers in seconds with Bloom’s Taxonomy support, difficulty distribution, and syllabus mapping.",
+      },
+    ],
 
-    {
-      url: "/videos/video2.mp4",
-      title: "AI Evaluation System",
-      description:
-        "Evaluate answer sheets instantly using AI-powered grading with dynamic rubrics, feedback generation, and smart moderation tools.",
-    },
+    tutor: [
+      {
+        url: "/videos/video1.mp4",
+        title: "AI Test Creation",
+        description:
+          "Generate quizzes, assignments, and practice tests automatically from notes, PDFs, topics, or uploaded materials.",
+      },
+      {
+        url: "/videos/video2.mp4",
+        title: "Smart Test Evaluation",
+        description:
+          "Analyze student answers instantly with AI-assisted grading, feedback suggestions, and performance-based insights.",
+      },
+      {
+        url: "/videos/video3.mp4",
+        title: "Batch Performance Analytics",
+        description:
+          "Track class progress, identify weak topics, monitor attendance trends, and generate detailed batch-wise analytics reports.",
+      },
+    ],
 
-    {
-      url: "/videos/video3.mp4",
-      title: "Question Paper Generator",
-      description:
-        "Create balanced question papers in seconds with Bloom’s Taxonomy support, difficulty distribution, and syllabus mapping.",
-    },
-  ],
-
-  tutor: [
-    {
-      url: "/videos/video1.mp4",
-      title: "AI Test Creation",
-      description:
-        "Generate quizzes, assignments, and practice tests automatically from notes, PDFs, topics, or uploaded materials.",
-    },
-
-    {
-      url: "/videos/video2.mp4",
-      title: "Smart Test Evaluation",
-      description:
-        "Analyze student answers instantly with AI-assisted grading, feedback suggestions, and performance-based insights.",
-    },
-
-    {
-      url: "/videos/video3.mp4",
-      title: "Batch Performance Analytics",
-      description:
-        "Track class progress, identify weak topics, monitor attendance trends, and generate detailed batch-wise analytics reports.",
-    },
-  ],
-
-  student: [
-    {
-      url: "/videos/video1.mp4",
-      title: "AI Pomodoro Learning",
-      description:
-        "Stay focused with smart Pomodoro sessions that combine study timers, AI-generated tests, and personalized revision workflows.",
-    },
-
-    {
-      url: "/videos/video2.mp4",
-      title: "Roadmap Generation",
-      description:
-        "Generate personalized learning roadmaps based on your goals, syllabus, strengths, weaknesses, and exam timelines.",
-    },
-
-    {
-      url: "/videos/video3.mp4",
-      title: "Homework Help & Practice",
-      description:
-        "Get instant AI assistance for homework, concept explanations, adaptive practice questions, and step-by-step problem solving.",
-    },
-  ],
-};
+    student: [
+      {
+        url: "/videos/student1.mp4",
+        title: "AI Pomodoro Learning",
+        description:
+          "Stay focused with smart Pomodoro sessions that combine study timers, AI-generated tests, and personalized revision workflows.",
+      },
+      {
+        url: "/videos/student2.mp4",
+        title: "Roadmap Generation",
+        description:
+          "Generate personalized learning roadmaps based on your goals, syllabus, strengths, weaknesses, and exam timelines.",
+      },
+      {
+        url: "/videos/student3.mp4",
+        title: "Homework Help & Practice",
+        description:
+          "Get instant AI assistance for homework, concept explanations, adaptive practice questions, and step-by-step problem solving.",
+      },
+    ],
+  };
 
   const handleScheduleNowClick = () => {
     router.push("/contact-us");
@@ -155,61 +92,73 @@ const videoData = {
       </div>
 
       {/* HERO */}
-      <section className="bg-[#f1f5f5] px-6 sm:px-10 lg:px-16 pb-16 pt-5">
+      <section className="bg-gradient-to-b from-[#f1f5f5] to-white px-6 sm:px-10 lg:px-16 pb-16 pt-5">
         <div className="mx-auto grid max-w-[1760px] grid-cols-1 items-center gap-10 pt-10 lg:grid-cols-[50%_50%]">
           <div>
-            <h1 className="text-[42px] sm:text-[55px] lg:text-[60px] font-[500] text-[#0d3b4a] mb-6 leading-tight">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-100 text-[#ff7f10] text-sm font-semibold mb-5 shadow-sm">
+              <span className="w-2 h-2 rounded-full bg-[#ff7f10] animate-pulse"></span>
+              Institutional & Learning Demo
+            </div>
+
+            <h1 className="text-[42px] sm:text-[55px] lg:text-[60px] font-[600] text-[#0d3b4a] mb-6 leading-tight">
               Get a Demo
             </h1>
 
-            <p className="mt-10 max-w-[900px] text-[20px] font-light leading-[1.35] text-[#60666b]">
-              Discover why institutions use grAdelytics to evaluate answers
-              faster, generate outcome reports, and never go back to grading the
-              old way.
+            <p className="mt-4 max-w-[900px] text-[19px] font-normal leading-relaxed text-[#60666b]">
+              Discover why top institutions use grAdelytics to evaluate answers
+              faster, generate outcome reports, and elevate student achievement.
             </p>
 
-            <button
-              className="mt-12 rounded-lg bg-[#ff7f10] px-6 py-3 text-[18px] font-medium text-[#ffffff] transition hover:bg-[#e67e00] hover:-translate-y-0.5 hover:shadow-lg"
-              onClick={handleScheduleNowClick}
-            >
-              Schedule a Demo
-            </button>
+            {/* Premium Educational CTA Button */}
+            <div className="mt-10 flex flex-wrap items-center gap-4">
+              <button
+                className="group inline-flex items-center gap-3.5 rounded-full bg-gradient-to-r from-[#ff7f10] via-orange-500 to-amber-500 px-8 py-4 text-[17px] font-semibold text-white shadow-[0_10px_25px_rgba(255,127,16,0.38)] transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_14px_35px_rgba(255,127,16,0.5)] active:scale-[0.98] border border-white/20"
+                onClick={handleScheduleNowClick}
+              >
+                <span>Schedule a Demo</span>
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white/25 transition-transform duration-300 group-hover:translate-x-1">
+                  →
+                </span>
+              </button>
+            </div>
           </div>
 
-          <img src="/pics/demopage1.png" className="h-[350px] object-contain" />
+          <div className="flex justify-center">
+            <img src="/pics/demopage1.png" className="h-[350px] object-contain drop-shadow-md" alt="Demo Illustration" />
+          </div>
         </div>
       </section>
 
       {/* VIDEO SHOWCASE */}
-      <section className="w-full py-24 bg-white overflow-hidden">
+      <section className="w-full py-20 bg-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-6">
           {/* Heading */}
-          <div className="text-center mb-14">
-            <p className="text-[#ff7f10] font-semibold mb-3">
+          <div className="text-center mb-12">
+            <p className="text-[#ff7f10] font-semibold mb-2.5 tracking-wide text-sm uppercase">
               PLATFORM WALKTHROUGH
             </p>
 
-            <h2 className="text-5xl font-[600] text-[#0d3b4a] mb-5">
+            <h2 className="text-4xl md:text-5xl font-[700] text-[#0d3b4a] mb-4">
               Explore grAdelytics
             </h2>
 
-            <p className="text-gray-600 text-xl max-w-3xl mx-auto">
+            <p className="text-gray-600 text-lg md:text-xl max-w-3xl mx-auto">
               Watch how Institutes, Tutors, and Students use grAdelytics to
               automate workflows, improve learning, and save time.
             </p>
           </div>
 
           {/* Tabs */}
-          <div className="flex justify-center mb-12">
-            <div className="bg-[#fff7f0] border border-orange-100 rounded-2xl p-2 flex gap-3 shadow-lg">
+          <div className="flex justify-center mb-10">
+            <div className="bg-[#fff7f0] border border-orange-100 rounded-2xl p-1.5 flex gap-2 shadow-md">
               {["institute", "tutor", "student"].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveVideoTab(tab)}
-                  className={`px-8 py-4 rounded-xl font-semibold capitalize transition-all duration-500 ${
+                  className={`px-7 py-3 rounded-xl font-semibold capitalize transition-all duration-300 text-sm md:text-base ${
                     activeVideoTab === tab
-                      ? "bg-[#ff7f10] text-white shadow-xl scale-105"
-                      : "text-[#0d3b4a] hover:bg-orange-50"
+                      ? "bg-gradient-to-r from-[#ff7f10] to-orange-500 text-white shadow-lg scale-[1.02]"
+                      : "text-[#0d3b4a] hover:bg-orange-50/80"
                   }`}
                 >
                   {tab}
@@ -221,7 +170,7 @@ const videoData = {
           {/* SLIDER */}
           <div className="w-full overflow-hidden">
             <div
-              className="flex transition-transform duration-700 py-10 ease-in-out"
+              className="flex transition-transform duration-700 py-6 ease-in-out"
               style={{
                 transform:
                   activeVideoTab === "institute"
@@ -237,18 +186,35 @@ const videoData = {
                   {videoData.institute.map((video, index) => (
                     <div
                       key={index}
-                      className="bg-[#fffaf5] rounded-3xl shadow-xl overflow-hidden border border-orange-100 hover:-translate-y-2 transition-all duration-300"
+                      className="group bg-gradient-to-b from-[#fffaf5] to-white rounded-3xl shadow-lg hover:shadow-2xl overflow-hidden border border-orange-100/80 hover:-translate-y-2 transition-all duration-300 flex flex-col"
                     >
-                      <video controls className="w-full h-[420px] object-cover">
-                        <source src={video.url} type="video/mp4" />
-                      </video>
+                      <div className="relative w-full h-[400px] bg-black/5 overflow-hidden">
+                        <video
+                          controls
+                          playsInline
+                          preload="metadata"
+                          className="w-full h-full object-cover"
+                        >
+                          <source src={video.url} type="video/mp4" />
+                        </video>
+                        <div className="absolute top-4 left-4 pointer-events-none">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-black/60 backdrop-blur-md text-white border border-white/20 shadow-sm">
+                            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            grAdelytics • Demo
+                          </span>
+                        </div>
+                      </div>
 
-                      <div className="p-6">
-                        <h3 className="text-2xl font-semibold text-orange-500 mb-3">
-                           {video.title}
-                        </h3>
+                      <div className="p-6 flex flex-col flex-grow justify-between">
+                        <div>
+                          <h3 className="text-xl font-bold text-[#0d3b4a] group-hover:text-[#ff7f10] transition-colors mb-2.5">
+                            {video.title}
+                          </h3>
 
-                        <p className="text-black">{video.description}</p>
+                          <p className="text-gray-600 text-sm leading-relaxed">
+                            {video.description}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -261,18 +227,35 @@ const videoData = {
                   {videoData.tutor.map((video, index) => (
                     <div
                       key={index}
-                      className="bg-[#fffaf5] rounded-3xl shadow-xl overflow-hidden border border-orange-100 hover:-translate-y-2 transition-all duration-300"
+                      className="group bg-gradient-to-b from-[#fffaf5] to-white rounded-3xl shadow-lg hover:shadow-2xl overflow-hidden border border-orange-100/80 hover:-translate-y-2 transition-all duration-300 flex flex-col"
                     >
-                      <video controls className="w-full h-[420px] object-cover">
-                        <source src={video.url} type="video/mp4" />
-                      </video>
+                      <div className="relative w-full h-[400px] bg-black/5 overflow-hidden">
+                        <video
+                          controls
+                          playsInline
+                          preload="metadata"
+                          className="w-full h-full object-cover"
+                        >
+                          <source src={video.url} type="video/mp4" />
+                        </video>
+                        <div className="absolute top-4 left-4 pointer-events-none">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-black/60 backdrop-blur-md text-white border border-white/20 shadow-sm">
+                            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            grAdelytics • Demo
+                          </span>
+                        </div>
+                      </div>
 
-                      <div className="p-6">
-                        <h3 className="text-2xl font-semibold text-orange-500 mb-3">
-                           {video.title}
-                        </h3>
+                      <div className="p-6 flex flex-col flex-grow justify-between">
+                        <div>
+                          <h3 className="text-xl font-bold text-[#0d3b4a] group-hover:text-[#ff7f10] transition-colors mb-2.5">
+                            {video.title}
+                          </h3>
 
-                        <p className="text-black">{video.description}</p>
+                          <p className="text-gray-600 text-sm leading-relaxed">
+                            {video.description}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -285,18 +268,35 @@ const videoData = {
                   {videoData.student.map((video, index) => (
                     <div
                       key={index}
-                      className="bg-[#fffaf5] rounded-3xl shadow-xl overflow-hidden border border-orange-100 hover:-translate-y-2 transition-all duration-300"
+                      className="group bg-gradient-to-b from-[#fffaf5] to-white rounded-3xl shadow-lg hover:shadow-2xl overflow-hidden border border-orange-100/80 hover:-translate-y-2 transition-all duration-300 flex flex-col"
                     >
-                      <video controls className="w-full h-[420px] object-cover">
-                        <source src={video.url} type="video/mp4" />
-                      </video>
+                      <div className="relative w-full h-[400px] bg-black/5 overflow-hidden">
+                        <video
+                          controls
+                          playsInline
+                          preload="metadata"
+                          className="w-full h-full object-cover"
+                        >
+                          <source src={video.url} type="video/mp4" />
+                        </video>
+                        <div className="absolute top-4 left-4 pointer-events-none">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-black/60 backdrop-blur-md text-white border border-white/20 shadow-sm">
+                            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            grAdelytics • Learning
+                          </span>
+                        </div>
+                      </div>
 
-                      <div className="p-6">
-                        <h3 className="text-2xl font-semibold text-orange-500  mb-3">
-                         {video.title}
-                        </h3>
+                      <div className="p-6 flex flex-col flex-grow justify-between">
+                        <div>
+                          <h3 className="text-xl font-bold text-[#0d3b4a] group-hover:text-[#ff7f10] transition-colors mb-2.5">
+                            {video.title}
+                          </h3>
 
-                        <p className="text-black">{video.description}</p>
+                          <p className="text-gray-600 text-sm leading-relaxed">
+                            {video.description}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -307,38 +307,34 @@ const videoData = {
         </div>
       </section>
 
-      {/* TESTIMONIALS */}
-      <section className="grid grid-cols-1 gap-7 px-[70px] py-14 lg:grid-cols-3 items-center">
-        {testimonials.map((item) => (
-          <QuoteCard key={item.name} item={item} />
-        ))}
-      </section>
-
       {/* CTA */}
-      <section className="px-[72px] py-20">
+      <section className="px-6 sm:px-12 lg:px-[72px] py-16 bg-[#f8fafb]">
         <div className="mx-auto grid max-w-[1760px] grid-cols-1 items-center gap-12 lg:grid-cols-[1fr_520px]">
           <div>
-            <h2 className="max-w-[850px] text-[35px] font-semibold leading-tight text-[#004653]">
-              Are you an instructor?
+            <h2 className="max-w-[850px] text-[32px] md:text-[38px] font-bold leading-tight text-[#004653]">
+              Are you an instructor or institution?
               <br />
-              Get started with grAdelytics today!
+              <span className="text-[#ff7f10]">Get started with grAdelytics today!</span>
             </h2>
 
-            <p className="mt-10 text-[18px] font-light text-[#646a70]">
+            <p className="mt-5 text-[17px] font-normal leading-relaxed text-[#646a70]">
               Save time grading and spend more time teaching. Start your
               institution-ready evaluation workflow.
             </p>
 
             <button
-              className="mt-12 rounded-lg bg-[#ff7f10] px-6 py-3 text-[18px] font-medium text-[#ffffff] transition hover:bg-[#e67e00] hover:-translate-y-0.5 hover:shadow-lg"
+              className="group mt-8 inline-flex items-center gap-3.5 rounded-full bg-gradient-to-r from-[#ff7f10] via-orange-500 to-amber-500 px-8 py-3.5 text-[16px] font-semibold text-white shadow-[0_8px_22px_rgba(255,127,16,0.35)] transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_12px_30px_rgba(255,127,16,0.45)] active:scale-[0.98] border border-white/20"
               onClick={handleGetStartedForFreeClick}
             >
-              Get Started
+              <span>Get Started</span>
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/25 transition-transform duration-300 group-hover:translate-x-1">
+                →
+              </span>
             </button>
           </div>
 
-          <div>
-            <img src="/pics/demopage3.png" className="w-full" />
+          <div className="flex justify-center">
+            <img src="/pics/demopage3.png" className="w-full max-w-[480px] drop-shadow-md" alt="CTA Graphic" />
           </div>
         </div>
       </section>
