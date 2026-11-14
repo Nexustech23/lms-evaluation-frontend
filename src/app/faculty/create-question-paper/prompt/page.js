@@ -26,6 +26,7 @@ import InputStage, {
   getDefaultSections,
 } from "@/components/question-paper/InputStage";
 import GeneratingStage from "@/components/question-paper/GeneratingStage";
+import { boardsForClass, stageSectionsForClass } from "@/lib/cbse";
 import EditorStage from "@/components/question-paper/EditorStage";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -93,6 +94,35 @@ export default function QuestionPaperGenerator() {
   const [docxBase64, setDocxBase64] = useState("");
   // Ask the AI to solve every question after writing the paper and flag any that look wrong.
   const [checkAnswers, setCheckAnswers] = useState(true);
+
+  // CBSE school papers. `cbseBlueprints` stays null for colleges and coaching: the server answers 403 for them.
+  const [cbseBlueprints, setCbseBlueprints] = useState(null);
+  const [cbseClass, setCbseClass] = useState("");
+  const [cbsePresetKey, setCbsePresetKey] = useState("");
+  useEffect(() => {
+    let cancelled = false;
+    axios
+      .get("/api/question-paper/cbse/blueprints", { withCredentials: true })
+      .then((res) => { if (!cancelled) setCbseBlueprints(res.data); })
+      .catch(() => { if (!cancelled) setCbseBlueprints(null); });
+    return () => { cancelled = true; };
+  }, []);
+
+  const handleCbseClassChange = (value) => {
+    setCbseClass(value);
+    setCbsePresetKey("");
+    const starting = stageSectionsForClass(cbseBlueprints, value);
+    if (starting) setSections(starting);
+  };
+
+  const handleCbsePresetChange = (key) => {
+    setCbsePresetKey(key);
+    const board = boardsForClass(cbseBlueprints, cbseClass).find((entry) => entry.key === key);
+    if (!board) return;
+    setTotalMarks(board.total);
+    setDuration(board.duration);
+    if (!selectedSubject) setSubjectNameInput(board.subject);
+  };
   // Flags and the answer key for the faculty (not part of the paper).
   const [reviewNotes, setReviewNotes] = useState(null);
   const [docxFilename, setDocxFilename] = useState("question_paper.docx");
@@ -451,7 +481,8 @@ export default function QuestionPaperGenerator() {
   // ── Generate ──────────────────────────────────────────────────────────────
   const handleGenerate = async () => {
     if (generationStartingRef.current) return;
-    if (!sectionPercentValid) {
+    // A CBSE blueprint fixes the sections on the server, so hand-made percentages don't apply to it.
+    if (!cbsePresetKey && !sectionPercentValid) {
       toast.error(
         totalSectionPercent !== 100
           ? `Sections total ${totalSectionPercent}% — must equal 100%.`
@@ -473,6 +504,8 @@ export default function QuestionPaperGenerator() {
         selectedSubject?.subject_name || subjectNameInput.trim() || "Subject",
       );
       if (selectedSemester) formData.append("semester", selectedSemester);
+      else if (cbseClass) formData.append("semester", `Class ${cbseClass}`);
+      if (cbsePresetKey) formData.append("cbsePreset", cbsePresetKey);
       if (academicYear) formData.append("academicYear", academicYear);
       formData.append("examType", examType);
       formData.append("totalMarks", String(totalMarks));
@@ -1049,6 +1082,17 @@ export default function QuestionPaperGenerator() {
                 setSections={setSections}
                 checkAnswers={checkAnswers}
                 setCheckAnswers={setCheckAnswers}
+                cbse={
+                  cbseBlueprints
+                    ? {
+                        blueprints: cbseBlueprints,
+                        classLevel: cbseClass,
+                        presetKey: cbsePresetKey,
+                        onClassChange: handleCbseClassChange,
+                        onPresetChange: handleCbsePresetChange,
+                      }
+                    : undefined
+                }
                 onBack={handleReset}
                 onGenerate={handleGenerate}
                 t={t}

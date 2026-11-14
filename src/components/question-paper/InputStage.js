@@ -3,6 +3,7 @@ import { FaMicrophone, FaPlus } from "react-icons/fa";
 import { withAlpha, darkenColor } from "@/lib/question-paper/colorHelpers";
 import DropZone from "./DropZone";
 import CoursePlannerUpload from "./CoursePlannerUpload";
+import CbseSchoolPanel from "./CbseSchoolPanel";
 import { useEffect, useState } from "react";
 
 // crypto.randomUUID() only exists in secure contexts (HTTPS/localhost) —
@@ -120,6 +121,8 @@ export default function InputStage({
   setSections,
   checkAnswers,
   setCheckAnswers,
+  // School institutes only: { blueprints, classLevel, presetKey, onClassChange, onPresetChange }. Colleges pass nothing.
+  cbse,
   onBack,
   onGenerate,
   t,
@@ -146,10 +149,13 @@ export default function InputStage({
   );
 
   // Validation: all sections > 0 AND total === 100
+  // A CBSE blueprint fixes the sections itself, so the percentage check only applies to hand-made sections.
+  const cbseLocked = !!cbse?.presetKey;
   const sectionPercentValid =
-    sections?.length > 0 &&
-    totalPercent === 100 &&
-    sections.every((s) => Number(s.percent) > 0);
+    cbseLocked ||
+    (sections?.length > 0 &&
+      totalPercent === 100 &&
+      sections.every((s) => Number(s.percent) > 0));
 
   // ── Drop handler for main file ─────────────────────────────────────────────
   const handleDrop = (e) => {
@@ -220,6 +226,7 @@ export default function InputStage({
       type:     "number",
       value:    totalMarks,
       onChange: (e) => setTotalMarks(Number(e.target.value)),
+      disabled: cbseLocked,
       min:      10,
       max:      500,
     },
@@ -228,6 +235,7 @@ export default function InputStage({
       isSelect: true,
       value:    duration,
       onChange: (e) => setDuration(e.target.value),
+      disabled: cbseLocked,
       options:  ["1 Hour", "1.5 Hours", "2 Hours", "2.5 Hours", "3 Hours"],
     },
     {
@@ -401,6 +409,17 @@ export default function InputStage({
           )}
         </div>
 
+        {cbse && (
+          <CbseSchoolPanel
+            color={color}
+            blueprints={cbse.blueprints}
+            classLevel={cbse.classLevel}
+            presetKey={cbse.presetKey}
+            onClassChange={cbse.onClassChange}
+            onPresetChange={cbse.onPresetChange}
+          />
+        )}
+
         {/* ── Exam metadata card ── */}
         <div className="rounded-2xl border border-gray-200 p-5 bg-gray-50">
           <p className="text-sm font-semibold text-gray-600 mb-4">{t("examDetails")}</p>
@@ -452,6 +471,7 @@ export default function InputStage({
           </div>
 
           {/* ── Section marks distribution ── */}
+          {!cbseLocked && (
           <div className="mt-5 pt-4 border-t border-gray-200">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
@@ -654,6 +674,7 @@ export default function InputStage({
               </p>
             )}
           </div>
+          )}
         </div>
 
         {/* ── Answer check ── */}
