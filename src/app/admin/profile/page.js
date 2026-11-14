@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Navbar from "@/components/ui/Navbar";
 import Spinner from "@/components/ui/Spinner";
 import { AuthContext } from "@/app/AuthContext";
+import { instituteTypeLabel } from "@/lib/instituteType";
 import toast, { Toaster } from "react-hot-toast";
 import { LOCALE_COOKIE_NAME } from "@/i18n/config";
 
@@ -385,6 +386,7 @@ const UserProfile = () => {
                     {[
                       { label: "Affiliation", value: userProfile.institute_profile.affiliation },
                       { label: "Accreditation", value: userProfile.institute_profile.accreditation },
+                      { label: "Institute Type", value: instituteTypeLabel(userProfile.institute_profile.institute_type) },
                       { label: "Est. Year", value: userProfile.institute_profile.established_year },
                       { label: "Website", value: userProfile.institute_profile.website },
                     ].map(item => item.value && (
