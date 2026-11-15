@@ -47,6 +47,7 @@ import {
   UNDO_COMMAND, REDO_COMMAND,
   $createParagraphNode, $createTextNode,
   createCommand, $getNodeByKey,
+  PASTE_COMMAND, DROP_COMMAND, DRAGOVER_COMMAND, COMMAND_PRIORITY_HIGH,
 } from "lexical";
 
 import {
@@ -66,6 +67,30 @@ const A4_HEIGHT_PX = 1123;
 const ActiveEditorCtx = createContext({ ref: { current: null }, setToolbarState: () => { } });
 
 // ═══════════════════════════════════════════════════════════
+// Picture upload (ImageKit) — shared by the toolbar, Replace, paste and drop
+// ═══════════════════════════════════════════════════════════
+const IMAGE_TYPES = ["image/png", "image/jpeg", "image/gif", "image/webp"];
+const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
+
+export function imageProblem(file) {
+  if (!file || !IMAGE_TYPES.includes(file.type)) return "Use a PNG, JPG, GIF or WebP picture";
+  if (file.size > MAX_IMAGE_BYTES) return "The picture is larger than 8 MB";
+  return "";
+}
+
+export async function uploadImage(file) {
+  const res = await fetch("/api/imagekit-auth", { credentials: "include" });
+  if (!res.ok) throw new Error("Auth failed");
+  const auth = await res.json();
+  const fd = new FormData();
+  fd.append("file", file); fd.append("fileName", file.name || "picture.png");
+  fd.append("publicKey", process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY);
+  fd.append("signature", auth.signature); fd.append("expire", auth.expire); fd.append("token", auth.token);
+  const r = await axios.post("https://upload.imagekit.io/api/v1/files/upload", fd);
+  return r.data.url;
+}
+
+// ═══════════════════════════════════════════════════════════
 // ImageNode
 // ═══════════════════════════════════════════════════════════
 export const INSERT_IMAGE_COMMAND = createCommand("INSERT_IMAGE_COMMAND");
@@ -73,6 +98,71 @@ export const INSERT_IMAGE_COMMAND = createCommand("INSERT_IMAGE_COMMAND");
 function ImageComponent({ src, altText, width, align, nodeKey }) {
   const [editor] = useLexicalComposerContext();
   const [hovered, setHovered] = useState(false);
+  const [replacing, setReplacing] = useState(false);
+  const [dragWidth, setDragWidth] = useState(null);
+  const boxRef = useRef(null);
+  const fileRef = useRef(null);
+  const btn = { whiteSpace: "nowrap", padding: "4px 8px", background: "transparent", border: "none", borderRadius: 4, cursor: "pointer", fontSize: 11, color: "#374151" };
+
+  // Replace the picture itself; its size, alignment and place in the paper stay as they are.
+  const handleReplace = async (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    const problem = imageProblem(file);
+    if (problem) { toast.error(problem); return; }
+    setReplacing(true);
+    try {
+      const url = await uploadImage(file);
+      editor.update(() => {
+        const node = $getNodeByKey(nodeKey);
+        if ($isImageNode(node)) node.setSrc(url);
+      });
+      toast.success("Picture replaced");
+    } catch { toast.error("Upload failed"); } finally { setReplacing(false); }
+  };
+
+  // A caption is an ordinary centred italic line under the picture, so it prints and downloads like any text.
+  const handleCaption = () => {
+    editor.update(() => {
+      const node = $getNodeByKey(nodeKey);
+      if (!node) return;
+      const block = node.getTopLevelElementOrThrow();
+      const next = block.getNextSibling();
+      if (next && next.getTextContent().startsWith("Figure")) { next.selectEnd(); return; }
+      const line = $createParagraphNode();
+      line.setFormat("center");
+      const text = $createTextNode("Figure: ");
+      text.toggleFormat("italic");
+      line.append(text);
+      block.insertAfter(line);
+      line.selectEnd();
+    });
+  };
+
+  // Drag the corner to set any width; it is saved in pixels, and the Word file follows it.
+  const startResize = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const box = boxRef.current;
+    if (!box) return;
+    const startX = event.clientX;
+    const startWidth = box.getBoundingClientRect().width;
+    const limit = box.parentElement ? box.parentElement.getBoundingClientRect().width : 760;
+    let latest = startWidth;
+    const onMove = (e) => {
+      latest = Math.max(80, Math.min(limit, startWidth + (e.clientX - startX)));
+      setDragWidth(latest);
+    };
+    const onUp = () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+      setDragWidth(null);
+      handleWidthChange(`${Math.round(latest)}px`);
+    };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+  };
 
   const handleDelete = () => {
     editor.update(() => {
@@ -111,11 +201,12 @@ function ImageComponent({ src, altText, width, align, nodeKey }) {
 
   return (
     <div
+      ref={boxRef}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
         position: "relative",
-        maxWidth: width,
+        maxWidth: dragWidth ? `${dragWidth}px` : width,
         width: "100%",
         margin: margin,
         borderRadius: 8,
@@ -138,10 +229,20 @@ function ImageComponent({ src, altText, width, align, nodeKey }) {
       />
       {hovered && (
         <div
+          onMouseDown={startResize}
+          title="Drag to resize"
+          data-testid="image-resize"
+          style={{ position: "absolute", right: -7, bottom: -7, width: 14, height: 14, background: "#3b82f6", border: "2px solid white", borderRadius: 4, cursor: "nwse-resize", zIndex: 11 }}
+        />
+      )}
+      {hovered && (
+        <div
           style={{
             position: "absolute",
             top: 8,
             right: 8,
+            whiteSpace: "nowrap",
+            width: "max-content",
             background: "rgba(255, 255, 255, 0.95)",
             backdropFilter: "blur(4px)",
             padding: "4px 8px",
@@ -153,6 +254,15 @@ function ImageComponent({ src, altText, width, align, nodeKey }) {
             zIndex: 10,
           }}
         >
+{/* Replace and caption */}
+          <button type="button" onClick={() => fileRef.current?.click()} disabled={replacing} style={btn} title="Replace this picture with another">
+            {replacing ? "Uploading…" : "Replace"}
+          </button>
+          <button type="button" onClick={handleCaption} style={btn} title="Add a caption under the picture">Caption</button>
+          <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/gif,image/webp" style={{ display: "none" }} onChange={handleReplace} />
+
+          <span style={{ width: 1, height: 12, background: "#cbd5e1" }} />
+
           {/* Alignment controls */}
           <button
             type="button"
@@ -323,15 +433,7 @@ export class ImageNode extends DecoratorNode {
         conversion: (d) => {
           if (d instanceof HTMLImageElement) {
             const w = d.style.width || "100%";
-            let a = "center";
-            if (d.style.margin && d.style.margin.includes("auto 0")) {
-              a = "left";
-            } else if (d.style.margin && d.style.margin.includes("0 auto")) {
-              a = "center";
-            } else if (d.style.margin && d.style.margin.includes("auto")) {
-              a = "right";
-            }
-            return { node: $createImageNode(d.src, d.alt || "Uploaded", w, a) };
+            return { node: $createImageNode(d.src, d.alt || "Uploaded", w, alignFromMargin(d.style.margin)) };
           }
           return null;
         },
@@ -344,6 +446,9 @@ export class ImageNode extends DecoratorNode {
     writable.__width = width;
     writable.__align = align;
   }
+  setSrc(src) {
+    this.getWritable().__src = src;
+  }
   decorate() {
     return React.createElement(ImageComponent, {
       src: this.__src,
@@ -354,8 +459,41 @@ export class ImageNode extends DecoratorNode {
     });
   }
 }
+// exportDOM writes "16px auto" (centre), "16px 0 16px auto" (right) or "16px 0" (left); browsers may add units
+// ("0px"), so read the auto sides rather than matching text. No margin means centre.
+export function alignFromMargin(margin) {
+  const parts = (margin || "").trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return "center";
+  let left = false, right = false;
+  if (parts.length === 1) left = right = parts[0] === "auto";
+  else if (parts.length === 2) left = right = parts[1] === "auto";
+  else if (parts.length === 3) left = right = parts[1] === "auto";
+  else { right = parts[1] === "auto"; left = parts[3] === "auto"; }
+  if (left && right) return "center";
+  return left ? "right" : "left";
+}
 export function $createImageNode(src, alt = "Uploaded", width = "100%", align = "center") { return new ImageNode(src, alt, width, align); }
 export function $isImageNode(n) { return n instanceof ImageNode; }
+
+// Upload each picture file, then put it in the paper at the cursor.
+async function uploadAndInsert(editor, files) {
+  for (const file of files) {
+    const problem = imageProblem(file);
+    if (problem) { toast.error(problem); continue; }
+    const id = toast.loading("Uploading picture…");
+    try {
+      const url = await uploadImage(file);
+      editor.update(() => {
+        const node = $createImageNode(url, "Uploaded");
+        const p = $createParagraphNode();
+        const s = $getSelection();
+        if ($isRangeSelection(s)) { s.insertNodes([node, p]); p.select(); }
+        else { const root = $getRoot(); root.append(node, p); p.select(); }
+      });
+      toast.success("Picture added", { id });
+    } catch { toast.error("Upload failed", { id }); }
+  }
+}
 
 function ImagePlugin() {
   const [editor] = useLexicalComposerContext();
@@ -365,6 +503,30 @@ function ImagePlugin() {
     const p = $createParagraphNode(); root.append(p); p.select();
     return true;
   }, 1), [editor]);
+  // Paste a copied picture, or drop a picture file, straight into the paper.
+  useEffect(() => {
+    const imageFiles = (dt) => Array.from(dt?.files || []).filter((f) => f.type && f.type.startsWith("image/"));
+    const offPaste = editor.registerCommand(PASTE_COMMAND, (event) => {
+      const files = imageFiles(event.clipboardData);
+      if (!files.length) return false;
+      event.preventDefault();
+      uploadAndInsert(editor, files);
+      return true;
+    }, COMMAND_PRIORITY_HIGH);
+    const offOver = editor.registerCommand(DRAGOVER_COMMAND, (event) => {
+      if (!Array.from(event.dataTransfer?.types || []).includes("Files")) return false;
+      event.preventDefault();
+      return true;
+    }, COMMAND_PRIORITY_HIGH);
+    const offDrop = editor.registerCommand(DROP_COMMAND, (event) => {
+      const files = imageFiles(event.dataTransfer);
+      if (!files.length) return false;
+      event.preventDefault();
+      uploadAndInsert(editor, files);
+      return true;
+    }, COMMAND_PRIORITY_HIGH);
+    return () => { offPaste(); offOver(); offDrop(); };
+  }, [editor]);
   return null;
 }
 
@@ -427,22 +589,13 @@ function SharedToolbar({ pageStyle, setPageStyle, onAddPage }) {
     else blockType === "ol" ? editor.dispatchCommand(REMOVE_LIST_COMMAND, undefined) : editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined);
   };
 
-  const authenticator = async () => {
-    const res = await fetch("/api/imagekit-auth", { credentials: "include" });
-    if (!res.ok) throw new Error("Auth failed");
-    return res.json();
-  };
-
   const handleImageUpload = async file => {
-    if (!file) return; setUploading(true);
+    if (!file) return;
+    const problem = imageProblem(file);
+    if (problem) { toast.error(problem); return; }
+    setUploading(true);
     try {
-      const auth = await authenticator();
-      const fd = new FormData();
-      fd.append("file", file); fd.append("fileName", file.name);
-      fd.append("publicKey", process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY);
-      fd.append("signature", auth.signature); fd.append("expire", auth.expire); fd.append("token", auth.token);
-      const r = await axios.post("https://upload.imagekit.io/api/v1/files/upload", fd);
-      setImageUrl(r.data.url); toast.success("Image uploaded");
+      setImageUrl(await uploadImage(file)); toast.success("Image uploaded");
     } catch { toast.error("Upload failed"); } finally { setUploading(false); }
   };
 
