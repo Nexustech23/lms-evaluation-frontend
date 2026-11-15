@@ -2,7 +2,8 @@
 import { withAlpha, darkenColor } from "@/lib/question-paper/colorHelpers";
 
 /**
- * Cascading filter bar: School → Programme → [Department] → Batch → Semester → Subject
+ * College filter bar (semester based): School → Programme → [Department] → Batch → Semester → Subject.
+ * Schools have classes, not semesters, and use their own filter in src/school.
  * Department is skipped automatically for batch-based programmes (no real departments).
  *
  * Props:

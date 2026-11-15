@@ -20,7 +20,7 @@ import { buildPreviewHtml } from "@/lib/question-paper/previewBuilder";
 import { startRecoverablePolling } from "@/lib/pollBackoff";
 
 import Navbar from "@/components/ui/Navbar";
-import FilterBar from "@/components/question-paper/FilterBar";
+import FilterBar from "@/college/FilterBar";
 import ChooseStage from "@/components/question-paper/ChooseStage";
 import InputStage, {
   getDefaultSections,
@@ -28,7 +28,7 @@ import InputStage, {
 import GeneratingStage from "@/components/question-paper/GeneratingStage";
 import {
   boardsForClass, isLayoutCustomised, layoutFromBoard, layoutPayload, layoutProblem, matchBoard, stageSectionsForClass,
-} from "@/lib/cbse";
+} from "@/school/cbse";
 import EditorStage from "@/components/question-paper/EditorStage";
 
 // ─────────────────────────────────────────────────────────────────────────────
