@@ -13,6 +13,7 @@ import {
   IconPencil,
 } from "@tabler/icons-react";
 import { AuthContext } from "@/app/AuthContext";
+import { DEFAULT_INSTITUTE_TYPE, INSTITUTE_TYPES } from "@/lib/instituteType";
 
 // ─── ImageKit Upload Helper ────────────────────────────────────────────────────
 async function uploadToImageKit(file, folder = "institutes") {
@@ -285,6 +286,7 @@ const Register = () => {
           institute_name: inst.institute_name ?? "",
           short_name: inst.short_name ?? "",
           institute_code: inst.institute_code ?? "",
+          institute_type: inst.institute_type ?? DEFAULT_INSTITUTE_TYPE,
           phone: inst.phone ?? "",
           website: inst.website ?? "",
           address_line1: inst.address_line1 ?? "",
@@ -343,6 +345,7 @@ const Register = () => {
       institute_name: formData.get("institute_name"),
       short_name: formData.get("short_name"),
       institute_code: formData.get("institute_code"),
+      institute_type: formData.get("institute_type") || DEFAULT_INSTITUTE_TYPE,
       phone: formData.get("phone"),
       website: formData.get("website"),
       address_line1: formData.get("address_line1"),
@@ -544,6 +547,17 @@ const Register = () => {
                     <Field label="Institute Name" name="institute_name" placeholder="ABC University" required defaultValue={instituteData?.institute_name} />
                     <Field label="Short Name" name="short_name" placeholder="ABCU" defaultValue={instituteData?.short_name} />
                     <Field label="Institute Code" name="institute_code" placeholder="ABCU001" defaultValue={instituteData?.institute_code} />
+                    <Field label="Institute Type" name="institute_type">
+                      <select
+                        name="institute_type"
+                        defaultValue={instituteData?.institute_type || DEFAULT_INSTITUTE_TYPE}
+                        className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-orange-400/50 focus:border-orange-400 transition"
+                      >
+                        {INSTITUTE_TYPES.map((type) => (
+                          <option key={type.value} value={type.value}>{type.label}</option>
+                        ))}
+                      </select>
+                    </Field>
                     <Field label="Phone" name="phone" type="tel" placeholder="+91 00000 00000" defaultValue={instituteData?.phone} />
                     <Field label="Website" name="website" type="url" placeholder="https://example.edu" defaultValue={instituteData?.website} />
                     <Field label="Established Year" name="established_year" type="number" placeholder="2000" defaultValue={instituteData?.established_year} />
