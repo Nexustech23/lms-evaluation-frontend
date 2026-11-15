@@ -1,6 +1,6 @@
 "use client";
 import { withAlpha } from "@/lib/question-paper/colorHelpers";
-import { CBSE_CLASSES, boardsForClass, classNote, sectionMarks, sectionQuestions, withCounts } from "@/lib/cbse";
+import { CBSE_CLASSES, boardsForClass, classNote, sectionMarks, sectionQuestions, withCounts } from "@/school/cbse";
 
 // A small number field that sits inside a sentence.
 function NumberBox({ value, onChange, label, testId, min = 0, max = 500, width = "w-12" }) {

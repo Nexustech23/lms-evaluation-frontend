@@ -3,7 +3,7 @@ import { FaMicrophone, FaPlus } from "react-icons/fa";
 import { withAlpha, darkenColor } from "@/lib/question-paper/colorHelpers";
 import DropZone from "./DropZone";
 import CoursePlannerUpload from "./CoursePlannerUpload";
-import CbseSchoolPanel from "./CbseSchoolPanel";
+import CbseSchoolPanel from "@/school/CbseSchoolPanel";
 import { useEffect, useState } from "react";
 
 // crypto.randomUUID() only exists in secure contexts (HTTPS/localhost) —
