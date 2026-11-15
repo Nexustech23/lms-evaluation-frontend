@@ -149,7 +149,7 @@ export default function InputStage({
   );
 
   // Validation: all sections > 0 AND total === 100
-  // A CBSE blueprint fixes the sections itself, so the percentage check only applies to hand-made sections.
+  // A CBSE blueprint has its own section editor (counts and marks), so the percentage check only applies to hand-made sections.
   const cbseLocked = !!cbse?.presetKey;
   const sectionPercentValid =
     cbseLocked ||
@@ -226,7 +226,6 @@ export default function InputStage({
       type:     "number",
       value:    totalMarks,
       onChange: (e) => setTotalMarks(Number(e.target.value)),
-      disabled: cbseLocked,
       min:      10,
       max:      500,
     },
@@ -235,7 +234,6 @@ export default function InputStage({
       isSelect: true,
       value:    duration,
       onChange: (e) => setDuration(e.target.value),
-      disabled: cbseLocked,
       options:  ["1 Hour", "1.5 Hours", "2 Hours", "2.5 Hours", "3 Hours"],
     },
     {
@@ -252,7 +250,8 @@ export default function InputStage({
   // ── Generate guard ─────────────────────────────────────────────────────────
   const canGenerate =
     (inputMode === "pdf" ? !!uploadedFile : !!prompt.trim()) &&
-    sectionPercentValid;
+    sectionPercentValid &&
+    !cbse?.problem;
 
   return (
     <>
@@ -417,6 +416,13 @@ export default function InputStage({
             presetKey={cbse.presetKey}
             onClassChange={cbse.onClassChange}
             onPresetChange={cbse.onPresetChange}
+            layout={cbse.layout}
+            onLayoutChange={cbse.onLayoutChange}
+            total={totalMarks}
+            duration={duration}
+            customised={cbse.customised}
+            problem={cbse.problem}
+            onReset={cbse.onReset}
           />
         )}
 

@@ -26,7 +26,9 @@ import InputStage, {
   getDefaultSections,
 } from "@/components/question-paper/InputStage";
 import GeneratingStage from "@/components/question-paper/GeneratingStage";
-import { boardsForClass, stageSectionsForClass } from "@/lib/cbse";
+import {
+  boardsForClass, isLayoutCustomised, layoutFromBoard, layoutPayload, layoutProblem, matchBoard, stageSectionsForClass,
+} from "@/lib/cbse";
 import EditorStage from "@/components/question-paper/EditorStage";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -111,18 +113,34 @@ export default function QuestionPaperGenerator() {
   const handleCbseClassChange = (value) => {
     setCbseClass(value);
     setCbsePresetKey("");
+    setCbseLayout(null);
     const starting = stageSectionsForClass(cbseBlueprints, value);
     if (starting) setSections(starting);
   };
 
-  const handleCbsePresetChange = (key) => {
-    setCbsePresetKey(key);
-    const board = boardsForClass(cbseBlueprints, cbseClass).find((entry) => entry.key === key);
-    if (!board) return;
+  // The official blueprint is the starting point; the teacher can change any number in it.
+  const [cbseLayout, setCbseLayout] = useState(null);
+  const cbseBoard = cbseBlueprints?.boards?.find((entry) => entry.key === cbsePresetKey) || null;
+  const cbseProblem = cbseBoard ? layoutProblem(cbseLayout, totalMarks) : "";
+  const cbseCustomised = cbseBoard
+    ? isLayoutCustomised(cbseBoard, cbseLayout, totalMarks) || duration !== cbseBoard.duration
+    : false;
+
+  const applyCbseBoard = (board) => {
+    setCbsePresetKey(board.key);
+    setCbseLayout(layoutFromBoard(board));
     setTotalMarks(board.total);
     setDuration(board.duration);
     if (!selectedSubject) setSubjectNameInput(board.subject);
   };
+
+  const handleCbsePresetChange = (key) => {
+    const board = boardsForClass(cbseBlueprints, cbseClass).find((entry) => entry.key === key);
+    if (!board) { setCbsePresetKey(""); setCbseLayout(null); return; }
+    applyCbseBoard(board);
+  };
+
+  const handleCbseReset = () => { if (cbseBoard) applyCbseBoard(cbseBoard); };
   // Flags and the answer key for the faculty (not part of the paper).
   const [reviewNotes, setReviewNotes] = useState(null);
   const [docxFilename, setDocxFilename] = useState("question_paper.docx");
@@ -143,6 +161,18 @@ export default function QuestionPaperGenerator() {
   const [selectedBatch, setSelectedBatch] = useState(null);
   const [selectedSemester, setSelectedSemester] = useState("");
   const [selectedSubject, setSelectedSubject] = useState(null);
+
+  // Picking the batch and subject at the top loads the matching CBSE blueprint on its own (only when exactly one fits).
+  useEffect(() => {
+    if (!cbseBlueprints || !selectedSubject) return;
+    const board = matchBoard(cbseBlueprints, {
+      batchName: selectedBatch?.name, semester: selectedSemester, subjectName: selectedSubject.subject_name,
+    });
+    if (!board) return;
+    setCbseClass(String(board.class));
+    applyCbseBoard(board);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cbseBlueprints, selectedSubject?._id]);
 
   // ── Fetch subject tree on mount ───────────────────────────────────────────
   const fetchSubjects = useCallback(async () => {
@@ -482,6 +512,10 @@ export default function QuestionPaperGenerator() {
   const handleGenerate = async () => {
     if (generationStartingRef.current) return;
     // A CBSE blueprint fixes the sections on the server, so hand-made percentages don't apply to it.
+    if (cbsePresetKey && cbseProblem) {
+      toast.error(cbseProblem);
+      return;
+    }
     if (!cbsePresetKey && !sectionPercentValid) {
       toast.error(
         totalSectionPercent !== 100
@@ -505,7 +539,10 @@ export default function QuestionPaperGenerator() {
       );
       if (selectedSemester) formData.append("semester", selectedSemester);
       else if (cbseClass) formData.append("semester", `Class ${cbseClass}`);
-      if (cbsePresetKey) formData.append("cbsePreset", cbsePresetKey);
+      if (cbsePresetKey) {
+        formData.append("cbsePreset", cbsePresetKey);
+        if (cbseLayout) formData.append("cbseLayout", JSON.stringify(layoutPayload(cbseLayout)));
+      }
       if (academicYear) formData.append("academicYear", academicYear);
       formData.append("examType", examType);
       formData.append("totalMarks", String(totalMarks));
@@ -1090,6 +1127,11 @@ export default function QuestionPaperGenerator() {
                         presetKey: cbsePresetKey,
                         onClassChange: handleCbseClassChange,
                         onPresetChange: handleCbsePresetChange,
+                        layout: cbseLayout,
+                        onLayoutChange: setCbseLayout,
+                        customised: cbseCustomised,
+                        problem: cbseProblem,
+                        onReset: handleCbseReset,
                       }
                     : undefined
                 }
