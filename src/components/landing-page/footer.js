@@ -42,12 +42,12 @@ function Footer() {
               <div className="flex items-center gap-3">
                 <MdEmail size={18} />
 
-                <span>support@gradelytics.com</span>
+                <span>info@antarpath.com</span>
               </div>
 
               <div className="flex items-center gap-3">
                 <FaPhoneAlt size={16} />
-                <span>+91 98765 43210</span>
+                <span>+91 72780 03671</span>
               </div>
 
               <div className="flex items-center gap-3">
@@ -59,28 +59,41 @@ function Footer() {
 
           {/* Features */}
           <div className="flex flex-col lg:col-span-2 gap-4">
-            <h2 className="font-semibold text-lg">Features</h2>
+            <h2 className="font-semibold text-lg">Features & Tools</h2>
 
-            <div className="flex flex-col gap-3 text-sm text-white/85">
-              <p className="hover:text-white hover:translate-x-1 transition-all duration-300 cursor-default">
-                Complete Institute Evaluation System
-              </p>
+            <div className="flex flex-col gap-3.5 text-sm text-white/85">
+              <div className="flex flex-col gap-1.5">
+                <span className="text-xs uppercase tracking-wider font-semibold text-amber-200">
+                  grAdelytics Evaluation
+                </span>
+                <p className="hover:text-white hover:translate-x-1 transition-all duration-300 cursor-default">
+                  AI Answer Script Evaluation
+                </p>
+                <p className="hover:text-white hover:translate-x-1 transition-all duration-300 cursor-default">
+                  Dynamic Rubrics & Moderation
+                </p>
+                <p className="hover:text-white hover:translate-x-1 transition-all duration-300 cursor-default">
+                  CO-PO Attainment & Analytics
+                </p>
+                <p className="hover:text-white hover:translate-x-1 transition-all duration-300 cursor-default">
+                  Question Paper Generator
+                </p>
+              </div>
 
-              <p className="hover:text-white hover:translate-x-1 transition-all duration-300 cursor-default">
-                MyCareerGuru - AI-Powered Career Guidance
-              </p>
-
-              <p className="hover:text-white hover:translate-x-1 transition-all duration-300 cursor-default">
-                AI Tutor Management
-              </p>
-
-              <p className="hover:text-white hover:translate-x-1 transition-all duration-300 cursor-default">
-                AI Generated Notes & Assignments
-              </p>
-
-              <p className="hover:text-white hover:translate-x-1 transition-all duration-300 cursor-default">
-                My skill Guru
-              </p>
+              <div className="flex flex-col gap-1.5 pt-1 border-t border-white/10">
+                <span className="text-xs uppercase tracking-wider font-semibold text-amber-200">
+                  MyCareerGuru / MySkillGuru
+                </span>
+                <p className="hover:text-white hover:translate-x-1 transition-all duration-300 cursor-default">
+                  Personalized Learning Roadmaps
+                </p>
+                <p className="hover:text-white hover:translate-x-1 transition-all duration-300 cursor-default">
+                  AI Tutor & Smart Doubt Clearing
+                </p>
+                <p className="hover:text-white hover:translate-x-1 transition-all duration-300 cursor-default">
+                  Adaptive Mock Tests & Analytics
+                </p>
+              </div>
             </div>
           </div>
 

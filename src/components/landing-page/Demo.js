@@ -13,64 +13,43 @@ const Demo = () => {
   const videoData = {
     institute: [
       {
-        url: "/videos/video1.mp4",
+        url: "/videos/institute1.mp4",
         title: "CO-PO Analytics",
         description:
           "Automatically generate CO-PO mappings, attainment reports, and outcome-based insights for accreditation and academic planning.",
       },
       {
-        url: "/videos/video2.mp4",
+        url: "/videos/institute2.mp4",
         title: "AI Evaluation System",
         description:
           "Evaluate answer sheets instantly using AI-powered grading with dynamic rubrics, feedback generation, and smart moderation tools.",
       },
       {
-        url: "/videos/video3.mp4",
+        url: "/videos/institute3.mp4",
         title: "Question Paper Generator",
         description:
           "Create balanced question papers in seconds with Bloom’s Taxonomy support, difficulty distribution, and syllabus mapping.",
       },
     ],
 
-    tutor: [
+    faculty: [
       {
-        url: "/videos/video1.mp4",
-        title: "AI Test Creation",
+        url: "/videos/faculty1.mp4",
+        title: "Question Paper & Test Creation",
         description:
-          "Generate quizzes, assignments, and practice tests automatically from notes, PDFs, topics, or uploaded materials.",
+          "Generate question papers, quizzes, and structured assignments with Bloom’s taxonomy support and syllabus mapping.",
       },
       {
-        url: "/videos/video2.mp4",
-        title: "Smart Test Evaluation",
+        url: "/videos/faculty2.mp4",
+        title: "AI Answer Sheet Grading",
         description:
-          "Analyze student answers instantly with AI-assisted grading, feedback suggestions, and performance-based insights.",
+          "Evaluate student answer sheets instantly with AI-assisted rubric grading, feedback generation, and score moderation.",
       },
       {
-        url: "/videos/video3.mp4",
-        title: "Batch Performance Analytics",
+        url: "/videos/faculty3.mp4",
+        title: "Batch & Subject Analytics",
         description:
-          "Track class progress, identify weak topics, monitor attendance trends, and generate detailed batch-wise analytics reports.",
-      },
-    ],
-
-    student: [
-      {
-        url: "/videos/student1.mp4",
-        title: "AI Pomodoro Learning",
-        description:
-          "Stay focused with smart Pomodoro sessions that combine study timers, AI-generated tests, and personalized revision workflows.",
-      },
-      {
-        url: "/videos/student2.mp4",
-        title: "Roadmap Generation",
-        description:
-          "Generate personalized learning roadmaps based on your goals, syllabus, strengths, weaknesses, and exam timelines.",
-      },
-      {
-        url: "/videos/student3.mp4",
-        title: "Homework Help & Practice",
-        description:
-          "Get instant AI assistance for homework, concept explanations, adaptive practice questions, and step-by-step problem solving.",
+          "Track class performance, analyze CO-PO attainment levels, identify weak topics, and export detailed evaluation reports.",
       },
     ],
   };
@@ -143,25 +122,28 @@ const Demo = () => {
             </h2>
 
             <p className="text-gray-600 text-lg md:text-xl max-w-3xl mx-auto">
-              Watch how Institutes, Tutors, and Students use grAdelytics to
-              automate workflows, improve learning, and save time.
+              Watch how Institutes and Faculty Members use grAdelytics to
+              automate workflows, evaluate answers faster, and save time.
             </p>
           </div>
 
           {/* Tabs */}
           <div className="flex justify-center mb-10">
             <div className="bg-[#fff7f0] border border-orange-100 rounded-2xl p-1.5 flex gap-2 shadow-md">
-              {["institute", "tutor", "student"].map((tab) => (
+              {[
+                { id: "institute", label: "Institute" },
+                { id: "faculty", label: "Faculty Member" },
+              ].map((tab) => (
                 <button
-                  key={tab}
-                  onClick={() => setActiveVideoTab(tab)}
-                  className={`px-7 py-3 rounded-xl font-semibold capitalize transition-all duration-300 text-sm md:text-base ${
-                    activeVideoTab === tab
+                  key={tab.id}
+                  onClick={() => setActiveVideoTab(tab.id)}
+                  className={`px-7 py-3 rounded-xl font-semibold transition-all duration-300 text-sm md:text-base ${
+                    activeVideoTab === tab.id
                       ? "bg-gradient-to-r from-[#ff7f10] to-orange-500 text-white shadow-lg scale-[1.02]"
                       : "text-[#0d3b4a] hover:bg-orange-50/80"
                   }`}
                 >
-                  {tab}
+                  {tab.label}
                 </button>
               ))}
             </div>
@@ -175,9 +157,7 @@ const Demo = () => {
                 transform:
                   activeVideoTab === "institute"
                     ? "translateX(0%)"
-                    : activeVideoTab === "tutor"
-                      ? "translateX(-100%)"
-                      : "translateX(-200%)",
+                    : "translateX(-100%)",
               }}
             >
               {/* INSTITUTE */}
@@ -221,10 +201,10 @@ const Demo = () => {
                 </div>
               </div>
 
-              {/* TUTOR */}
+              {/* FACULTY MEMBER */}
               <div className="min-w-full px-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-                  {videoData.tutor.map((video, index) => (
+                  {videoData.faculty.map((video, index) => (
                     <div
                       key={index}
                       className="group bg-gradient-to-b from-[#fffaf5] to-white rounded-3xl shadow-lg hover:shadow-2xl overflow-hidden border border-orange-100/80 hover:-translate-y-2 transition-all duration-300 flex flex-col"
@@ -241,48 +221,7 @@ const Demo = () => {
                         <div className="absolute top-4 left-4 pointer-events-none">
                           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-black/60 backdrop-blur-md text-white border border-white/20 shadow-sm">
                             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                            grAdelytics • Demo
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="p-6 flex flex-col flex-grow justify-between">
-                        <div>
-                          <h3 className="text-xl font-bold text-[#0d3b4a] group-hover:text-[#ff7f10] transition-colors mb-2.5">
-                            {video.title}
-                          </h3>
-
-                          <p className="text-gray-600 text-sm leading-relaxed">
-                            {video.description}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* STUDENT */}
-              <div className="min-w-full px-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-                  {videoData.student.map((video, index) => (
-                    <div
-                      key={index}
-                      className="group bg-gradient-to-b from-[#fffaf5] to-white rounded-3xl shadow-lg hover:shadow-2xl overflow-hidden border border-orange-100/80 hover:-translate-y-2 transition-all duration-300 flex flex-col"
-                    >
-                      <div className="relative w-full h-[400px] bg-black/5 overflow-hidden">
-                        <video
-                          controls
-                          playsInline
-                          preload="metadata"
-                          className="w-full h-full object-cover"
-                        >
-                          <source src={video.url} type="video/mp4" />
-                        </video>
-                        <div className="absolute top-4 left-4 pointer-events-none">
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-black/60 backdrop-blur-md text-white border border-white/20 shadow-sm">
-                            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                            grAdelytics • Learning
+                            grAdelytics • Faculty
                           </span>
                         </div>
                       </div>

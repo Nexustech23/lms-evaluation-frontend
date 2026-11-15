@@ -336,19 +336,7 @@ const Pricing = () => {
               </div>
             ))}
 
-            <div className="p-6 bg-orange-50">
-              <p className="text-[#0d3b4a] font-semibold mb-2">
-                Institute Pricing Model
-              </p>
 
-              <p className="text-gray-600">
-                Institutes follow a
-                <span className="font-semibold text-[#ff7f10]">
-                  {" "}Use First, Pay Later{" "}
-                </span>
-                model based on active users, AI usage, and enabled premium features.
-              </p>
-            </div>
           </div>
         )}
 

@@ -175,9 +175,6 @@ const Contact = () => {
                   📞 Dr Subhendu Dey - +91 7278003671 (India)
                 </div>
 
-                <div className="flex items-center gap-2">
-                  📞 Dr Tapan Sarker - +61 401 735 265 (Australia)
-                </div>
               </div>
             </div>
 
@@ -188,7 +185,7 @@ const Contact = () => {
               </h2>
 
               <div className="flex flex-row gap-2 items-center text-gray-700 text-sm break-all">
-                📧 antarpathimpactconsulting@gmail.com
+                📧 info@antarpath.com
               </div>
 
               <a
@@ -213,22 +210,6 @@ const Contact = () => {
                   <p>
                     8/1/2, Dr. U.N Brahmachari Street, 4th Floor,
                     Kolkata - 700017, West Bengal
-                  </p>
-                </div>
-
-                <div className="flex gap-2.5 items-start">
-                  <span>📍</span>
-                  <p>
-                    F535 Brigade Meadows, Wisteria Kanakpura Main Road,
-                    Bengaluru - 560082, Karnataka
-                  </p>
-                </div>
-
-                <div className="flex gap-2.5 items-start">
-                  <span>📍</span>
-                  <p>
-                    6 Santa Cruz Pl, Forest Lake,
-                    Queensland - 4078, Brisbane
                   </p>
                 </div>
               </div>

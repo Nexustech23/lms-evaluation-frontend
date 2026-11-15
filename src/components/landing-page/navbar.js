@@ -52,15 +52,9 @@ function Navbar() {
                             <Link href="/get-a-demo" className="hover:text-orange-600 transition-colors duration-200">
                                 Get a Demo
                             </Link>
-                            <button
-                                onClick={() => {
-                                    const section = document.getElementById("aboutus");
-                                    if (section) section.scrollIntoView({ behavior: "smooth", block: "start" });
-                                }}
-                                className="hover:text-orange-600 transition-colors duration-200"
-                            >
-                                About Us
-                            </button>
+                            <Link href="/faq" className="hover:text-orange-600 transition-colors duration-200">
+                                FAQs
+                            </Link>
                             <Link href="/contact-us" className="hover:text-orange-600 transition-colors duration-200">
                                 Contact Us
                             </Link>
@@ -105,6 +99,9 @@ function Navbar() {
                             </Link>
                             <Link href="/get-a-demo" className="text-gray-600 hover:text-orange-600 text-sm font-medium transition-colors">
                                 Get a Demo
+                            </Link>
+                            <Link href="/faq" className="text-gray-600 hover:text-orange-600 text-sm font-medium transition-colors">
+                                FAQs
                             </Link>
                             <Link href="/contact-us" className="text-gray-600 hover:text-orange-600 text-sm font-medium transition-colors">
                                 Contact Us
