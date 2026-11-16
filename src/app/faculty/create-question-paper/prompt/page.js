@@ -32,6 +32,7 @@ import InputStage, {
 import GeneratingStage from "@/components/question-paper/GeneratingStage";
 import {
   boardsForClass, isLayoutCustomised, layoutFromBoard, layoutPayload, layoutProblem, matchBoard, stageSectionsForClass,
+  CUSTOM_PAPER,
 } from "@/school/cbse";
 import EditorStage from "@/components/question-paper/EditorStage";
 
@@ -111,6 +112,8 @@ export default function QuestionPaperGenerator() {
   const [cbseBlueprints, setCbseBlueprints] = useState(null);
   const [cbseClass, setCbseClass] = useState("");
   const [cbsePresetKey, setCbsePresetKey] = useState("");
+  // "Custom paper": a school test with no CBSE pattern. The faculty builds the sections in the section editor, as in a college.
+  const [cbseCustom, setCbseCustom] = useState(false);
   useEffect(() => {
     let cancelled = false;
     axios
@@ -137,6 +140,7 @@ export default function QuestionPaperGenerator() {
     : false;
 
   const applyCbseBoard = (board) => {
+    setCbseCustom(false);
     setCbsePresetKey(board.key);
     setCbseLayout(layoutFromBoard(board));
     setTotalMarks(board.total);
@@ -145,6 +149,8 @@ export default function QuestionPaperGenerator() {
   };
 
   const handleCbsePresetChange = (key) => {
+    if (key === CUSTOM_PAPER) { setCbseCustom(true); setCbsePresetKey(""); setCbseLayout(null); return; }
+    setCbseCustom(false);
     const board = boardsForClass(cbseBlueprints, cbseClass).find((entry) => entry.key === key);
     if (!board) { setCbsePresetKey(""); setCbseLayout(null); return; }
     applyCbseBoard(board);
@@ -1147,6 +1153,7 @@ export default function QuestionPaperGenerator() {
                         blueprints: cbseBlueprints,
                         classLevel: cbseClass,
                         presetKey: cbsePresetKey,
+                        custom: cbseCustom,
                         onClassChange: handleCbseClassChange,
                         onPresetChange: handleCbsePresetChange,
                         layout: cbseLayout,
