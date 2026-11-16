@@ -13,6 +13,7 @@ import { useParams, useRouter } from "next/navigation";
 import Navbar from "@/components/ui/Navbar";
 
 import { AuthContext } from "@/app/AuthContext";
+import useInstitute from "@/institute/useInstitute";
 
 import {
     IconEye,
@@ -25,6 +26,7 @@ export default function Enroll() {
     const router = useRouter();
 
     const { user } = useContext(AuthContext);
+    const { isSchool, word } = useInstitute();      // a school has classes, not semesters
 
     const params = useParams();
 
@@ -290,9 +292,9 @@ export default function Enroll() {
                                 md:text-lg
                             "
                         >
-                            View enrolled students
-                            by programme, batch,
-                            semester and school.
+                            {isSchool
+                                ? "View enrolled students by programme, class and school."
+                                : "View enrolled students by programme, batch, semester and school."}
                         </p>
                     </div>
 
@@ -380,17 +382,17 @@ export default function Enroll() {
                                         Program
                                     </th>
 
-                                    <th className="px-4 py-4 font-bold text-black">
-                                        Batch
-                                    </th>
+                                    <th className="px-4 py-4 font-bold text-black">{isSchool ? word("batch") : "Batch"}</th>
 
                                     <th className="px-4 py-4 font-bold text-black">
                                         No. of Students
                                     </th>
 
-                                    <th className="px-4 py-4 font-bold text-black">
+                                    {!isSchool && (
+<th className="px-4 py-4 font-bold text-black">
                                         Semester
                                     </th>
+)}
 
                                     <th className="px-4 py-4 text-center font-bold text-black">
                                         Actions
@@ -444,7 +446,8 @@ export default function Enroll() {
 
                                                 {/* SCHOOL */}
 
-                                                <td className="px-4 py-5">
+                                                {!isSchool && (
+<td className="px-4 py-5">
 
                                                     <span
                                                         className="
@@ -462,6 +465,7 @@ export default function Enroll() {
                                                         {sub.semester}
                                                     </span>
                                                 </td>
+)}
 
                                                 {/* PROGRAM */}
 
@@ -694,10 +698,12 @@ export default function Enroll() {
                                             opacity-90
                                         "
                                     >
-                                        {
-                                            selectedSubject.semester
-                                        }
-                                        {" — "}
+                                        {!isSchool && (
+                                            <>
+                                                {selectedSubject.semester}
+                                                {" — "}
+                                            </>
+                                        )}
                                         {
                                             selectedSubject.subject_code
                                         }

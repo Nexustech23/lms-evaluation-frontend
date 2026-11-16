@@ -7,6 +7,7 @@ import Navbar from "@/components/ui/Navbar";
 import Spinner from "@/components/ui/Spinner";
 import toast from "react-hot-toast";
 import { AuthContext } from "@/app/AuthContext";
+import useInstitute from "@/institute/useInstitute";
 import {
   IconBuilding,
   IconEdit,
@@ -18,6 +19,7 @@ import { useTranslations } from "next-intl";
 
 export default function ProgrammePage() {
   const { user } = useContext(AuthContext);
+  const { isSchool } = useInstitute();      // a school's programme has no semesters
   const searchParams = useSearchParams();
   const router = useRouter();
   const schoolId = searchParams.get("schoolId");
@@ -286,9 +288,11 @@ export default function ProgrammePage() {
                     <th className="px-5 py-3 text-gray-500 font-semibold">
                       {t("duration")}
                     </th>
-                    <th className="px-5 py-3 text-gray-500 font-semibold">
+                    {!isSchool && (
+<th className="px-5 py-3 text-gray-500 font-semibold">
                       {ts("semester")}
                     </th>
+)}
                     <th className="px-5 py-3 text-gray-500 font-semibold">
                       {t("type")}
                     </th>
@@ -332,9 +336,11 @@ export default function ProgrammePage() {
                         {p.duration_years === 1 ? "Year" : "Years"}
                       </td>
 
-                      <td className="px-5 py-4 text-gray-600">
+                      {!isSchool && (
+<td className="px-5 py-4 text-gray-600">
                         {p.total_semesters} Sems
                       </td>
+)}
 
                       <td className="px-5 py-4">
                         <div className="relative group inline-block">
@@ -652,7 +658,8 @@ export default function ProgrammePage() {
                     className={`w-full p-2.5 border rounded-lg text-gray-600 text-sm focus:outline-none focus:ring-2 ${user?.color ? "focus:ring-green-300" : "focus:ring-orange-300"}`}
                   />
                 </div>
-                <div>
+                {!isSchool && (
+<div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     {t("totalSemesters")}
                   </label>
@@ -669,6 +676,7 @@ export default function ProgrammePage() {
                     className={`w-full p-2.5 border rounded-lg text-gray-600 text-sm focus:outline-none focus:ring-2 ${user?.color ? "focus:ring-green-300" : "focus:ring-orange-300"}`}
                   />
                 </div>
+)}
               </div>
 
               <div
