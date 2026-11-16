@@ -1,4 +1,6 @@
 // Helpers for the CBSE school paper form. Colleges never use these.
+// The subject choice that means "no CBSE pattern: I will set the sections myself".
+export const CUSTOM_PAPER = "custom";
 export const CBSE_CLASSES = Array.from({ length: 12 }, (_, i) => i + 1);
 
 let nextId = 0;

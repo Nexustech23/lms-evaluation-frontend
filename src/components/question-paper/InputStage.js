@@ -4,6 +4,7 @@ import { withAlpha, darkenColor } from "@/lib/question-paper/colorHelpers";
 import DropZone from "./DropZone";
 import CoursePlannerUpload from "./CoursePlannerUpload";
 import CbseSchoolPanel from "@/school/CbseSchoolPanel";
+import { SECTION_PALETTE } from "@/lib/question-paper/sectionPalette";
 import { COLLEGE, examTypesFor } from "@/institute/instituteKind";
 import { useEffect, useState } from "react";
 
@@ -67,16 +68,6 @@ const BLOOM_OPTIONS = [
   { label: "L4 – Analyse",    value: 4 },
   { label: "L5 – Evaluate",   value: 5 },
   { label: "L6 – Create",     value: 6 },
-];
-
-// Section palette — cycles for new sections
-const SECTION_PALETTE = [
-  { bg: "rgba(99,102,241,0.12)",  text: "#6366f1" },
-  { bg: "rgba(16,185,129,0.12)",  text: "#10b981" },
-  { bg: "rgba(245,158,11,0.12)",  text: "#f59e0b" },
-  { bg: "rgba(239,68,68,0.12)",   text: "#ef4444" },
-  { bg: "rgba(59,130,246,0.12)",  text: "#3b82f6" },
-  { bg: "rgba(168,85,247,0.12)",  text: "#a855f7" },
 ];
 
 export function getDefaultSections() {
@@ -410,6 +401,7 @@ export default function InputStage({
             blueprints={cbse.blueprints}
             classLevel={cbse.classLevel}
             presetKey={cbse.presetKey}
+            custom={cbse.custom}
             onClassChange={cbse.onClassChange}
             onPresetChange={cbse.onPresetChange}
             layout={cbse.layout}
