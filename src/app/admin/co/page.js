@@ -9,6 +9,7 @@ import toast from "react-hot-toast";
 import { useTranslations } from "next-intl";
 import { useContext } from "react";
 import { AuthContext } from "@/app/AuthContext";
+import useInstitute from "@/institute/useInstitute";
 
 /* =========================================================
    HELPERS
@@ -74,6 +75,7 @@ export default function SavedResult() {
   const router = useRouter();
 
   const { user } = useContext(AuthContext);
+  const { isSchool, word } = useInstitute();      // a school has classes, not semesters
 
   const color = user?.color || "#ff7f10";
 
@@ -552,7 +554,7 @@ setSearch("");
                 setSelectedSemester("");
               }}
             >
-              <option value="">Batch</option>
+              <option value="">{isSchool ? word("batch") : "Batch"}</option>
 
               {batches.map((b) => (
                 <option key={b.id} value={b.id}>
@@ -562,7 +564,7 @@ setSearch("");
             </ColoredSelect>
 
             {/* SEMESTER */}
-
+{!isSchool && (
             <ColoredSelect
               color={color}
               disabled={!selectedBatch}
@@ -579,6 +581,7 @@ setSearch("");
                 </option>
               ))}
             </ColoredSelect>
+)}
 
             {/* CLEAR */}
 
@@ -681,6 +684,7 @@ setSearch("");
 ========================================================= */
 
 function FolderCard({ sub, color, onClick, ts, t }) {
+  const { isSchool, word } = useInstitute();      // a school's cards say Class and show no semester
   const [hovered, setHovered] = useState(false);
 
   return (
@@ -722,10 +726,11 @@ function FolderCard({ sub, color, onClick, ts, t }) {
             color: darkenColor(color),
           }}
         >
-          {ts("batch")} {sub.batch_name}
+          {isSchool ? word("batch") : ts("batch")} {sub.batch_name}
         </span>
 
-        <span
+        {!isSchool && (
+<span
           className="text-xs font-medium px-2 py-0.5 rounded-full"
           style={{
             backgroundColor: withAlpha(color, 0.12),
@@ -734,6 +739,7 @@ function FolderCard({ sub, color, onClick, ts, t }) {
         >
           {ts("semester")} {sub.semester}
         </span>
+)}
       </div>
     </div>
   );

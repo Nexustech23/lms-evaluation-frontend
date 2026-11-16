@@ -1,4 +1,5 @@
 import React from "react";
+import { isSchool } from "@/institute/instituteKind";
 
 import {
   IconHome,
@@ -125,11 +126,16 @@ export const getSidebarLinks = (role, user, t) => {
           href: "/admin/academicResults",
           icon: <IconUserPlus />,
         },
-        {
-          label: "Academic Transcript",
-          href: "/admin/academic-transcript",
-          icon: <IconCertificate />,
-        },
+        // The semester-wise TGPA/CGPA transcript is a college record; a school has no semesters.
+        ...(isSchool(user)
+          ? []
+          : [
+            {
+              label: "Academic Transcript",
+              href: "/admin/academic-transcript",
+              icon: <IconCertificate />,
+            },
+          ]),
         {
           label: "Relative Grading",
           href: "/admin/relativeGrades",
