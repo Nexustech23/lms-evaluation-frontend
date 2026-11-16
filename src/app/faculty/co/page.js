@@ -20,6 +20,7 @@ import toast from "react-hot-toast";
 import { useTranslations } from "next-intl";
 
 import { AuthContext } from "@/app/AuthContext";
+import useInstitute from "@/institute/useInstitute";
 
 import Filters from "@/components/Filters";
 
@@ -456,6 +457,8 @@ function FolderCard({
   t,
 }) {
 
+  const { isSchool, word } = useInstitute();      // a school's cards say Class and show no semester
+
   const [hovered,
     setHovered] =
     useState(false);
@@ -561,11 +564,12 @@ function FolderCard({
               ),
           }}
         >
-          {ts("batch")}{" "}
+          {isSchool ? word("batch") : ts("batch")}{" "}
           {sub.batch_name}
         </span>
 
-        <span
+        {!isSchool && (
+<span
           className="text-xs font-medium px-2 py-0.5 rounded-full"
           style={{
             backgroundColor:
@@ -583,6 +587,7 @@ function FolderCard({
           {ts("semester")}{" "}
           {sub.semester}
         </span>
+)}
       </div>
     </div>
   );

@@ -13,6 +13,7 @@ import {
 import Navbar from "@/components/ui/Navbar";
 import Spinner from "@/components/ui/Spinner";
 import { AuthContext } from "@/app/AuthContext";
+import useInstitute from "@/institute/useInstitute";
 
 // Lazy-load SheetJS (~500KB) — only needed when the user downloads the
 // template (Phase 5.3). The marks upload itself goes to the backend as a
@@ -81,6 +82,8 @@ function ImportTypeCard({ active, title, description, icon: Icon, color, onClick
 
 export default function ImportMarksExcel() {
   const { user } = useContext(AuthContext);
+  // A school has classes, not semesters: its class is the batch, and a batch with one (hidden) semester needs no picker.
+  const { isSchool, word } = useInstitute();
   const color = user?.color || "#ff7f10";
   const fileInputRef = useRef(null);
 
@@ -201,7 +204,9 @@ export default function ImportMarksExcel() {
     setSelected((previous) => ({ ...previous, batch: batchId, semester: "" }));
     resetOutcome();
     const batch = batches.find((item) => item.id === batchId);
-    setSemesters([...(new Set(batch?.semesters || []))].sort((left, right) => left - right));
+    const batchSemesters = [...(new Set(batch?.semesters || []))].sort((left, right) => left - right);
+    setSemesters(batchSemesters);
+    if (isSchool && batchSemesters.length === 1) setSelected((previous) => ({ ...previous, semester: batchSemesters[0] }));
   };
 
   const handleSelectSemester = (semester) => {
@@ -231,7 +236,7 @@ export default function ImportMarksExcel() {
 
   const handleOverallUpload = async () => {
     if (!selected.batch || !selected.semester || !file) {
-      toast.error("Please select batch, semester and Excel file");
+      toast.error(isSchool ? "Please select a class and an Excel file" : "Please select batch, semester and Excel file");
       return;
     }
     const formData = createFormData();
@@ -355,11 +360,12 @@ export default function ImportMarksExcel() {
             <ImportTypeCard
               active={importType === "overall"}
               title="Overall Marks"
-              description="Existing format: one student column and one total-marks column for a selected semester."
+              description={isSchool ? "One student column and one total-marks column for the selected class." : "Existing format: one student column and one total-marks column for a selected semester."}
               icon={IconFileSpreadsheet}
               color={color}
               onClick={() => handleImportType("overall")}
             />
+            {!isSchool && (
             <ImportTypeCard
               active={importType === "transcript"}
               title="Subject-wise Transcript Marks"
@@ -368,6 +374,7 @@ export default function ImportMarksExcel() {
               color={color}
               onClick={() => handleImportType("transcript")}
             />
+            )}
           </div>
 
           <div
@@ -379,9 +386,9 @@ export default function ImportMarksExcel() {
             {hasDepartment && (
               <FilterSelect label="Department" value={selected.department} onChange={handleSelectDepartment} options={departments} getLabel={(item) => item.department_name} getValue={(item) => item.id} disabled={!selected.programme} color={color} />
             )}
-            <FilterSelect label="Batch" value={selected.batch} onChange={handleSelectBatch} options={batches} getLabel={(item) => item.batch_name} getValue={(item) => item.id} disabled={hasDepartment ? !selected.department : !selected.programme} color={color} />
-            {importType === "overall" && (
-              <FilterSelect label="Semester" value={selected.semester} onChange={handleSelectSemester} options={semesters.map((semester) => ({ id: semester, name: `Semester ${semester}` }))} getLabel={(item) => item.name} getValue={(item) => item.id} disabled={!selected.batch} color={color} />
+            <FilterSelect label={isSchool ? word("batch") : "Batch"} value={selected.batch} onChange={handleSelectBatch} options={batches} getLabel={(item) => item.batch_name} getValue={(item) => item.id} disabled={hasDepartment ? !selected.department : !selected.programme} color={color} />
+            {importType === "overall" && (!isSchool || semesters.length > 1) && (
+              <FilterSelect label={isSchool ? "Term" : "Semester"} value={selected.semester} onChange={handleSelectSemester} options={semesters.map((semester) => ({ id: semester, name: `${isSchool ? "Term" : "Semester"} ${semester}` }))} getLabel={(item) => item.name} getValue={(item) => item.id} disabled={!selected.batch} color={color} />
             )}
           </div>
 
