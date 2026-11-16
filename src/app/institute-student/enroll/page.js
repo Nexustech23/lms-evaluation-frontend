@@ -9,6 +9,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 
 import { AuthContext } from "@/app/AuthContext";
+import useInstitute from "@/institute/useInstitute";
 
 import toast from "react-hot-toast";
 
@@ -16,6 +17,8 @@ const MyBatch = () => {
   const router = useRouter();
 
   const { user } = useContext(AuthContext);
+  // A school has classes, not semesters: a student sees the whole class's subjects, with no semester boxes.
+  const { isSchool, loading: instituteLoading } = useInstitute();
 
   const color = user?.color || "#ff7f10";
 
@@ -54,13 +57,17 @@ const MyBatch = () => {
 
   const semesterBoxes = [1, 2, 3, 4, 5, 6, 7, 8];
 
-  const filteredEnrolledSubjects = enrolledSubjects.filter(
-    (subject) => String(subject.semester) === String(selectedEnrolledSemester),
-  );
+  const filteredEnrolledSubjects = isSchool
+    ? enrolledSubjects
+    : enrolledSubjects.filter(
+        (subject) => String(subject.semester) === String(selectedEnrolledSemester),
+      );
 
-  const selectedSemesterNewlyEnrolledSubjects = newlyEnrolledSubjects.filter(
-    (subject) => String(subject.semester) === String(selectedEnrolledSemester),
-  );
+  const selectedSemesterNewlyEnrolledSubjects = isSchool
+    ? newlyEnrolledSubjects
+    : newlyEnrolledSubjects.filter(
+        (subject) => String(subject.semester) === String(selectedEnrolledSemester),
+      );
 
   const visibleEnrolledSubjects = [
     ...filteredEnrolledSubjects,
@@ -86,7 +93,7 @@ const MyBatch = () => {
       setLoadingAvailableSubjects(true);
 
       const res = await axios.get(
-        `/api/student-subjects?batch=${batchId}&semester=${semester}&department=${departmentId || ""}`,
+        `/api/student-subjects?batch=${batchId}${semester ? `&semester=${semester}` : ""}&department=${departmentId || ""}`,
         {
           withCredentials: true,
         },
@@ -141,6 +148,13 @@ const MyBatch = () => {
 
         setSemesters([]);
 
+        if (isSchool) {
+          // no semester boxes: show every subject of the class that the student has not enrolled in yet
+          setShowAvailableTable(true);
+          await fetchAvailableSubjects("", batchId, departmentId);
+          return;
+        }
+
         const semesterOneSubjects = subjects.filter(
           (subject) => String(subject.semester) === "1",
         );
@@ -185,8 +199,10 @@ const MyBatch = () => {
   };
 
   useEffect(() => {
+    if (instituteLoading) return;            // wait until we know whether this is a school
     fetchAcademicData();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [instituteLoading, isSchool]);
 
   // =====================================================
   // SELECT ENROLLED SEMESTER BOX
@@ -240,7 +256,7 @@ const MyBatch = () => {
 
       const addedSubject = {
         ...subject,
-        semester: selectedEnrolledSemester,
+        semester: isSchool ? subject.semester : selectedEnrolledSemester,
       };
 
       setNewlyEnrolledSubjects((prev) => [...prev, addedSubject]);
@@ -286,6 +302,13 @@ const MyBatch = () => {
     setSelectedBatch(batch);
 
     setSemesters(batch?.semesters || []);
+
+    // a school's class has one hidden semester: go straight to its subjects
+    if (isSchool && (batch?.semesters || []).length === 1) {
+      router.push(
+        `/institute-student/enroll/${batch.semesters[0]}?batch=${batch?.id}&department=${selectedDepartment}`,
+      );
+    }
   };
 
   return (
@@ -295,7 +318,7 @@ const MyBatch = () => {
         backgroundColor: color,
       }}
     >
-      <Navbar title="Semester Enroll" />
+      <Navbar title={isSchool ? "Subject Enroll" : "Semester Enroll"} />
 
       <div className="flex-1 px-8 py-8">
         <div>
@@ -306,7 +329,7 @@ const MyBatch = () => {
               text-white
             "
           >
-            Semester Enrollment
+            {isSchool ? "Subject Enrollment" : "Semester Enrollment"}
           </h1>
 
           <p
@@ -315,7 +338,7 @@ const MyBatch = () => {
               text-white/80
             "
           >
-            Enroll subjects according to your batch and semester.
+            {isSchool ? "Enroll in the subjects of your class." : "Enroll subjects according to your batch and semester."}
           </p>
         </div>
 
@@ -338,7 +361,8 @@ const MyBatch = () => {
                 {/* =================================== */}
                 {/* SEMESTER BOXES */}
                 {/* =================================== */}
-                <div className="bg-white border border-white/30 rounded-[32px] p-6 shadow-xl mt-2">
+                {!isSchool && (
+<div className="bg-white border border-white/30 rounded-[32px] p-6 shadow-xl mt-2">
                   <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-bold text-gray-900">
                       Your Semesters
@@ -409,6 +433,7 @@ const MyBatch = () => {
                     })}
                   </div>
                 </div>
+)}
 
 
 
@@ -610,9 +635,11 @@ const MyBatch = () => {
                             Credits
                           </th>
 
-                          <th className="px-4 py-4 text-left">
+                          {!isSchool && (
+<th className="px-4 py-4 text-left">
                             Semester
                           </th>
+)}
                         </tr>
                       </thead>
 
@@ -647,9 +674,11 @@ const MyBatch = () => {
                                 {sub.credits || "-"}
                               </td>
 
-                              <td className="px-4 py-5">
+                              {!isSchool && (
+<td className="px-4 py-5">
                                 {sub.semester || selectedEnrolledSemester}
                               </td>
+)}
                             </tr>
                           ))
                         ) : (
@@ -747,7 +776,7 @@ const MyBatch = () => {
                           mb-6
                         "
                       >
-                        Select Batch
+                        {isSchool ? "Select Class" : "Select Batch"}
                       </h2>
 
                       <div
@@ -782,7 +811,7 @@ const MyBatch = () => {
                 {/* SEMESTERS */}
                 {/* ================================= */}
 
-                {selectedBatch && semesters.length > 0 && (
+                {selectedBatch && semesters.length > 0 && !(isSchool && semesters.length === 1) && (
                   <div
                     className="
                       mt-8
@@ -798,7 +827,7 @@ const MyBatch = () => {
                         mb-6
                       "
                     >
-                      Select Semester
+                      {isSchool ? "Select Term" : "Select Semester"}
                     </h2>
 
                     <div
