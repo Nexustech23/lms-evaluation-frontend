@@ -4,6 +4,7 @@ import { withAlpha, darkenColor } from "@/lib/question-paper/colorHelpers";
 import DropZone from "./DropZone";
 import CoursePlannerUpload from "./CoursePlannerUpload";
 import CbseSchoolPanel from "@/school/CbseSchoolPanel";
+import { COLLEGE, examTypesFor } from "@/institute/instituteKind";
 import { useEffect, useState } from "react";
 
 // crypto.randomUUID() only exists in secure contexts (HTTPS/localhost) —
@@ -110,6 +111,7 @@ export default function InputStage({
   setSubjectNameInput,
   examType,
   setExamType,
+  examTypes = examTypesFor(COLLEGE),     // a school's exam types differ from a college's
   totalMarks,
   setTotalMarks,
   duration,
@@ -212,13 +214,7 @@ export default function InputStage({
       isSelect: true,
       value:    examType,
       onChange: (e) => setExamType(e.target.value),
-      options: [
-        "End Semester Examination",
-        "Mid Semester Examination",
-        "Unit Test",
-        "Quiz",
-        "Internal Assessment",
-      ],
+      options: examTypes,
     },
     {
       label:    t("totalMarks"),
