@@ -21,6 +21,10 @@ import { startRecoverablePolling } from "@/lib/pollBackoff";
 
 import Navbar from "@/components/ui/Navbar";
 import FilterBar from "@/college/FilterBar";
+import ClassFilterBar from "@/school/ClassFilterBar";
+import { classLabel, sortClasses, subjectsOfClass } from "@/school/classSubjects";
+import useInstitute from "@/institute/useInstitute";
+import { COLLEGE, defaultExamType } from "@/institute/instituteKind";
 import ChooseStage from "@/components/question-paper/ChooseStage";
 import InputStage, {
   getDefaultSections,
@@ -34,6 +38,7 @@ import EditorStage from "@/components/question-paper/EditorStage";
 // ─────────────────────────────────────────────────────────────────────────────
 export default function QuestionPaperGenerator() {
   const { user } = useContext(AuthContext);
+  const institute = useInstitute();            // a school's screens say Class, a college's say Semester
   const color = user?.color || "#ff7f10";
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -71,7 +76,12 @@ export default function QuestionPaperGenerator() {
 
   // ── Exam metadata ─────────────────────────────────────────────────────────
   const [subjectNameInput, setSubjectNameInput] = useState("");
-  const [examType, setExamType] = useState("End Semester Examination");
+  const [examType, setExamType] = useState(defaultExamType(COLLEGE));
+  // A school sits annual and half-yearly exams, not semester exams: change the default once we know it is a school.
+  useEffect(() => {
+    if (institute.isSchool && examType === defaultExamType(COLLEGE)) setExamType(institute.defaultExamType);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [institute.isSchool]);
   const [totalMarks, setTotalMarks] = useState(100);
   const [duration, setDuration] = useState("3 Hours");
   const [folderName, setFolderName] = useState("");
@@ -293,9 +303,12 @@ export default function QuestionPaperGenerator() {
   })();
 
   const semesters = selectedBatch ? Object.keys(semesterSource) : [];
-  const filteredSubjects = selectedSemester
-    ? semesterSource[selectedSemester] || []
-    : [];
+  // A school has no semester step: its subjects are all the subjects of the class.
+  const filteredSubjects = institute.isSchool
+    ? (selectedBatch ? subjectsOfClass(semesterSource) : [])
+    : selectedSemester
+      ? semesterSource[selectedSemester] || []
+      : [];
 
   // ── Filter cascade helpers ────────────────────────────────────────────────
   const resetBelow = (level) => {
@@ -313,6 +326,34 @@ export default function QuestionPaperGenerator() {
     setSelectedBatch(null);
     setSelectedSemester("");
     setSelectedSubject(null);
+  };
+
+  // What both filter bars (school and college) share; each adds or leaves out the semester step.
+  const filterProps = {
+    color, loadingSubjects, schools, programmes, departments, filteredSubjects,
+    batches: institute.isSchool ? sortClasses(batches) : batches,
+    selectedSchool, selectedProgramme, selectedDepartment, selectedBatch, selectedSubject,
+    onSchoolChange: (v) => {
+      setSelectedSchool(schools.find((s) => s.id === v) || null);
+      resetBelow(1);
+    },
+    onProgrammeChange: (v) => {
+      setSelectedProgramme(programmes.find((p) => p.id === v) || null);
+      resetBelow(2);
+    },
+    onDepartmentChange: (v) => {
+      setSelectedDepartment(departments.find((d) => d.id === v) || null);
+      resetBelow(3);
+    },
+    onBatchChange: (v) => {
+      setSelectedBatch(batches.find((b) => b.id === v) || null);
+      resetBelow(4);
+    },
+    onSubjectChange: (v) => setSelectedSubject(filteredSubjects.find((s) => s._id === v) || null),
+    onClear: handleClearFilters,
+    filterNote: t("filterNote"),
+    filterHint: t("filterHint"),
+    clearLabel: ts("clear"),
   };
 
   const fetchPaperDetails = async () => {
@@ -423,6 +464,8 @@ export default function QuestionPaperGenerator() {
 
       semester: selectedSemester || generationMeta.semester || "",
 
+      semesterLabel: institute.word("semester"),
+
       academicYear:  academicYear || generationMeta.academicYear || "",
 
       duration: generationMeta.duration || duration,
@@ -439,6 +482,7 @@ export default function QuestionPaperGenerator() {
       generationMeta,
       examType,
       selectedSemester,
+      institute.isSchool,
       academicYear,
       duration,
       totalMarks,
@@ -537,7 +581,10 @@ export default function QuestionPaperGenerator() {
         "subjectName",
         selectedSubject?.subject_name || subjectNameInput.trim() || "Subject",
       );
-      if (selectedSemester) formData.append("semester", selectedSemester);
+      if (institute.isSchool) {
+        const className = classLabel(selectedBatch?.name, cbseClass);
+        if (className) formData.append("semester", className);
+      } else if (selectedSemester) formData.append("semester", selectedSemester);
       else if (cbseClass) formData.append("semester", `Class ${cbseClass}`);
       if (cbsePresetKey) {
         formData.append("cbsePreset", cbsePresetKey);
@@ -998,60 +1045,34 @@ export default function QuestionPaperGenerator() {
       </div>
 
       <div className="bg-white min-h-screen p-4 mx-6 rounded-xl">
-        {/* ── Filter bar ── */}
-        <FilterBar
-          color={color}
-          loadingSubjects={loadingSubjects}
-          schools={schools}
-          programmes={programmes}
-          departments={departments}
-          batches={batches}
-          semesters={semesters}
-          filteredSubjects={filteredSubjects}
-          selectedSchool={selectedSchool}
-          selectedProgramme={selectedProgramme}
-          selectedDepartment={selectedDepartment}
-          selectedBatch={selectedBatch}
-          selectedSemester={selectedSemester}
-          selectedSubject={selectedSubject}
-          onSchoolChange={(v) => {
-            setSelectedSchool(schools.find((s) => s.id === v) || null);
-            resetBelow(1);
-          }}
-          onProgrammeChange={(v) => {
-            setSelectedProgramme(programmes.find((p) => p.id === v) || null);
-            resetBelow(2);
-          }}
-          onDepartmentChange={(v) => {
-            setSelectedDepartment(departments.find((d) => d.id === v) || null);
-            resetBelow(3);
-          }}
-          onBatchChange={(v) => {
-            setSelectedBatch(batches.find((b) => b.id === v) || null);
-            resetBelow(4);
-          }}
-          onSemesterChange={(v) => {
-            setSelectedSemester(v);
-            setSelectedSubject(null);
-          }}
-          onSubjectChange={(v) =>
-            setSelectedSubject(
-              filteredSubjects.find((s) => s._id === v) || null,
-            )
-          }
-          onClear={handleClearFilters}
-          filterNote={t("filterNote")}
-          filterHint={t("filterHint")}
-          labelMap={{
+        {/* ── Filter bar: a school picks a class, a college picks a batch and a semester ── */}
+        {institute.isSchool ? (
+          <ClassFilterBar {...filterProps} labelMap={{
             school: ts("school"),
             programme: ts("programme"),
             department: ts("department"),
-            batch: ts("batch"),
-            semester: ts("semester"),
+            batch: institute.word("batch"),
             subject: ts("subject"),
-          }}
-          clearLabel={ts("clear")}
-        />
+          }} />
+        ) : (
+          <FilterBar
+            {...filterProps}
+            semesters={semesters}
+            selectedSemester={selectedSemester}
+            onSemesterChange={(v) => {
+              setSelectedSemester(v);
+              setSelectedSubject(null);
+            }}
+            labelMap={{
+              school: ts("school"),
+              programme: ts("programme"),
+              department: ts("department"),
+              batch: ts("batch"),
+              semester: ts("semester"),
+              subject: ts("subject"),
+            }}
+          />
+        )}
 
         {/* ── Stage router ── */}
         {(stage === STAGES.CHOOSE ||
@@ -1108,6 +1129,7 @@ export default function QuestionPaperGenerator() {
                 setSubjectNameInput={setSubjectNameInput}
                 examType={examType}
                 setExamType={setExamType}
+                examTypes={institute.examTypes}
                 totalMarks={totalMarks}
                 setTotalMarks={setTotalMarks}
                 duration={duration}

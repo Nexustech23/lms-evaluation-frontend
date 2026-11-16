@@ -30,6 +30,9 @@ const examType =
 
 const semester =
   meta.semester || "";
+// A school's papers say "Class: Class 12"; when the value already starts with the word, show it once.
+const semesterLabel = meta.semesterLabel || "Semester";
+const semesterText = new RegExp("^" + semesterLabel + "\\b", "i").test(semester) ? semester : `${semesterLabel}: ${semester}`;
 
 const acadYear =
   meta.academicYear || "";
@@ -103,7 +106,7 @@ const duration =
   <div style="font-size:16px;font-weight:700;color:#111;margin-bottom:4px">${examType}</div>
   <div style="font-size:13px;font-weight:600;color:#333;margin-bottom:6px">Subject: ${subjectName}</div>
   <div style="display:flex;justify-content:center;gap:24px;font-size:11.5px;color:#555">
-    ${semester ? `<span>Semester: ${semester}</span>` : ""}
+    ${semester ? `<span>${semesterText}</span>` : ""}
     ${acadYear ? `<span>Academic Year: ${acadYear}</span>` : ""}
     <span>Duration: ${duration}</span>
     <span>Total Marks: ${totalMarks}</span>

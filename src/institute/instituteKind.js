@@ -14,11 +14,22 @@ export function instituteTypeOf(user) {
 export const isSchool = (user) => instituteTypeOf(user) === SCHOOL;
 
 // The word each kind of institute uses. A college keeps today's wording; add a key here when a screen needs a new word.
+//   semester: the term a subject belongs to (a school has none, so its screens say Class)
+//   batch:    a group of students (in a school that group is a class)
 const TERMS = {
-  [COLLEGE]: { semester: "Semester" },
-  [SCHOOL]: { semester: "Class" },
+  [COLLEGE]: { semester: "Semester", batch: "Batch" },
+  [SCHOOL]: { semester: "Class", batch: "Class" },
 };
 
 export function term(type, key) {
   return (TERMS[type] || TERMS[COLLEGE])[key] ?? TERMS[COLLEGE][key] ?? key;
 }
+
+// The kinds of exam a paper can be for. A school sits annual, half-yearly and pre-board exams, not semester exams.
+const EXAM_TYPES = {
+  [COLLEGE]: ["End Semester Examination", "Mid Semester Examination", "Unit Test", "Quiz", "Internal Assessment"],
+  [SCHOOL]: ["Annual Examination", "Half Yearly Examination", "Pre-Board Examination", "Periodic Test", "Unit Test", "Class Test"],
+};
+
+export const examTypesFor = (type) => EXAM_TYPES[type] || EXAM_TYPES[COLLEGE];
+export const defaultExamType = (type) => examTypesFor(type)[0];
