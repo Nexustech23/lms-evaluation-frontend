@@ -5,9 +5,11 @@ import { useRouter } from "next/navigation";
 import Navbar from "@/components/ui/Navbar";
 import Spinner from "@/components/ui/Spinner";
 import { AuthContext } from "@/app/AuthContext";
+import useInstitute from "@/institute/useInstitute";
 
 const UserProfile = () => {
   const { user } = useContext(AuthContext);
+  const { word } = useInstitute();      // a school's profile says Class where a college's says Semester
   const router = useRouter();
   const defaultAvatar = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
   const { setUser } = useContext(AuthContext);
@@ -369,7 +371,7 @@ const UserProfile = () => {
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className={labelCls}>Semester</label>
+                    <label className={labelCls}>{word("semester")}</label>
                     <input
                       type="number"
                       min="0"
