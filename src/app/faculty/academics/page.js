@@ -16,9 +16,11 @@ import {
   Send,
 } from "lucide-react";
 import { AuthContext } from "@/app/AuthContext";
+import useInstitute from "@/institute/useInstitute";
 
 const AcademicsPage = () => {
   const { user } = useContext(AuthContext);
+  const { isSchool } = useInstitute();      // a school has classes, not semesters
 
   const themeColor = user?.color || "#ff7f10";
 
@@ -115,7 +117,7 @@ const AcademicsPage = () => {
       return false;
     }
 
-    if (formData.semester && String(subject.semester) !== String(formData.semester)) {
+    if (!isSchool && formData.semester && String(subject.semester) !== String(formData.semester)) {
       return false;
     }
 
@@ -129,6 +131,7 @@ const AcademicsPage = () => {
       selectedSubject === "all" || item.subject_id === selectedSubject;
 
     const matchesSemester =
+      isSchool ||
       selectedSemester === "All Semesters" ||
       String(item.semester) === selectedSemester.replace("Semester ", "");
 
@@ -614,6 +617,7 @@ const AcademicsPage = () => {
                 </button>
               </div>
 
+              {!isSchool && (
               <div className="relative border px-2 py-1 rounded-xl">
                 <span className="absolute text-sm top-[-10px] left-[8px] bg-white px-2">
                   Filters
@@ -630,6 +634,7 @@ const AcademicsPage = () => {
                   ))}
                 </select>
               </div>
+              )}
             </div>
           </div>
         </div>
@@ -687,8 +692,7 @@ const AcademicsPage = () => {
                 <p className="text-xs text-gray-400 mb-3">
                   {item.branch_name}
                   {item.batch_name ? ` | ${item.batch_name}` : ""}
-                  {" | "}
-                  Semester {item.semester}
+                  {!isSchool && <>{" | "}Semester {item.semester}</>}
                 </p>
 
                 <div
@@ -880,6 +884,7 @@ const AcademicsPage = () => {
                   </select>
                 </div>
 
+                {!isSchool && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Semester <span className="text-red-500">*</span>
@@ -899,6 +904,7 @@ const AcademicsPage = () => {
                     ))}
                   </select>
                 </div>
+                )}
               </div>
 
               <div>

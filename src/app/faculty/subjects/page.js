@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Navbar from "@/components/ui/Navbar";
 import Spinner from "@/components/ui/Spinner";
 import { AuthContext } from "@/app/AuthContext";
+import useInstitute from "@/institute/useInstitute";
 import { IconEye } from "@tabler/icons-react";
 import { useTranslations } from "next-intl";
 import Filters from "@/components/Filters";
@@ -23,6 +24,7 @@ function withAlpha(hex = "#ff7f10", alpha = 1) {
 export default function SubjectsPage() {
   const router = useRouter();
   const { user } = useContext(AuthContext);
+  const { isSchool, word } = useInstitute();      // a school's screens say Class and have no semester
 
   const color = user?.color || "#ff7f10";
 
@@ -122,8 +124,10 @@ export default function SubjectsPage() {
                     <th className="px-4 py-3">{t("subjectCode")}</th>
                     <th className="px-4 py-3">{t("programme")}</th>
                     <th className="px-4 py-3">{t("department")}</th>
-                    <th className="px-4 py-3">{t("batch")}</th>
-                    <th className="px-4 py-3">{t("semester")}</th>
+                    <th className="px-4 py-3">{isSchool ? word("batch") : t("batch")}</th>
+                    {!isSchool && (
+<th className="px-4 py-3">{t("semester")}</th>
+)}
 
                     {user?.hasCOAccess && (
                       <th className="px-4 py-3">{t("action")}</th>
@@ -135,7 +139,7 @@ export default function SubjectsPage() {
                   {tableSubjects.length === 0 ? (
                     <tr>
                       <td
-                        colSpan={9}
+                        colSpan={isSchool ? 8 : 9}
                         className="text-center py-8 text-gray-400 font-medium"
                       >
                         No subjects found.
@@ -183,7 +187,8 @@ export default function SubjectsPage() {
                           {sub.batch_name}
                         </td>
 
-                        <td className="px-4 py-4">
+                        {!isSchool && (
+<td className="px-4 py-4">
                           <span
                             className="px-2 py-1 rounded-full text-xs font-medium border"
                             style={{
@@ -195,6 +200,7 @@ export default function SubjectsPage() {
                             {sub.semester}
                           </span>
                         </td>
+)}
 
                         {user?.hasCOAccess && (
                           <td className="px-4 py-4">

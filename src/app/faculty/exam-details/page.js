@@ -5,6 +5,7 @@ import Navbar from "@/components/ui/Navbar";
 import Spinner from "@/components/ui/Spinner";
 import Filters from "@/components/Filters";
 import { AuthContext } from "@/app/AuthContext";
+import useInstitute from "@/institute/useInstitute";
 import { useTranslations } from "next-intl";
 
 import toast from "react-hot-toast";
@@ -22,6 +23,7 @@ export default function SavedResult() {
   });
 
   const { user } = useContext(AuthContext);
+  const { isSchool, word } = useInstitute();      // a school's screens say Class and have no semester
 
   const t = useTranslations("examDetails");
   const ts = useTranslations("subjects");
@@ -167,12 +169,14 @@ export default function SavedResult() {
                       </th>
 
                       <th className="p-3 text-gray-900 font-bold">
-                        {ts("batch")}
+                        {isSchool ? word("batch") : ts("batch")}
                       </th>
 
-                      <th className="p-3 text-gray-900 font-bold">
+                      {!isSchool && (
+<th className="p-3 text-gray-900 font-bold">
                         {ts("semester")}
                       </th>
+)}
 
                       <th className="p-3 text-gray-900 font-bold">
                         {ts("subject")}
@@ -184,7 +188,7 @@ export default function SavedResult() {
                     {documents?.length === 0 ? (
                       <tr>
                         <td
-                          colSpan={11}
+                          colSpan={isSchool ? 10 : 11}
                           className="py-8 text-center text-gray-400"
                         >
                           {t("noDocuments")}
@@ -266,7 +270,7 @@ export default function SavedResult() {
                             {doc.batch_name || "—"}
                           </td>
 
-                          {/* Semester */}
+                          {!isSchool && (
                           <td className="px-4 py-4">
                             {doc.semester ? (
                               <span
@@ -290,6 +294,7 @@ export default function SavedResult() {
                               "—"
                             )}
                           </td>
+)}
 
                           {/* Subject */}
                           <td className="px-4 py-4">

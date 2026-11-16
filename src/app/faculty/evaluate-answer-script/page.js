@@ -11,10 +11,12 @@ import Filters from "@/components/Filters";
 import { useDocuments } from "../../../api/Document"
 import { useContext } from "react";
 import { AuthContext } from "@/app/AuthContext";
+import useInstitute from "@/institute/useInstitute";
 
 import { getPageNumbers } from "@/lib/utils";
 export default function page() {
   const { user } = useContext(AuthContext);
+  const { isSchool, word } = useInstitute();      // a school's screens say Class and have no semester
   const router = useRouter();
   const [documents, setDocuments] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -142,8 +144,10 @@ export default function page() {
                         <th className="p-3 text-black font-bold">{ts("school")}</th>
                         <th className="p-3 text-black font-bold">{ts("programme")}</th>
                         <th className="p-3 text-black font-bold">{ts("department")}</th>
-                        <th className="p-3  text-black font-bold">{ts("batch")}</th>
-                        <th className="p-3">{ts("semester")}</th>
+                        <th className="p-3  text-black font-bold">{isSchool ? word("batch") : ts("batch")}</th>
+                        {!isSchool && (
+<th className="p-3">{ts("semester")}</th>
+)}
                         <th className="p-3 text-black font-bold ">{ts("subject")}</th>
                         <th className="p-3 text-black font-bold ">{tcq("examType")}</th>
                         <th className="p-3 text-black font-bold">{ts("action")}</th>
@@ -198,12 +202,13 @@ export default function page() {
                               {doc.batch_name}
                             </td>
 
-                            {/* Semester */}
+                            {!isSchool && (
                             <td className="px-4 py-4">
                               <span className="px-2 py-1 bg-blue-50 text-blue-600 border border-blue-200 rounded-full text-xs font-medium">
                                 {doc.semester}
                               </span>
                             </td>
+)}
 
                             {/* Subject */}
                             <td className="px-4 py-4 text-gray-600 whitespace-nowrap">
