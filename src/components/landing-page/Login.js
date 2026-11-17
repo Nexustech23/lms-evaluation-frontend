@@ -33,10 +33,23 @@ const Login = ({ close }) => {
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await response.json();
+      // The Next rewrite proxy returns a plain-text 500 when the backend is
+      // unreachable, so only parse JSON when the response actually is JSON.
+      const contentType = response.headers.get("content-type") || "";
+      const data = contentType.includes("application/json")
+        ? await response.json()
+        : null;
 
       if (!response.ok || data?.error) {
-        setError(data?.error || t("invalidCredentials"));
+        setError(
+          data?.error ||
+            (response.ok ? t("invalidCredentials") : t("loginError")),
+        );
+        return;
+      }
+
+      if (!data?.user) {
+        setError(t("loginError"));
         return;
       }
 

@@ -105,6 +105,8 @@ function TabSection() {
       title: "AI Powered Learning Platform for Students",
       description:
         "Boost productivity and exam preparation with Pomodoro learning, AI roadmaps, homework help, and smart practice tools.",
+      ctaLink: "https://antarpath.com/mycareerguru",
+      ctaLabel: "Explore MyCareerGuru →",
 
       image: "/pics/student.png",
 
@@ -247,6 +249,20 @@ function TabSection() {
                 </div>
               ))}
             </div>
+
+            {/* External CTA — only shown for tabs that have a ctaLink */}
+            {tabData[activeTab].ctaLink && (
+              <div className="mt-10">
+                <a
+                  href={tabData[activeTab].ctaLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-orange-500 text-white font-semibold text-sm shadow-lg hover:bg-orange-600 hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
+                >
+                  {tabData[activeTab].ctaLabel}
+                </a>
+              </div>
+            )}
           </div>
         </div>
       </div>
