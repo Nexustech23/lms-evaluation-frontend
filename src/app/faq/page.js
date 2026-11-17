@@ -34,12 +34,13 @@ export default function FaqPage() {
         <div className="mx-auto h-[1px] w-[80%] bg-[#b5c7ca]" />
       </div>
 
-      <section className="w-full bg-amber-50 px-4 py-10 sm:px-8 lg:px-24 xl:px-40">
-        <h1 className="text-3xl font-medium text-orange-500 sm:text-4xl">
-          Frequently Asked Questions
+      <section className="w-full bg-amber-50 px-4 pt-28 pb-10 sm:px-8 lg:px-24 xl:px-40">
+        <h1 className="text-4xl font-bold text-[#0d3b4a] sm:text-5xl">
+          Frequently Asked{" "}
+          <span className="text-orange-500">Questions</span>
         </h1>
-        <p className="mt-2 text-gray-500">
-          Product overview — what Gradelytics does and how to use it responsibly.
+        <p className="mt-3 text-gray-500 text-base max-w-2xl">
+          Product overview — what grAdelytics does and how to use it responsibly.
         </p>
       </section>
 
@@ -48,12 +49,15 @@ export default function FaqPage() {
       </section>
 
       <section className="w-full bg-amber-50 px-4 py-10 sm:px-8 lg:px-24 xl:px-40">
-        <p className="text-lg">
-          Have more questions?{" "}
-          <a href="/contact-us" className="text-[#0068b3] underline">
-            Contact our team
-          </a>
-        </p>
+        <div className="inline-flex items-center gap-3 px-6 py-4 rounded-2xl bg-orange-50 border border-orange-200">
+          <span className="text-2xl">💬</span>
+          <p className="text-base text-gray-700">
+            Have more questions?{" "}
+            <a href="/contact-us" className="text-orange-500 font-semibold hover:underline">
+              Contact our team
+            </a>
+          </p>
+        </div>
       </section>
 
       <Footer />

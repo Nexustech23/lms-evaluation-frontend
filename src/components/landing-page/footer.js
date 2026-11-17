@@ -84,15 +84,30 @@ function Footer() {
                 <span className="text-xs uppercase tracking-wider font-semibold text-amber-200">
                   MyCareerGuru / MySkillGuru
                 </span>
-                <p className="hover:text-white hover:translate-x-1 transition-all duration-300 cursor-default">
+                <a
+                  href="https://antarpath.com/mycareerguru"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-white hover:translate-x-1 transition-all duration-300"
+                >
                   Personalized Learning Roadmaps
-                </p>
-                <p className="hover:text-white hover:translate-x-1 transition-all duration-300 cursor-default">
+                </a>
+                <a
+                  href="https://antarpath.com/mycareerguru"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-white hover:translate-x-1 transition-all duration-300"
+                >
                   AI Tutor & Smart Doubt Clearing
-                </p>
-                <p className="hover:text-white hover:translate-x-1 transition-all duration-300 cursor-default">
+                </a>
+                <a
+                  href="https://antarpath.com/myskillsguru"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-white hover:translate-x-1 transition-all duration-300"
+                >
                   Adaptive Mock Tests & Analytics
-                </p>
+                </a>
               </div>
             </div>
           </div>

@@ -1,5 +1,9 @@
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
 import createNextIntlPlugin from "next-intl/plugin";
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.js");
 
 /** @type {import('next').NextConfig} */
@@ -10,13 +14,19 @@ const nextConfig = {
   // `node .next/standalone/server.js` with .next/static + public copied in.
   output: "standalone",
 
+  // Pin the tracing root to this project. Without it Next walks up and finds
+  // an unrelated lockfile (C:\Users\vc964\package-lock.json), which makes dev
+  // HMR and standalone file tracing slower/wrong.
+  outputFileTracingRoot: __dirname,
+
   images: {
-    domains: ["assets.aceternity.com"],
+    remotePatterns: [
+      { protocol: "https", hostname: "assets.aceternity.com" },
+    ],
   },
 
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
+  // Next 16 no longer reads `eslint` from next.config.mjs; the key is
+  // removed. Run `npx next lint`/ESLint separately.
 
   experimental: {
     // Next's rewrite proxy defaults to a 10MB request body cap, which silently
@@ -26,7 +36,9 @@ const nextConfig = {
   },
 
   async rewrites() {
-    const API_URL = process.env.API_URL || "http://127.0.0.1:5050";
+    // `uvicorn app.main:app --reload` listens on 8000 by default — keep the
+    // fallback in sync with that so local dev works even without .env.
+    const API_URL = process.env.API_URL || "http://127.0.0.1:8000";
     return [
       // Exact base path: /:path* does not match zero segments in Next.js,
       // so GET /api/self-learner/roadmap and POST /api/self-learner/roadmap
@@ -60,13 +72,11 @@ const nextConfig = {
         source: "/api/ai-tutor/:path*",
         destination: `${API_URL}/api/ai-tutor/:path*`,
       },
-      // All other API calls: strips /api prefix — non-roadmap Flask routes have no /api prefix.
+      // All other API calls: strips /api prefix — non-prefixed backend
+      // routers are mounted at root.
       {
         source: "/api/:path*",
-        destination: `${process.env.API_URL || "http://localhost:5050/"}/:path*`,
-        // destination: `${process.env.API_URL || "http://103.192.198.186:5050/"}/:path*`,
         destination: `${API_URL}/:path*`,
-
       },
     ];
   },

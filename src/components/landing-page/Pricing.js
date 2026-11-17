@@ -8,9 +8,7 @@ import Signup from "./Signup";
 
 const Pricing = () => {
   const router = useRouter();
-
   const [showConsent, setShowConsent] = useState(true);
-  const [activeTab, setActiveTab] = useState("institute");
 
   const features = [
     {
@@ -89,83 +87,8 @@ const Pricing = () => {
     },
   ];
 
-  const tutorPlans = [
-    {
-      duration: "1 Month",
-      tokens: "25K AI Tokens",
-      features: [
-        "AI Evaluation",
-        "Live Classroom",
-        "Report Export",
-      ],
-    },
-    {
-      duration: "3 Months",
-      tokens: "100K AI Tokens",
-      features: [
-        "AI Evaluation",
-        "Live Classroom",
-        "Priority AI",
-      ],
-    },
-    {
-      duration: "6 Months",
-      tokens: "250K AI Tokens",
-      features: [
-        "Advanced Reports",
-        "Live Classroom",
-        "Priority Support",
-      ],
-    },
-    {
-      duration: "12 Months",
-      tokens: "600K AI Tokens",
-      features: [
-        "Unlimited Classrooms",
-        "Priority AI",
-        "Premium Support",
-      ],
-    },
-  ];
-
-  const studentPlans = [
-    {
-      duration: "1 Month",
-      tokens: "20K AI Tokens",
-      features: [
-        "Pomodoro",
-        "Custom AI Feedback",
-        "Practice Tests",
-      ],
-    },
-    {
-      duration: "3 Months",
-      tokens: "80K AI Tokens",
-      features: [
-        "Pomodoro",
-        "AI Feedback",
-        "Study Insights",
-      ],
-    },
-    {
-      duration: "6 Months",
-      tokens: "200K AI Tokens",
-      features: [
-        "Advanced Analytics",
-        "Practice Tests",
-        "AI Recommendations",
-      ],
-    },
-    {
-      duration: "12 Months",
-      tokens: "500K AI Tokens",
-      features: [
-        "Full Learning Suite",
-        "AI Mentor",
-        "Premium Insights",
-      ],
-    },
-  ];
+  const tutorPlans = [];
+  const studentPlans = [];
 
   const handleContactClick = () => {
     router.push("/contact-us");
@@ -267,160 +190,53 @@ const Pricing = () => {
           </p>
 
           <h2 className="text-4xl font-[600] text-[#0d3b4a] mb-5">
-            Pricing for Everyone
+            Institutional Feature Plans
           </h2>
 
           <p className="text-gray-600 text-lg max-w-3xl mx-auto">
-            Choose dedicated plans for Institutes, Tutors, and Students.
-            Institutes use a pay-after-usage model, while Tutors and
-            Students purchase AI tokens in advance.
+            Compare what's included in the Basic and Premium institutional plans. Contact us to get a custom quote.
           </p>
         </div>
 
-        {/* TABS */}
-        <div className="flex justify-center mb-10">
-          <div className="bg-white border border-orange-100 rounded-2xl p-2 flex gap-2 shadow-lg">
-            
-            {["institute", "tutor", "student"].map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-6 py-3 rounded-xl font-semibold capitalize transition-all duration-300 ${
-                  activeTab === tab
-                    ? "bg-[#ff7f10] text-white shadow-lg"
-                    : "text-[#0d3b4a] hover:bg-orange-50"
-                }`}
-              >
-                {tab}
-              </button>
-            ))}
+        {/* INSTITUTE FEATURE TABLE */}
+        <div className="max-w-5xl mx-auto bg-white rounded-3xl shadow-2xl border border-orange-100 overflow-hidden">
+
+          <div className="grid grid-cols-3 bg-gradient-to-r from-[#ff7f10] to-[#ff9a3d] text-white p-6 font-bold text-center">
+            <div className="text-left">Features</div>
+            <div>Basic</div>
+            <div>Premium</div>
           </div>
-        </div>
 
-        {/* INSTITUTE */}
-        {activeTab === "institute" && (
-          <div className="max-w-5xl mx-auto bg-white rounded-3xl shadow-2xl border border-orange-100 overflow-hidden">
+          {instituteFeatures.map((item, index) => (
+            <div
+              key={index}
+              className={`grid grid-cols-3 p-5 border-b border-orange-100 items-center ${
+                index % 2 === 0 ? "bg-white" : "bg-orange-50/40"
+              }`}
+            >
+              <div className="font-medium text-[#0d3b4a]">
+                {item.feature}
+              </div>
 
-            <div className="grid grid-cols-3 bg-gradient-to-r from-[#ff7f10] to-[#ff9a3d] text-white p-6 font-bold text-center">
-              <div className="text-left">Features</div>
-              <div>Basic</div>
-              <div>Premium</div>
+              <div className="text-center">
+                {item.basic ? (
+                  <span className="text-green-500 text-2xl">✓</span>
+                ) : (
+                  <span className="text-gray-300">—</span>
+                )}
+              </div>
+
+              <div className="text-center">
+                {item.premium ? (
+                  <span className="text-[#ff7f10] text-2xl">★</span>
+                ) : (
+                  <span className="text-gray-300">—</span>
+                )}
+              </div>
             </div>
+          ))}
 
-            {instituteFeatures.map((item, index) => (
-              <div
-                key={index}
-                className={`grid grid-cols-3 p-5 border-b border-orange-100 items-center ${
-                  index % 2 === 0 ? "bg-white" : "bg-orange-50/40"
-                }`}
-              >
-                <div className="font-medium text-[#0d3b4a]">
-                  {item.feature}
-                </div>
-
-                <div className="text-center">
-                  {item.basic ? (
-                    <span className="text-green-500 text-2xl">✓</span>
-                  ) : (
-                    <span className="text-gray-300">—</span>
-                  )}
-                </div>
-
-                <div className="text-center">
-                  {item.premium ? (
-                    <span className="text-[#ff7f10] text-2xl">★</span>
-                  ) : (
-                    <span className="text-gray-300">—</span>
-                  )}
-                </div>
-              </div>
-            ))}
-
-
-          </div>
-        )}
-
-        {/* TUTOR */}
-        {activeTab === "tutor" && (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8 max-w-7xl mx-auto">
-            {tutorPlans.map((plan, index) => (
-              <div
-                key={index}
-                className="bg-white border border-orange-100 rounded-3xl p-8 shadow-xl hover:-translate-y-2 transition-all duration-300"
-              >
-                <h3 className="text-2xl font-bold text-[#0d3b4a] mb-2">
-                  {plan.duration}
-                </h3>
-
-                <p className="text-[#ff7f10] font-semibold mb-6">
-                  {plan.tokens}
-                </p>
-
-                <div className="flex flex-col gap-3 mb-8">
-                  {plan.features.map((feature, i) => (
-                    <div key={i} className="flex items-center gap-2 text-gray-600">
-                      <span className="text-green-500">✓</span>
-                      {feature}
-                    </div>
-                  ))}
-                </div>
-
-                <div className="bg-orange-50 rounded-2xl p-4 text-sm text-gray-600">
-                  Pay first and receive AI tokens valid for the selected duration.
-                  AI services stop once tokens expire.
-                </div>
-
-                <button
-                  onClick={handleGetStarted}
-                  className="w-full mt-6 py-3 bg-[#ff7f10] text-white rounded-xl font-semibold hover:bg-[#e67100] transition-all"
-                >
-                  Get Started
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* STUDENT */}
-        {activeTab === "student" && (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8 max-w-7xl mx-auto">
-            {studentPlans.map((plan, index) => (
-              <div
-                key={index}
-                className="bg-white border border-orange-100 rounded-3xl p-8 shadow-xl hover:-translate-y-2 transition-all duration-300"
-              >
-                <h3 className="text-2xl font-bold text-[#0d3b4a] mb-2">
-                  {plan.duration}
-                </h3>
-
-                <p className="text-[#ff7f10] font-semibold mb-6">
-                  {plan.tokens}
-                </p>
-
-                <div className="flex flex-col gap-3 mb-8">
-                  {plan.features.map((feature, i) => (
-                    <div key={i} className="flex items-center gap-2 text-gray-600">
-                      <span className="text-green-500">✓</span>
-                      {feature}
-                    </div>
-                  ))}
-                </div>
-
-                <div className="bg-orange-50 rounded-2xl p-4 text-sm text-gray-600">
-                  Purchase tokens first and use them for AI-powered learning,
-                  Pomodoro sessions, and custom feedback.
-                </div>
-
-                <button
-                  onClick={handleGetStarted}
-                  className="w-full mt-6 py-3 bg-[#ff7f10] text-white rounded-xl font-semibold hover:bg-[#e67100] transition-all"
-                >
-                  Get Started
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
+        </div>
       </section>
 
       {/* INFO SECTION */}
