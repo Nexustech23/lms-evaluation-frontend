@@ -3,7 +3,9 @@ import { FaMicrophone, FaPlus } from "react-icons/fa";
 import { withAlpha, darkenColor } from "@/lib/question-paper/colorHelpers";
 import DropZone from "./DropZone";
 import CoursePlannerUpload from "./CoursePlannerUpload";
-import CbseSchoolPanel from "./CbseSchoolPanel";
+import CbseSchoolPanel from "@/school/CbseSchoolPanel";
+import { SECTION_PALETTE } from "@/lib/question-paper/sectionPalette";
+import { COLLEGE, examTypesFor } from "@/institute/instituteKind";
 import { useEffect, useState } from "react";
 
 // crypto.randomUUID() only exists in secure contexts (HTTPS/localhost) —
@@ -68,16 +70,6 @@ const BLOOM_OPTIONS = [
   { label: "L6 – Create",     value: 6 },
 ];
 
-// Section palette — cycles for new sections
-const SECTION_PALETTE = [
-  { bg: "rgba(99,102,241,0.12)",  text: "#6366f1" },
-  { bg: "rgba(16,185,129,0.12)",  text: "#10b981" },
-  { bg: "rgba(245,158,11,0.12)",  text: "#f59e0b" },
-  { bg: "rgba(239,68,68,0.12)",   text: "#ef4444" },
-  { bg: "rgba(59,130,246,0.12)",  text: "#3b82f6" },
-  { bg: "rgba(168,85,247,0.12)",  text: "#a855f7" },
-];
-
 export function getDefaultSections() {
   return [
     { id: genId(), label: "Section A", bloomLevels: [1, 2], percent: 30 },
@@ -110,6 +102,7 @@ export default function InputStage({
   setSubjectNameInput,
   examType,
   setExamType,
+  examTypes = examTypesFor(COLLEGE),     // a school's exam types differ from a college's
   totalMarks,
   setTotalMarks,
   duration,
@@ -149,7 +142,7 @@ export default function InputStage({
   );
 
   // Validation: all sections > 0 AND total === 100
-  // A CBSE blueprint fixes the sections itself, so the percentage check only applies to hand-made sections.
+  // A CBSE blueprint has its own section editor (counts and marks), so the percentage check only applies to hand-made sections.
   const cbseLocked = !!cbse?.presetKey;
   const sectionPercentValid =
     cbseLocked ||
@@ -212,13 +205,7 @@ export default function InputStage({
       isSelect: true,
       value:    examType,
       onChange: (e) => setExamType(e.target.value),
-      options: [
-        "End Semester Examination",
-        "Mid Semester Examination",
-        "Unit Test",
-        "Quiz",
-        "Internal Assessment",
-      ],
+      options: examTypes,
     },
     {
       label:    t("totalMarks"),
@@ -226,7 +213,6 @@ export default function InputStage({
       type:     "number",
       value:    totalMarks,
       onChange: (e) => setTotalMarks(Number(e.target.value)),
-      disabled: cbseLocked,
       min:      10,
       max:      500,
     },
@@ -235,7 +221,6 @@ export default function InputStage({
       isSelect: true,
       value:    duration,
       onChange: (e) => setDuration(e.target.value),
-      disabled: cbseLocked,
       options:  ["1 Hour", "1.5 Hours", "2 Hours", "2.5 Hours", "3 Hours"],
     },
     {
@@ -252,7 +237,8 @@ export default function InputStage({
   // ── Generate guard ─────────────────────────────────────────────────────────
   const canGenerate =
     (inputMode === "pdf" ? !!uploadedFile : !!prompt.trim()) &&
-    sectionPercentValid;
+    sectionPercentValid &&
+    !cbse?.problem;
 
   return (
     <>
@@ -415,8 +401,16 @@ export default function InputStage({
             blueprints={cbse.blueprints}
             classLevel={cbse.classLevel}
             presetKey={cbse.presetKey}
+            custom={cbse.custom}
             onClassChange={cbse.onClassChange}
             onPresetChange={cbse.onPresetChange}
+            layout={cbse.layout}
+            onLayoutChange={cbse.onLayoutChange}
+            total={totalMarks}
+            duration={duration}
+            customised={cbse.customised}
+            problem={cbse.problem}
+            onReset={cbse.onReset}
           />
         )}
 

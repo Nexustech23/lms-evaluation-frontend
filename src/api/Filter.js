@@ -181,6 +181,7 @@ export const useFacultySubjects =
     department_id,
     batch_id,
     semester,
+    anySemester = false,   // a school has no semester step: list the class's subjects from the batch alone
   }) => {
 
     return useQuery({
@@ -189,6 +190,7 @@ export const useFacultySubjects =
         "faculty-subjects",
         batch_id,
         semester,
+        anySemester,
       ],
 
       queryFn: () =>
@@ -201,7 +203,7 @@ export const useFacultySubjects =
         }),
 
       enabled:
-        !!semester,
+        !!semester || (anySemester && !!batch_id),
 
       staleTime:
         1000 * 60 * 10,

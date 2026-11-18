@@ -9,6 +9,7 @@ import toast from "react-hot-toast";
 import { useTranslations } from "next-intl";
 import { useContext } from "react";
 import { AuthContext } from "@/app/AuthContext";
+import useInstitute from "@/institute/useInstitute";
 import { fmt2 } from "@/lib/utils";
 
 /* =========================================================
@@ -40,6 +41,15 @@ const GRADE_STYLES = {
   C: { bg: "rgba(249,115,22,0.12)", color: "#ea580c" },
   D: { bg: "rgba(239,68,68,0.13)", color: "#b91c1c" },
   U: { bg: "rgba(239,68,68,0.13)", color: "#b91c1c" },
+  // A school's CBSE nine-point scale
+  A1: { bg: "rgba(34,197,94,0.14)", color: "#15803d" },
+  A2: { bg: "rgba(34,197,94,0.12)", color: "#16a34a" },
+  B1: { bg: "rgba(234,179,8,0.14)", color: "#a16207" },
+  B2: { bg: "rgba(234,179,8,0.12)", color: "#b45309" },
+  C1: { bg: "rgba(249,115,22,0.14)", color: "#c2410c" },
+  C2: { bg: "rgba(249,115,22,0.12)", color: "#ea580c" },
+  E1: { bg: "rgba(239,68,68,0.13)", color: "#b91c1c" },
+  E2: { bg: "rgba(239,68,68,0.13)", color: "#b91c1c" },
 };
 
 function GradeBadge({ grade }) {
@@ -203,6 +213,7 @@ function SemesterGrid({ semesters, onSelect, color }) {
    SUBJECTS LIST  (click one to see results)
 ========================================================= */
 function SubjectsList({ subjects, color, loading, onSelectSubject }) {
+  const { isSchool } = useInstitute();      // a school's subject cards show no semester
   const [hovered, setHovered] = useState(null);
 
   if (loading) {
@@ -260,12 +271,14 @@ function SubjectsList({ subjects, color, loading, onSelectSubject }) {
               >
                 {sub.batch_name}
               </span>
-              <span
+              {!isSchool && (
+<span
                 className="text-xs font-medium px-2 py-0.5 rounded-full"
                 style={{ backgroundColor: withAlpha(color, 0.12), color: darkenColor(color) }}
               >
                 Sem {sub.semester}
               </span>
+)}
             </div>
 
             <p className="text-xs font-semibold mt-3" style={{ color: darkenColor(color) }}>
@@ -679,6 +692,7 @@ function StudentResultsGrid({ data, color, loading }) {
 export default function SavedResult() {
   const router = useRouter();
   const { user } = useContext(AuthContext);
+  const { isSchool, word } = useInstitute();      // a school has classes, not semesters: no semester step
   const color = user?.color || "#ff7f10";
   const t = useTranslations("courseOutcomePage");
 
@@ -796,6 +810,24 @@ export default function SavedResult() {
     }
   };
 
+  // A school's class holds all its subjects in one hidden semester: list them straight from the class.
+  const loadClassSubjects = async (batch) => {
+    setLoading(true);
+    try {
+      const params = { page: 1, limit: 0, batch_id: batch.id };
+      if (selectedSchool) params.school_id = selectedSchool.id;
+      if (selectedProgramme) params.programme_id = selectedProgramme.id;
+      if (selectedDepartment) params.department_id = selectedDepartment.id;
+      const res = await axios.get(`/api/subjects/institute`, { params, withCredentials: true });
+      setSubjects(res.data.subjects || []);
+      setStep("subjects");
+    } catch {
+      toast.error("Failed to load subjects");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSelectBatch = (batch) => {
     setSelectedBatch(batch);
     const allSemesters = [...new Set(batch.semesters || [])].sort((a, b) => a - b);
@@ -804,6 +836,10 @@ export default function SavedResult() {
       ...prev.filter((t) => t.step !== "batch" && t.step !== "semester"),
       { label: batch.batch_name, step: "batch" },
     ]);
+    if (isSchool) {
+      loadClassSubjects(batch);
+      return;
+    }
     setStep("semester");
   };
 
@@ -895,7 +931,7 @@ export default function SavedResult() {
     } else if (target.step === "batch") {
       setResultsData(null);
       setSelectedSemester(null);
-      setStep("semester");
+      setStep(isSchool ? "subjects" : "semester");
       setTrail(trail.slice(0, trail.findIndex((t) => t.step === "batch") + 1));
     } else if (target.step === "semester") {
       setResultsData(null);
@@ -909,9 +945,9 @@ export default function SavedResult() {
     school: "Select a School",
     programme: "Select a Programme",
     department: "Select a Department",
-    batch: "Select a Batch",
+    batch: isSchool ? "Select a Class" : "Select a Batch",
     semester: "Select a Semester",
-    subjects: `Subjects — Semester ${selectedSemester}`,
+    subjects: isSchool ? `Subjects — ${selectedBatch?.batch_name || "Class"}` : `Subjects — Semester ${selectedSemester}`,
     student_results: resultsData
       ? `${resultsData.subject?.subject_name} — Results`
       : "Results",

@@ -5,12 +5,14 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useTranslations } from "next-intl";
 import { AuthContext } from "@/app/AuthContext";
+import useInstitute from "@/institute/useInstitute";
 import { withAlpha } from "@/lib/question-paper/colorHelpers";
 import Navbar from "@/components/ui/Navbar";
 import { IconTrash, IconEdit, IconEye, IconPercentage, IconScoreboard } from "@tabler/icons-react";
 import { Eye, Download, Search, Settings, MoreVertical, ChevronLeft, ChevronRight, Upload } from "lucide-react";
 export default function ResultPage() {
   const { user } = useContext(AuthContext);
+  const { isSchool } = useInstitute();      // a school has classes, not semesters
   const color = user?.color || "#ff7f10";
   const t = useTranslations("faculty");
 
@@ -91,7 +93,9 @@ export default function ResultPage() {
           <thead>
             <tr style={{ backgroundColor: `${color}20` }} className="text-left">
               <th className="px-4 py-4 font-bold text-black">S.No</th>
-              <th className="px-4 py-4 font-bold text-black">Semester</th>
+              {!isSchool && (
+<th className="px-4 py-4 font-bold text-black">Semester</th>
+)}
               <th className="px-4 py-4 font-bold text-black">Subject Code</th>
               <th className="px-4 py-4 font-bold text-black">Subject Name</th>
               <th className="px-4 py-4 font-bold text-black">Subject Type</th>
@@ -104,11 +108,13 @@ export default function ResultPage() {
             {subjects.map((sub, index) => (
               <tr key={sub._id} className="border-t border-gray-200 transition hover:bg-gray-50">
                 <td className="px-4 py-5 text-gray-400">{index + 1}</td>
-                <td className="px-4 py-5">
+                {!isSchool && (
+<td className="px-4 py-5">
                   <span className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-medium text-blue-600">
                     {sub.semester}
                   </span>
                 </td>
+)}
                 <td className="px-4 py-5">
                   <span
                     className="rounded-full px-3 py-1 text-xs font-semibold"

@@ -6,6 +6,7 @@ import React, {
 } from "react";
 
 import { AuthContext } from "@/app/AuthContext";
+import useInstitute from "@/institute/useInstitute";
 
 import { useTranslations } from "next-intl";
 
@@ -106,6 +107,9 @@ export default function Filters({
 }) {
   const { user } =
     useContext(AuthContext);
+
+  // A school has classes, not semesters: no semester step, and its batch is called a class.
+  const { isSchool, word } = useInstitute();
 
   const t = useTranslations(
     "filters"
@@ -212,6 +216,8 @@ export default function Filters({
 
     semester:
       filters.selectedSemester,
+
+    anySemester: isSchool,
   });
 
   /* =========================================================
@@ -430,7 +436,7 @@ export default function Filters({
     {
       key: "selectedBatch",
 
-      label: ts("batch"),
+      label: isSchool ? word("batch") : ts("batch"),
 
       value:
         filters.selectedBatch,
@@ -444,22 +450,26 @@ export default function Filters({
         o.id,
     },
 
-    {
-      key:
-        "selectedSemester",
+    ...(isSchool
+      ? []
+      : [
+          {
+            key:
+              "selectedSemester",
 
-      label:
-        ts("semester"),
+            label:
+              ts("semester"),
 
-      value:
-        filters.selectedSemester,
+            value:
+              filters.selectedSemester,
 
-      options: semesters,
+            options: semesters,
 
-      getLabel: (o) => o,
+            getLabel: (o) => o,
 
-      getValue: (o) => o,
-    },
+            getValue: (o) => o,
+          },
+        ]),
 
     {
       key:
@@ -533,7 +543,7 @@ export default function Filters({
         </button>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+      <div className={`grid grid-cols-2 md:grid-cols-3 ${isSchool ? "lg:grid-cols-5" : "lg:grid-cols-6"} gap-3`}>
         {selectFields.map(({
           key,
           label,

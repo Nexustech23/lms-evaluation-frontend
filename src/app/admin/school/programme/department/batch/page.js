@@ -10,6 +10,7 @@ import { IconCopy, IconEdit, IconTrash } from "@tabler/icons-react";
 import { useTranslations } from "next-intl";
 import { useContext } from "react";
 import { AuthContext } from "@/app/AuthContext";
+import useInstitute from "@/institute/useInstitute";
 
 export default function BatchPage() {
 
@@ -37,6 +38,8 @@ const [pagination, setPagination] = useState({
   const [isDuplicate, setIsDuplicate] = useState(false);
   const [subjectsToBeDeleted, setSubjectsToBeDeleted] = useState([]);
   const { user ,isLoading} = useContext(AuthContext);
+  // A school sets up a class, not semesters: the class holds all its subjects in one hidden semester (number 1).
+  const { isSchool, word } = useInstitute();
   const [showDeleteModal,setShowDeleteModal] = useState(false);
 
   const t = useTranslations("programmeBatch");
@@ -166,7 +169,9 @@ useEffect(() => {
     setIsDuplicate(false);
     setSelectedBatch(null);
     setSubjectsToBeDeleted([]);
-    setBatchData({ batch_name: "", total_semesters: "", semesters: [] });
+    setBatchData(isSchool
+      ? { batch_name: "", total_semesters: 1, semesters: [{ semester_number: 1, subjects: [{ subject_name: "", subject_code: "", credits: "", faculty_id: "" }] }] }
+      : { batch_name: "", total_semesters: "", semesters: [] });
     setShowModal(true);
   };
 
@@ -508,8 +513,10 @@ const handlePrev = () => {
               <thead>
                 <tr className="bg-gray-50 border-b text-left">
                   <th className="px-5 py-3 text-gray-500 font-semibold">{t("batch_sno")}</th>
-                  <th className="px-5 py-3 text-gray-500 font-semibold">{t("batch_name")}</th>
-                  <th className="px-5 py-3 text-gray-500 font-semibold">{t("batch_semesters")}</th>
+                  <th className="px-5 py-3 text-gray-500 font-semibold">{isSchool ? word("batch") : t("batch_name")}</th>
+                  {!isSchool && (
+<th className="px-5 py-3 text-gray-500 font-semibold">{t("batch_semesters")}</th>
+)}
                   <th className="px-5 py-3 text-gray-500 font-semibold text-center">{t("batch_actions")}</th>
                 </tr>
               </thead>
@@ -523,12 +530,14 @@ const handlePrev = () => {
     1}
 </td>
                     <td className="px-5 py-4 font-semibold text-gray-800">{b.batch_name}</td>
-                    <td className="px-5 py-4">
+                    {!isSchool && (
+<td className="px-5 py-4">
                       <span className={`px-2.5 py-1 border ${user?.color?"bg-green-50 border-green-200":"bg-orange-50 border-orange-200"} rounded-full text-xs font-semibold`}
                       style={{color: user?.color || "#ff7f10"}}>
                         {b.total_semesters} {t("semester")}
                       </span>
                     </td>
+)}
                     <td className="px-5 py-4">
                       <div className="flex items-center justify-center gap-3">
 
@@ -781,10 +790,10 @@ const handlePrev = () => {
               {/* Batch Name */}
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t("batch_name")} <span className="text-red-500">*</span>
+                  {isSchool ? "Class name" : t("batch_name")} <span className="text-red-500">*</span>
                 </label>
                 <input
-                  placeholder="e.g. 2024-2028"
+                  placeholder={isSchool ? "e.g. Class 12" : "e.g. 2024-2028"}
                   value={batchData.batch_name}
                   onChange={(e) => setBatchData({ ...batchData, batch_name: e.target.value })}
                   className={`w-full p-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 ${user?.color?"focus:ring-green-300":"focus:ring-orange-300"} ${isDuplicate ? "border-blue-300 bg-blue-50" : ""
@@ -809,13 +818,14 @@ const handlePrev = () => {
                   <div key={semIndex} className="border border-gray-200 rounded-xl mb-4 overflow-hidden">
 
                     {/* Semester Header */}
+{!(isSchool && batchData.semesters.length === 1) && (
                     <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b">
                       <div className="flex items-center gap-2">
                         <span className="w-7 h-7 text-white rounded-full flex items-center justify-center text-xs font-bold" style={{backgroundColor: user?.color || "#ff7f10"}}>
                           {semester.semester_number}
                         </span>
                         <span className="font-semibold text-gray-700 text-sm">
-                          {t("semester")} {semester.semester_number}
+                          {isSchool ? "Term" : t("semester")} {semester.semester_number}
                         </span>
                         <span className="text-xs text-gray-400">
                           · {semester.subjects.length} subject{semester.subjects.length !== 1 ? "s" : ""}
@@ -828,6 +838,7 @@ const handlePrev = () => {
                         {t("remove")}
                       </button>
                     </div>
+)}
 
                     {/* Subjects */}
                     <div className="p-4 space-y-2">
@@ -901,12 +912,14 @@ const handlePrev = () => {
                 ))
               )}
 
-              <button
+              {!isSchool && (
+<button
                 onClick={addSemester}
                 className={`w-full py-2.5 border-2 border-dashed ${user?.color?"border-green-300 text-green-600 hover:bg-green-50":"border-orange-300 text-orange-600 hover:bg-orange-50"} rounded-xl text-sm font-medium transition`}
               >
                 {t("add_semester")}
               </button>
+)}
 
             </div>
 

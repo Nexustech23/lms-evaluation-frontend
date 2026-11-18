@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 
 import { AuthContext } from "@/app/AuthContext";
+import useInstitute from "@/institute/useInstitute";
 
 const data = [
   { name: "Electronics", value: 72 },
@@ -38,6 +39,7 @@ const Dashboard = () => {
   const t = useTranslations("dashboard");
 
   const { user } = useContext(AuthContext);
+  const { isSchool } = useInstitute();      // a school has classes, not semesters
 
   const [showNotifications, setShowNotifications] = useState(false);
 
@@ -330,7 +332,8 @@ const Dashboard = () => {
           <div className="lg:col-span-3 space-y-6">
 
             {/* SEMESTERS */}
-            <div className="bg-white border border-white/30 rounded-[32px] p-6 shadow-xl">
+            {!isSchool && (
+<div className="bg-white border border-white/30 rounded-[32px] p-6 shadow-xl">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-gray-900">
                   Your Semesters
@@ -371,6 +374,7 @@ const Dashboard = () => {
                 ))}
               </div>
             </div>
+)}
 
             {/* TIMETABLE */}
             <div className="bg-white border border-white/30 rounded-[32px] shadow-xl overflow-hidden">

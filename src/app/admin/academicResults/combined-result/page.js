@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import Navbar from "@/components/ui/Navbar";
 import { useTranslations } from "next-intl";
 import { AuthContext } from "@/app/AuthContext";
+import useInstitute from "@/institute/useInstitute";
 import {
     Award,
     BookOpen,
@@ -91,6 +92,15 @@ const GRADE_STYLES = {
     C: { bg: "rgba(249,115,22,0.12)", color: "#ea580c" },
     D: { bg: "rgba(239,68,68,0.13)", color: "#b91c1c" },
     U: { bg: "rgba(239,68,68,0.13)", color: "#b91c1c" },
+    // A school's CBSE nine-point scale
+    A1: { bg: "rgba(34,197,94,0.14)", color: "#15803d" },
+    A2: { bg: "rgba(34,197,94,0.12)", color: "#16a34a" },
+    B1: { bg: "rgba(234,179,8,0.14)", color: "#a16207" },
+    B2: { bg: "rgba(234,179,8,0.12)", color: "#b45309" },
+    C1: { bg: "rgba(249,115,22,0.14)", color: "#c2410c" },
+    C2: { bg: "rgba(249,115,22,0.12)", color: "#ea580c" },
+    E1: { bg: "rgba(239,68,68,0.13)", color: "#b91c1c" },
+    E2: { bg: "rgba(239,68,68,0.13)", color: "#b91c1c" },
 };
 
 function GradeBadge({ grade }) {
@@ -128,13 +138,14 @@ function SummaryMetric({ label, value, icon: Icon, color = "#7f1d1d" }) {
 }
 
 function ExportActions({ color, batchId, semester }) {
+    const { isSchool } = useInstitute();
     const [exporting, setExporting] = useState(false);
     const buttonClass =
         "inline-flex items-center justify-center gap-2 rounded-lg border bg-white px-4 py-2 text-sm font-semibold shadow-sm transition hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-60";
 
     const handleExportExcel = async () => {
         if (!batchId || !semester) {
-            toast.error("Please select batch and semester");
+            toast.error(isSchool ? "Please select a class" : "Please select batch and semester");
             return;
         }
 
@@ -168,7 +179,7 @@ function ExportActions({ color, batchId, semester }) {
 
     const handlePrintResult = () => {
         if (!batchId || !semester) {
-            toast.error("Please select batch and semester");
+            toast.error(isSchool ? "Please select a class" : "Please select batch and semester");
             return;
         }
 
@@ -339,6 +350,7 @@ function FiltersBar({
     searching,
     color,
 }) {
+    const { isSchool, word } = useInstitute();      // a school has classes, not semesters
     return (
         <div
             className="mb-6 flex flex-col gap-4 rounded-xl border p-4 sm:flex-row sm:items-end sm:flex-wrap"
@@ -382,7 +394,7 @@ function FiltersBar({
             )}
 
             <FilterSelect
-                label="Batch"
+                label={isSchool ? word("batch") : "Batch"}
                 value={selected.batch}
                 onChange={onSelectBatch}
                 options={batches}
@@ -392,16 +404,18 @@ function FiltersBar({
                 color={color}
             />
 
+{(!isSchool || semesters.length > 1) && (
             <FilterSelect
-                label="Semester"
+                label={isSchool ? "Term" : "Semester"}
                 value={selected.semester}
                 onChange={onSelectSemester}
-                options={semesters.map((s) => ({ id: s, name: `Semester ${s}` }))}
+                options={semesters.map((s) => ({ id: s, name: `${isSchool ? "Term" : "Semester"} ${s}` }))}
                 getLabel={(s) => s.name}
                 getValue={(s) => s.id}
                 disabled={!selected.batch}
                 color={color}
             />
+)}
 
             <button
                 onClick={onSearch}
@@ -656,6 +670,7 @@ function ResultTable({ rows, subjects, color, selected }) {
 
 export default function CombinedResult() {
     const { user } = useContext(AuthContext);
+    const { isSchool } = useInstitute();
     const color = user?.color || "#ff7f10";
     const t = useTranslations("combinedResult");
 
@@ -788,6 +803,8 @@ export default function CombinedResult() {
 
         const allSemesters = [...new Set(batchObj?.semesters || [])].sort((a, b) => a - b);
         setSemesters(allSemesters);
+        // a school's class has one hidden semester: select it so the results load without a picker
+        if (isSchool && allSemesters.length === 1) setSelected((prev) => ({ ...prev, semester: allSemesters[0] }));
     };
 
     const handleSelectSemester = (sem) => {
@@ -800,7 +817,7 @@ export default function CombinedResult() {
 
     const handleSearch = async () => {
         if (!selected.batch || !selected.semester) {
-            toast.error("Please select batch and semester");
+            toast.error(isSchool ? "Please select a class" : "Please select batch and semester");
             return;
         }
 

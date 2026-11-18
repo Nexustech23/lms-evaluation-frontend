@@ -14,9 +14,11 @@ import {
   Upload,
 } from "lucide-react";
 import { AuthContext } from "@/app/AuthContext";
+import useInstitute from "@/institute/useInstitute";
 
 const AcademicsPage = () => {
   const { user } = useContext(AuthContext);
+  const { isSchool } = useInstitute();      // a school has classes, not semesters
   const themeColor = user?.color || "#ff7f10";
 
   const [activeTab, setActiveTab] = useState("Notes");
@@ -96,6 +98,7 @@ const AcademicsPage = () => {
       selectedSubject === "all" || item.subject_id === selectedSubject;
 
     const matchesSemester =
+      isSchool ||
       selectedSemester === "All Semesters" ||
       String(item.semester) === selectedSemester.replace("Semester ", "");
 
@@ -279,7 +282,8 @@ const AcademicsPage = () => {
                 </button>
               </div>
 
-              <div className="relative border px-2 py-1 rounded-xl">
+              {!isSchool && (
+<div className="relative border px-2 py-1 rounded-xl">
                 <span className="absolute text-sm top-[-10px] left-[8px] bg-white px-2">
                   Filters
                 </span>
@@ -295,6 +299,7 @@ const AcademicsPage = () => {
                   ))}
                 </select>
               </div>
+)}
             </div>
           </div>
         </div>
@@ -349,8 +354,8 @@ const AcademicsPage = () => {
                   )}
 
                   <p className="text-xs text-gray-400 mb-3">
-                    Semester {item.semester}
-                    {item.total_marks ? ` | ${item.total_marks} marks` : ""}
+                    {!isSchool && `Semester ${item.semester}`}
+                    {item.total_marks ? `${isSchool ? "" : " | "}${item.total_marks} marks` : ""}
                   </p>
 
                   {item.due_date && (

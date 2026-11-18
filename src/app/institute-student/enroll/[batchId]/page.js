@@ -17,6 +17,7 @@ import {
 import Navbar from "@/components/ui/Navbar";
 
 import { AuthContext } from "@/app/AuthContext";
+import useInstitute from "@/institute/useInstitute";
 
 import toast from "react-hot-toast";
 
@@ -28,6 +29,7 @@ export default function SubjectsSemesterPagePreview() {
 
   const { user } =
     useContext(AuthContext);
+  const { isSchool } = useInstitute();      // a school's class has no semester to show
 
   const params = useParams();
 
@@ -179,7 +181,7 @@ export default function SubjectsSemesterPagePreview() {
     >
 
       <Navbar
-        title={`Semester ${selectedSemester}`}
+        title={isSchool ? "Subjects of your class" : `Semester ${selectedSemester}`}
       />
 
       <div className="flex-1 px-6 pb-8">
@@ -226,7 +228,7 @@ export default function SubjectsSemesterPagePreview() {
                 text-white
               "
             >
-              Semester {selectedSemester}
+              {isSchool ? "Subjects of your class" : `Semester ${selectedSemester}`}
             </h1>
 
             <p

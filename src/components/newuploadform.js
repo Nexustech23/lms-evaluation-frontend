@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 import { examDateTimeInput } from "@/lib/examDateTime";
 
 import { AuthContext } from "@/app/AuthContext";
+import useInstitute from "@/institute/useInstitute";
 
 import { useTranslations } from "next-intl";
 
@@ -294,6 +295,8 @@ function CustomSelect({
 ───────────────────────────────────────────────────── */
 export function ExamDetailsForm() {
   const { user } = useContext(AuthContext);
+  // A school has classes, not semesters: no semester field, and the subject decides the (hidden) semester.
+  const { isSchool, word } = useInstitute();
   const params = useParams();
   const folderId = params?.examId || null;
   const isEditMode = Boolean(folderId);
@@ -359,6 +362,7 @@ export function ExamDetailsForm() {
     department_id: selectedDepartment?.id,
     batch_id: selectedBatch?.id,
     semester: selectedSemester,
+    anySemester: isSchool,
   });
 
   /* =========================================================
@@ -662,7 +666,7 @@ export function ExamDetailsForm() {
 
                   {/* Batch */}
                   <LabelInputContainer error={fieldErrors.batch} touched={touchedFields.batch}>
-                    <Label>{ts("batch")} <span className="text-red-500">*</span></Label>
+                    <Label>{isSchool ? word("batch") : ts("batch")} <span className="text-red-500">*</span></Label>
                     <CustomSelect
                       placeholder={t("selectBatch")}
                       disabled={hasDepartment ? !selectedDepartment : !selectedProgramme}
@@ -682,7 +686,7 @@ export function ExamDetailsForm() {
                     {fieldErrors.batch && <p className="text-sm text-red-500 mt-1">{fieldErrors.batch}</p>}
                   </LabelInputContainer>
 
-                  {/* Semester */}
+                  {!isSchool && (
                   <LabelInputContainer error={fieldErrors.semester} touched={touchedFields.semester}>
                     <Label>{ts("semester")} <span className="text-red-500">*</span></Label>
                     <CustomSelect
@@ -702,13 +706,14 @@ export function ExamDetailsForm() {
                     />
                     {fieldErrors.semester && <p className="text-sm text-red-500 mt-1">{fieldErrors.semester}</p>}
                   </LabelInputContainer>
+)}
 
                   {/* Subject */}
                   <LabelInputContainer error={fieldErrors.subject_id} touched={touchedFields.subject_id}>
                     <Label>{ts("subject")} <span className="text-red-500">*</span></Label>
                     <CustomSelect
                       placeholder={t("selectSubject")}
-                      disabled={!selectedSemester}
+                      disabled={isSchool ? !selectedBatch : !selectedSemester}
                       value={selectedSubject?._id || selectedSubject?.id || ""}
                       error={!!fieldErrors.subject_id}
                       options={filteredSubjects.map((s) => ({
@@ -728,6 +733,8 @@ export function ExamDetailsForm() {
                           subject_id:  sub?._id  || sub?.id   || "",
                           subjectname: sub?.subject_name || sub?.name  || "",
                           subjectcode: sub?.subject_code || sub?.code  || "",
+                          // a school has no semester field: the chosen subject carries its (hidden) semester
+                          ...(isSchool ? { semester: String(sub?.semester ?? "") } : {}),
                         }));
                       }}
                     />
@@ -895,8 +902,8 @@ export function ExamDetailsForm() {
               <p><strong>{ts("school")}:</strong> {selectedSchool?.name}</p>
               <p><strong>{ts("programme")}:</strong> {selectedProgramme?.name}</p>
               <p><strong>{ts("department")}:</strong> {selectedDepartment?.name}</p>
-              <p><strong>{ts("batch")}:</strong> {selectedBatch?.name}</p>
-              <p><strong>{ts("semester")}:</strong> {formData.semester}</p>
+              <p><strong>{isSchool ? word("batch") : ts("batch")}:</strong> {selectedBatch?.name}</p>
+              {!isSchool && <p><strong>{ts("semester")}:</strong> {formData.semester}</p>}
               <p><strong>{ts("subject")}:</strong> {formData.subjectname}{formData.subjectcode ? ` (${formData.subjectcode})` : ""}</p>
               <p><strong>{tcq("examType")}:</strong> {formData.examtype}</p>
               <p><strong>{td("examDate")}:</strong> {formData.examdate ? new Date(formData.examdate).toLocaleString() : "—"}</p>

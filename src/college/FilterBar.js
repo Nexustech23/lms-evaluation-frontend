@@ -1,8 +1,9 @@
 "use client";
-import { withAlpha, darkenColor } from "@/lib/question-paper/colorHelpers";
+import FilterShell from "@/components/question-paper/FilterShell";
 
 /**
- * Cascading filter bar: School → Programme → [Department] → Batch → Semester → Subject
+ * College filter bar (semester based): School → Programme → [Department] → Batch → Semester → Subject.
+ * Schools have classes, not semesters, and use their own filter in src/school.
  * Department is skipped automatically for batch-based programmes (no real departments).
  *
  * Props:
@@ -41,9 +42,6 @@ export default function FilterBar({
   labelMap,   // { school, programme, department, batch, semester, subject }
   clearLabel,
 }) {
-  const selCls =
-    "p-2 border rounded text-sm disabled:bg-gray-50 disabled:text-gray-400 outline-none transition bg-white";
-
   // ✅ "null" id = backend placeholder meaning no real department exists
   const hasDepartments =
     departments.length > 0 && !departments.every((d) => d.id === "null");
@@ -103,50 +101,14 @@ export default function FilterBar({
   ];
 
   return (
-    <div
-      className="mb-5 rounded-xl p-4"
-      style={{
-        backgroundColor: withAlpha(color, 0.05),
-        border: `1px solid ${withAlpha(color, 0.15)}`,
-      }}
-    >
-      <div className="flex items-center justify-between mb-3">
-        <p className="text-sm font-medium text-gray-500">
-          {filterNote}
-          <span className="text-gray-400 font-normal ml-1">{filterHint}</span>
-        </p>
-      </div>
-
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
-        {dropdowns.map(({ label, value, disabled, options, onChange }) => (
-          <select
-            key={label}
-            className={selCls}
-            value={value}
-            disabled={disabled || loadingSubjects}
-            onChange={(e) => onChange(e.target.value)}
-            style={{ borderColor: withAlpha(color, 0.3), color: darkenColor(color) }}
-          >
-            <option value="">{label}</option>
-            {options.map((o) => (
-              <option key={o.id} value={o.id}>
-                {o.name}
-              </option>
-            ))}
-          </select>
-        ))}
-
-        {/* Clear button */}
-        <button
-          onClick={onClear}
-          className="px-3 py-2 rounded text-sm font-semibold transition"
-          style={{ backgroundColor: withAlpha(color, 0.12), color: darkenColor(color) }}
-          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = withAlpha(color, 0.22))}
-          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = withAlpha(color, 0.12))}
-        >
-          {clearLabel}
-        </button>
-      </div>
-    </div>
+    <FilterShell
+      color={color}
+      loadingSubjects={loadingSubjects}
+      dropdowns={dropdowns}
+      onClear={onClear}
+      filterNote={filterNote}
+      filterHint={filterHint}
+      clearLabel={clearLabel}
+    />
   );
 }
