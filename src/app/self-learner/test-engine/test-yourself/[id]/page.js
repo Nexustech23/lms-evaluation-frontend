@@ -353,7 +353,7 @@ export default function TestAttemptPage() {
     // PHASE: loading
     // ─────────────────────────────────────────────────────────────
     if (phase === "loading") return (
-        <div className="flex items-center justify-center h-screen" style={{ backgroundColor: color }}>
+        <div className="flex items-center justify-center h-screen" style={{ backgroundColor: "#F5F7FB" }}>
             <div className="bg-white rounded-2xl px-10 py-8 flex flex-col items-center gap-4 shadow-xl text-center max-w-xs w-full mx-4">
                 <Spinner />
                 <div>
@@ -374,7 +374,7 @@ export default function TestAttemptPage() {
     // PHASE: error
     // ─────────────────────────────────────────────────────────────
     if (phase === "error") return (
-        <div className="flex items-center justify-center h-screen" style={{ backgroundColor: color }}>
+        <div className="flex items-center justify-center h-screen" style={{ backgroundColor: "#F5F7FB" }}>
             <div className="bg-white rounded-2xl p-10 flex flex-col items-center gap-4 shadow-xl text-center max-w-sm">
                 <p className="text-4xl">⚠️</p>
                 <p className="text-lg font-bold text-gray-800">Test not found</p>
@@ -392,7 +392,7 @@ export default function TestAttemptPage() {
     // PHASE: briefing
     // ─────────────────────────────────────────────────────────────
     if (phase === "briefing") return (
-        <div className="flex items-center justify-center min-h-screen p-5" style={{ backgroundColor: color }}>
+        <div className="flex items-center justify-center min-h-screen p-5" style={{ backgroundColor: "#F5F7FB" }}>
             <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden">
 
                 <div className="px-6 py-5 text-center" style={{ borderBottom: "1.5px solid #f3f4f6" }}>
@@ -448,7 +448,7 @@ export default function TestAttemptPage() {
     // PHASE: submitting
     // ─────────────────────────────────────────────────────────────
     if (phase === "submitting") return (
-        <div className="flex items-center justify-center h-screen" style={{ backgroundColor: color }}>
+        <div className="flex items-center justify-center h-screen" style={{ backgroundColor: "#F5F7FB" }}>
             <div className="bg-white rounded-2xl p-12 flex flex-col items-center gap-4 shadow-xl text-center">
                 <Spinner />
                 <p className="text-lg font-semibold text-gray-700">Evaluating your answers…</p>
@@ -476,7 +476,7 @@ export default function TestAttemptPage() {
 
         return (
 
-            <div className="flex flex-col min-h-screen p-5" style={{ backgroundColor: color }}>
+            <div className="flex flex-col min-h-screen p-5" style={{ backgroundColor: "#F5F7FB" }}>
 
                 <div className="bg-white rounded-2xl shadow-xl max-w-3xl mx-auto w-full overflow-hidden">
 

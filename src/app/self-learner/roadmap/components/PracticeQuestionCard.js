@@ -64,7 +64,7 @@ export default function PracticeQuestionCard({ questions = [], onCompleteQuestio
           <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">
             Practice Sandbox
           </span>
-          <h3 className="text-sm font-bold text-[#1E1B4B] mt-0.5">
+          <h3 className="text-sm font-bold text-[#161F4C] mt-0.5">
             Question {currentIdx + 1} of {questions.length} ({q.type})
           </h3>
         </div>
@@ -74,7 +74,7 @@ export default function PracticeQuestionCard({ questions = [], onCompleteQuestio
       </div>
 
       {/* Question Statement */}
-      <div className="text-sm font-bold text-[#1E1B4B] leading-relaxed">
+      <div className="text-sm font-bold text-[#161F4C] leading-relaxed">
         {q.question}
       </div>
 
@@ -96,7 +96,7 @@ export default function PracticeQuestionCard({ questions = [], onCompleteQuestio
                 value={codeAnswer}
                 onChange={(e) => setCodeAnswer(e.target.value)}
                 placeholder="// Write your solution here...&#10;function solve() {&#10;  // code&#10;}"
-                className="w-full h-44 rounded-2xl border border-gray-200 bg-[#1E1B4B] p-4 text-xs font-mono text-gray-100 outline-none focus:ring-2 focus:ring-violet-400 resize-none"
+                className="w-full h-44 rounded-2xl border border-gray-200 bg-[#161F4C] p-4 text-xs font-mono text-gray-100 outline-none focus:ring-2 focus:ring-violet-400 resize-none"
               />
               <p className="text-[10px] font-semibold text-gray-400">
                 💡 Click &quot;Run Tests&quot; to execute your logic against the validation suite.
@@ -154,7 +154,7 @@ export default function PracticeQuestionCard({ questions = [], onCompleteQuestio
           q.type === "MCQ" ? (
             <button
               onClick={handleRevealAnswer}
-              className="flex items-center gap-1.5 bg-[#1E1B4B] hover:bg-[#1E1B4B]/95 text-white px-5 py-3 rounded-xl text-xs font-extrabold shadow-2xs transition-all duration-200"
+              className="flex items-center gap-1.5 bg-[#161F4C] hover:bg-[#161F4C]/95 text-white px-5 py-3 rounded-xl text-xs font-extrabold shadow-2xs transition-all duration-200"
             >
               <CheckCircle2 size={12} />
               Reveal Answer
@@ -172,7 +172,7 @@ export default function PracticeQuestionCard({ questions = [], onCompleteQuestio
         ) : (
           <button
             onClick={handleNext}
-            className="bg-[#FAFBFF] hover:bg-gray-100 text-[#1E1B4B] border border-gray-200 px-5 py-3 rounded-xl text-xs font-extrabold transition-all duration-200"
+            className="bg-[#FAFBFF] hover:bg-gray-100 text-[#161F4C] border border-gray-200 px-5 py-3 rounded-xl text-xs font-extrabold transition-all duration-200"
           >
             {currentIdx < questions.length - 1 ? "Next Question" : "Reset / Loop"}
           </button>

@@ -35,7 +35,7 @@ export default function RevisionPlanner({ initialFrequency = "Every Week" }) {
       
       {/* Header */}
       <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-        <h3 className="text-sm font-bold text-[#1E1B4B] flex items-center gap-1.5">
+        <h3 className="text-sm font-bold text-[#161F4C] flex items-center gap-1.5">
           <Calendar size={16} className="text-[#6C63FF]" />
           Revision Planner
         </h3>
@@ -59,7 +59,7 @@ export default function RevisionPlanner({ initialFrequency = "Every Week" }) {
         <select
           value={freq}
           onChange={(e) => setFreq(e.target.value)}
-          className="w-full border border-gray-200 rounded-xl bg-[#FAFBFF] p-2 text-xs text-[#1E1B4B] font-semibold outline-none cursor-pointer"
+          className="w-full border border-gray-200 rounded-xl bg-[#FAFBFF] p-2 text-xs text-[#161F4C] font-semibold outline-none cursor-pointer"
         >
           <option value="Every Day">Every Day</option>
           <option value="Every 2 Days">Every 2 Days</option>
@@ -81,7 +81,7 @@ export default function RevisionPlanner({ initialFrequency = "Every Week" }) {
             className={`py-1.5 px-2 rounded-lg text-[10px] font-bold text-center transition-all duration-200 ${
               activeTab === tab.id
                 ? "bg-white text-[#6C63FF] shadow-2xs font-extrabold"
-                : "text-gray-500 hover:text-[#1E1B4B]"
+                : "text-gray-500 hover:text-[#161F4C]"
             }`}
           >
             {tab.label}
@@ -107,7 +107,7 @@ export default function RevisionPlanner({ initialFrequency = "Every Week" }) {
             </div>
             
             <div className="flex-1">
-              <p className={`text-[11px] font-semibold leading-tight ${item.done ? "text-gray-400 line-through" : "text-[#1E1B4B]"}`}>
+              <p className={`text-[11px] font-semibold leading-tight ${item.done ? "text-gray-400 line-through" : "text-[#161F4C]"}`}>
                 {item.topic}
               </p>
               <span className="text-[9px] font-bold text-gray-400 block mt-1 uppercase flex items-center gap-1">

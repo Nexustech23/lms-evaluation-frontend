@@ -48,7 +48,7 @@ export default function RoadmapLevelCard({
             <span className="text-[11px] font-bold text-[#6C63FF] uppercase tracking-wider block">
               Stage {levelData.level}
             </span>
-            <h3 className="text-lg font-extrabold text-[#1E1B4B] mt-0.5">
+            <h3 className="text-lg font-extrabold text-[#161F4C] mt-0.5">
               {levelData.title}
             </h3>
             <p className="text-xs font-semibold text-gray-500 leading-relaxed mt-0.5">
@@ -72,7 +72,7 @@ export default function RoadmapLevelCard({
             </div>
           </div>
           <div className="text-right">
-            <span className="text-xs font-bold text-[#1E1B4B] block">
+            <span className="text-xs font-bold text-[#161F4C] block">
               {completedInLevel}/{totalSubtopics}
             </span>
             <span className="text-[9px] font-bold text-gray-400 uppercase block">
@@ -103,7 +103,7 @@ export default function RoadmapLevelCard({
                 <HelpCircle size={20} />
               </div>
               <div>
-                <h4 className="text-sm font-bold text-[#1E1B4B]">
+                <h4 className="text-sm font-bold text-[#161F4C]">
                   Stage {levelData.level} End Quiz
                 </h4>
                 <p className="text-xs font-semibold text-gray-500 mt-0.5">
@@ -125,7 +125,7 @@ export default function RoadmapLevelCard({
                   className={`flex items-center gap-1.5 px-5 py-3 rounded-xl text-xs font-extrabold shadow-2xs transition-all duration-200 ${
                     completedInLevel < totalSubtopics
                       ? "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed"
-                      : "bg-[#1E1B4B] hover:bg-[#1E1B4B]/95 text-white border border-transparent hover:scale-102"
+                      : "bg-[#161F4C] hover:bg-[#161F4C]/95 text-white border border-transparent hover:scale-102"
                   }`}
                 >
                   <PlayCircle size={14} />

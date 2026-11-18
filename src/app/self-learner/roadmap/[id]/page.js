@@ -54,7 +54,7 @@ export default function RoadmapDetailsPage() {
         <h3 className="text-lg font-black text-red-500">Roadmap Not Found</h3>
         <button
           onClick={() => router.push("/self-learner/roadmap")}
-          className="bg-[#1E1B4B] text-white px-5 py-2.5 rounded-xl font-bold text-xs"
+          className="bg-[#161F4C] text-white px-5 py-2.5 rounded-xl font-bold text-xs"
         >
           Return to List
         </button>
@@ -161,7 +161,7 @@ export default function RoadmapDetailsPage() {
           <button
             onClick={handleDownloadPdf}
             disabled={downloadingPdf}
-            className="flex items-center gap-1.5 bg-white border border-gray-200 text-[#1E1B4B] px-4 py-2 rounded-xl text-xs font-bold shadow-xs hover:border-[#6C63FF]/40 hover:text-[#6C63FF] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-1.5 bg-white border border-gray-200 text-[#161F4C] px-4 py-2 rounded-xl text-xs font-bold shadow-xs hover:border-[#6C63FF]/40 hover:text-[#6C63FF] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {downloadingPdf ? (
               <><Loader2 size={13} className="animate-spin" /> Preparing PDF…</>
@@ -194,13 +194,13 @@ export default function RoadmapDetailsPage() {
           <div className="lg:col-span-2 space-y-6">
 
             <div className="bg-[#F5F7FB] rounded-2xl">
-              <h3 className="text-sm font-black text-[#1E1B4B] uppercase tracking-wider mb-4 pl-1">
+              <h3 className="text-sm font-black text-[#161F4C] uppercase tracking-wider mb-4 pl-1">
                 Your Learning Journey
               </h3>
 
               {allWeeksCompleted && (
                 <div className="bg-white rounded-3xl border border-[#43C6AC]/30 shadow-xs p-6 text-center mb-4">
-                  <p className="text-sm font-black text-[#1E1B4B]">Roadmap Complete! 🎉</p>
+                  <p className="text-sm font-black text-[#161F4C]">Roadmap Complete! 🎉</p>
                   <p className="text-xs font-semibold text-gray-500 mt-1">
                     You've passed every week's quiz. Great work!
                   </p>
@@ -255,7 +255,7 @@ export default function RoadmapDetailsPage() {
                           />
                         </div>
 
-                        <h4 className="text-base font-black text-[#1E1B4B] mt-1 leading-snug">
+                        <h4 className="text-base font-black text-[#161F4C] mt-1 leading-snug">
                           {wk.title}
                         </h4>
 
@@ -314,7 +314,7 @@ export default function RoadmapDetailsPage() {
                                   e.stopPropagation();
                                   handleLaunchQuiz();
                                 }}
-                                className="flex items-center gap-1 px-4 py-2 rounded-xl text-[10px] font-extrabold shadow-2xs transition-all duration-200 hover:scale-102 bg-[#1E1B4B] text-white hover:bg-black"
+                                className="flex items-center gap-1 px-4 py-2 rounded-xl text-[10px] font-extrabold shadow-2xs transition-all duration-200 hover:scale-102 bg-[#161F4C] text-white hover:bg-black"
                               >
                                 Take Weekly Quiz
                               </button>
@@ -376,7 +376,7 @@ export default function RoadmapDetailsPage() {
             />
 
             <div className="bg-white rounded-3xl border border-gray-200 p-5 shadow-xs">
-              <h4 className="text-xs font-black text-[#1E1B4B] uppercase tracking-wider mb-4">
+              <h4 className="text-xs font-black text-[#161F4C] uppercase tracking-wider mb-4">
                 Quiz History
               </h4>
               {quizHistory.length === 0 ? (
@@ -399,7 +399,7 @@ export default function RoadmapDetailsPage() {
                         </span>
                       </div>
                       <div className="flex items-end justify-between mt-1">
-                        <span className="text-lg font-black text-[#1E1B4B]">{attempt.score}%</span>
+                        <span className="text-lg font-black text-[#161F4C]">{attempt.score}%</span>
                         <span className="text-[10px] font-bold text-gray-400">
                           {attempt.correctCount}/{attempt.totalQuestions} correct
                         </span>

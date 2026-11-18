@@ -61,7 +61,7 @@ export default function RoadmapStats({ stats, progress }) {
                   <Icon size={16} />
                 </div>
               </div>
-              <div className="text-lg md:text-xl font-extrabold text-[#1E1B4B] mt-2">
+              <div className="text-lg md:text-xl font-extrabold text-[#161F4C] mt-2">
                 {card.value}
               </div>
             </div>
@@ -73,7 +73,7 @@ export default function RoadmapStats({ stats, progress }) {
       <div className="bg-white rounded-3xl border border-gray-200 shadow-sm p-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
           <div>
-            <h3 className="text-sm font-bold text-[#1E1B4B] flex items-center gap-1.5">
+            <h3 className="text-sm font-bold text-[#161F4C] flex items-center gap-1.5">
               <Target size={18} className="text-[#6C63FF]" />
               Learning Progress Tracker
             </h3>
@@ -109,7 +109,7 @@ export default function RoadmapStats({ stats, progress }) {
               <span className="block text-[10px] font-bold text-gray-400 uppercase">
                 Topics Mastered
               </span>
-              <span className="text-xs font-bold text-[#1E1B4B]">
+              <span className="text-xs font-bold text-[#161F4C]">
                 {topicsCompleted} of {totalTopics} completed
               </span>
             </div>
@@ -123,7 +123,7 @@ export default function RoadmapStats({ stats, progress }) {
               <span className="block text-[10px] font-bold text-gray-400 uppercase">
                 Quizzes Passed
               </span>
-              <span className="text-xs font-bold text-[#1E1B4B]">
+              <span className="text-xs font-bold text-[#161F4C]">
                 {quizzesPassed} of {totalQuizzes} passed
               </span>
             </div>

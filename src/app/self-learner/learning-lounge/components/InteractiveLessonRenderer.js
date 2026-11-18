@@ -43,7 +43,7 @@ function LessonStart({ lesson }) {
             <Clock3 size={12} /> {lesson.mission.estimatedMinutes} minutes
           </span>
         </div>
-        <h4 className="mt-3 text-base font-black leading-relaxed text-[#1E1B4B]">{lesson.mission.goal}</h4>
+        <h4 className="mt-3 text-base font-black leading-relaxed text-[#161F4C]">{lesson.mission.goal}</h4>
         <p className="mt-2 text-xs font-medium leading-relaxed text-slate-600"><span className="font-black text-[#6C63FF]">Why it matters: </span>{lesson.mission.whyItMatters}</p>
         <div className="mt-4 grid gap-2 sm:grid-cols-2">
           {lesson.mission.successCriteria.map((criterion, index) => (
@@ -74,7 +74,7 @@ function LessonStart({ lesson }) {
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           {lesson.keyTerms.map((item, index) => (
             <div key={index} className="rounded-xl border border-blue-100 bg-white p-3">
-              <p className="text-xs font-black text-[#1E1B4B]">{item.term}</p>
+              <p className="text-xs font-black text-[#161F4C]">{item.term}</p>
               <p className="mt-1 text-xs font-medium leading-relaxed text-slate-600">{item.meaning}</p>
               {item.example && <p className="mt-2 text-[10px] font-semibold leading-relaxed text-blue-700">Example: {item.example}</p>}
             </div>
@@ -84,7 +84,7 @@ function LessonStart({ lesson }) {
 
       <section className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
         <div className="flex items-center gap-2 text-amber-700"><Lightbulb size={15} /><span className="text-[9px] font-black uppercase tracking-widest">Our anchor example</span></div>
-        <h4 className="mt-2 text-sm font-black text-[#1E1B4B]">{lesson.anchorExample.title}</h4>
+        <h4 className="mt-2 text-sm font-black text-[#161F4C]">{lesson.anchorExample.title}</h4>
         <p className="mt-2 text-xs font-medium leading-relaxed text-slate-700">{lesson.anchorExample.context}</p>
         <p className="mt-3 rounded-xl bg-white p-3 text-xs font-semibold leading-relaxed text-amber-900"><span className="font-black">Why this example: </span>{lesson.anchorExample.whyChosen}</p>
       </section>
@@ -129,7 +129,7 @@ function LessonFinish({ summary, mastery, onToggleMastery }) {
 function ReadableFallbackBlock({ block }) {
   const readableText = block.simpleExplanation || block.scenario || block.purpose || block.explanation;
   if (!readableText) return null;
-  return <section className="rounded-2xl border border-gray-200 bg-white p-5"><p className="text-[9px] font-black uppercase tracking-widest text-gray-400">Lesson section</p><h4 className="mt-1 text-sm font-black text-[#1E1B4B]">{block.title}</h4><p className="mt-2 text-xs font-medium leading-relaxed text-slate-600">{readableText}</p></section>;
+  return <section className="rounded-2xl border border-gray-200 bg-white p-5"><p className="text-[9px] font-black uppercase tracking-widest text-gray-400">Lesson section</p><h4 className="mt-1 text-sm font-black text-[#161F4C]">{block.title}</h4><p className="mt-2 text-xs font-medium leading-relaxed text-slate-600">{readableText}</p></section>;
 }
 
 export default function InteractiveLessonRenderer({ lesson, storageKey }) {
@@ -192,7 +192,7 @@ export default function InteractiveLessonRenderer({ lesson, storageKey }) {
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#6C63FF] text-white shadow-lg shadow-[#6C63FF]/20"><Sparkles size={18} /></div>
           <div>
             <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#6C63FF]">Guided English lesson · {lesson.domain}</p>
-            <h3 className="mt-1 text-base font-black text-[#1E1B4B]">{lesson.title}</h3>
+            <h3 className="mt-1 text-base font-black text-[#161F4C]">{lesson.title}</h3>
           </div>
         </div>
         <span className="shrink-0 text-xs font-black text-[#6C63FF]">{percent}%</span>
@@ -209,7 +209,7 @@ export default function InteractiveLessonRenderer({ lesson, storageKey }) {
       </nav>
 
       <div className="my-4 flex items-center justify-between gap-3 border-y border-[#6C63FF]/10 py-3">
-        <div><p className="text-[9px] font-black uppercase tracking-widest text-slate-400">Section {current + 1} of {sections.length}</p><p className="mt-0.5 text-xs font-black text-[#1E1B4B]">{section.title}</p></div>
+        <div><p className="text-[9px] font-black uppercase tracking-widest text-slate-400">Section {current + 1} of {sections.length}</p><p className="mt-0.5 text-xs font-black text-[#161F4C]">{section.title}</p></div>
         <p className="hidden text-[10px] font-semibold text-slate-400 sm:block">Complete one focused section at a time.</p>
       </div>
 
@@ -225,7 +225,7 @@ export default function InteractiveLessonRenderer({ lesson, storageKey }) {
       <div className="mt-5 flex justify-between gap-3 border-t border-[#6C63FF]/10 pt-4">
         <button type="button" onClick={() => goTo(Math.max(0, current - 1))} disabled={current === 0} className="flex items-center gap-1 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-xs font-black text-slate-600 disabled:opacity-40"><ChevronLeft size={14} /> Previous</button>
         {current < sections.length - 1 ? (
-          <button type="button" onClick={() => completeAndGo(current + 1)} className="flex items-center gap-1 rounded-xl bg-[#1E1B4B] px-5 py-2.5 text-xs font-black text-white">Complete &amp; continue <ChevronRight size={14} /></button>
+          <button type="button" onClick={() => completeAndGo(current + 1)} className="flex items-center gap-1 rounded-xl bg-[#161F4C] px-5 py-2.5 text-xs font-black text-white">Complete &amp; continue <ChevronRight size={14} /></button>
         ) : (
           <button type="button" onClick={() => completeAndGo(current)} className="flex items-center gap-1 rounded-xl bg-emerald-600 px-5 py-2.5 text-xs font-black text-white"><CheckCircle2 size={14} /> Finish lesson</button>
         )}

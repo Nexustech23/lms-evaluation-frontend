@@ -14,7 +14,7 @@ export default function ActivityShell({ icon, eyebrow, title, children, tone = "
         </div>
         <div className="min-w-0">
           <p className="text-[9px] font-black uppercase tracking-[0.18em] opacity-75">{eyebrow}</p>
-          <h4 className="text-sm font-black text-[#1E1B4B] mt-0.5">{title}</h4>
+          <h4 className="text-sm font-black text-[#161F4C] mt-0.5">{title}</h4>
         </div>
       </div>
       {children}

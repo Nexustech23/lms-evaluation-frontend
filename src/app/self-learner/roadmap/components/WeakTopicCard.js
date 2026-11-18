@@ -14,7 +14,7 @@ export default function WeakTopicCard({ weakTopics = [], onReviewTopic }) {
           }`}>
           {hasWeakAreas ? <AlertTriangle size={16} /> : <CheckCircle2 size={16} />}
         </div>
-        <h3 className="text-sm font-bold text-[#1E1B4B]">
+        <h3 className="text-sm font-bold text-[#161F4C]">
           Weak Topic Detector
         </h3>
       </div>
@@ -43,7 +43,7 @@ export default function WeakTopicCard({ weakTopics = [], onReviewTopic }) {
               >
                 <div className="flex items-center gap-2.5 min-w-0">
                   <div className="w-2 h-2 rounded-full bg-[#FF6584] shrink-0" />
-                  <span className="text-xs font-bold text-[#1E1B4B] truncate">
+                  <span className="text-xs font-bold text-[#161F4C] truncate">
                     {topic}
                   </span>
                 </div>
@@ -51,7 +51,7 @@ export default function WeakTopicCard({ weakTopics = [], onReviewTopic }) {
                 {onReviewTopic && (
                   <button
                     onClick={() => onReviewTopic(topic)}
-                    className="text-[10px] font-extrabold text-[#6C63FF] hover:text-[#1E1B4B] flex items-center gap-0.5 shrink-0"
+                    className="text-[10px] font-extrabold text-[#6C63FF] hover:text-[#161F4C] flex items-center gap-0.5 shrink-0"
                   >
                     Review
                     <ChevronRight size={10} />

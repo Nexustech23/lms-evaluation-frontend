@@ -35,7 +35,7 @@ export default function TopicTree({ topics, level, completedSubtopics, activeSub
                   <BookOpen size={16} />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-[#1E1B4B]">
+                  <h4 className="text-sm font-bold text-[#161F4C]">
                     {topic.title}
                   </h4>
                   <span className="text-[10px] font-bold text-gray-400 uppercase">

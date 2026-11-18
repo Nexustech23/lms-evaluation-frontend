@@ -4,7 +4,7 @@ import Link from "next/link";
 import { AuthContext } from "@/app/AuthContext";
 import LocaleSwitcher from "@/components/LocaleSwitcher";
 
-export default function Navbar({ title, style, hideLogo }) {
+export default function Navbar({ title, style, hideLogo, tone }) {
   const { user, loading } = useContext(AuthContext);
 
   if (loading) {
@@ -19,7 +19,10 @@ export default function Navbar({ title, style, hideLogo }) {
   }
 
   return (
-    <header className="text-white p-4 flex justify-between items-center" style={{backgroundColor: user?.color}}>
+    <header
+      className={tone === "light" ? "p-4 flex justify-between items-center text-[#161F4C]" : "text-white p-4 flex justify-between items-center"}
+      style={tone === "light" ? { backgroundColor: "transparent" } : {backgroundColor: user?.color}}
+    >
       <div className="flex items-center space-x-4">
         {user?.logo_url&&
         <img

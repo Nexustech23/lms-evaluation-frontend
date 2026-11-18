@@ -61,14 +61,14 @@ export default function RoadmapsListPage() {
       <div className="max-w-6xl mx-auto space-y-6">
 
         {/* Create new CTA Bar */}
-        <div className="flex justify-between items-center bg-white rounded-3xl border border-gray-200 shadow-sm p-5">
+        <div className="flex justify-between items-center bg-white rounded-2xl border border-[#E2E8F0] shadow-[0_1px_3px_rgba(22,31,76,0.06),0_4px_12px_rgba(22,31,76,0.04)] px-6 py-4 gap-4">
           <div>
-            <h3 className="text-sm font-black text-[#1E1B4B]">Need to learn a new skill?</h3>
-            <p className="text-xs font-semibold text-gray-500 mt-0.5">Generate a custom structured curriculum path in seconds.</p>
+            <h3 className="text-sm font-black text-[#161F4C]">Need to learn a new skill?</h3>
+            <p className="text-xs font-semibold text-[#475569] mt-0.5">Generate a custom structured curriculum path in seconds.</p>
           </div>
           <button
             onClick={() => router.push("/self-learner/roadmap/create")}
-            className="flex items-center gap-1.5 bg-[#1E1B4B] hover:bg-[#1E1B4B]/95 text-white px-5 py-3 rounded-2xl text-xs font-extrabold shadow-sm transition-all duration-200 hover:scale-102"
+            className="flex items-center justify-center gap-1.5 bg-[#161F4C] hover:bg-[#252F6B] text-white h-[42px] px-5 rounded-xl text-xs font-semibold shadow-sm transition-colors duration-200 shrink-0"
           >
             <Plus size={14} />
             Create Roadmap
@@ -77,31 +77,31 @@ export default function RoadmapsListPage() {
 
         {/* Loading display */}
         {loading ? (
-          <div className="text-center py-20 bg-white rounded-3xl border border-gray-200 shadow-sm font-bold text-sm text-gray-500">
+          <div className="text-center py-20 bg-white rounded-2xl border border-[#E2E8F0] shadow-[0_1px_3px_rgba(22,31,76,0.06),0_4px_12px_rgba(22,31,76,0.04)] font-bold text-sm text-gray-500">
             Loading your learning paths...
           </div>
         ) : roadmaps.length === 0 ? (
           /* Empty state */
-          <div className="text-center py-20 bg-white rounded-3xl border border-gray-200 shadow-sm space-y-4">
+          <div className="text-center py-20 bg-white rounded-2xl border border-[#E2E8F0] shadow-[0_1px_3px_rgba(22,31,76,0.06),0_4px_12px_rgba(22,31,76,0.04)] space-y-4">
             <div className="w-16 h-16 bg-[#F0EEFF] text-[#6C63FF] rounded-full flex items-center justify-center mx-auto">
               <BookOpen size={28} />
             </div>
             <div>
-              <h4 className="text-base font-black text-[#1E1B4B]">No Roadmaps Generated Yet</h4>
-              <p className="text-xs font-semibold text-gray-500 mt-1 max-w-sm mx-auto leading-relaxed">
+              <h4 className="text-base font-black text-[#161F4C]">No Roadmaps Generated Yet</h4>
+              <p className="text-xs font-semibold text-[#475569] mt-1 max-w-sm mx-auto leading-relaxed">
                 Provide a subject prompt like &quot;Python&quot; or &quot;Data Structures&quot; to build your first tailored study path.
               </p>
             </div>
             <button
               onClick={() => router.push("/self-learner/roadmap/create")}
-              className="inline-flex items-center gap-1.5 bg-[#6C63FF] text-white px-6 py-3 rounded-2xl text-xs font-extrabold shadow-sm transition-all duration-200 hover:scale-102"
+              className="inline-flex items-center justify-center gap-1.5 bg-[#161F4C] hover:bg-[#252F6B] text-white h-[44px] px-6 rounded-xl text-xs font-semibold shadow-sm transition-colors duration-200"
             >
               Get Started
             </button>
           </div>
         ) : (
           /* Grid of Roadmaps */
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {roadmaps.map((r) => {
               const roadmapId = r._id || r.id;
               const overallProg = r.progress?.overallProgress || 0;
@@ -111,9 +111,9 @@ export default function RoadmapsListPage() {
                 <div
                   key={roadmapId}
                   onClick={() => router.push(`/self-learner/roadmap/${roadmapId}`)}
-                  className={`bg-white rounded-3xl border cursor-pointer hover:-translate-y-1 transition-all duration-300 relative overflow-hidden flex flex-col justify-between p-6 h-[240px] ${isUserActive
+                  className={`bg-white rounded-2xl border cursor-pointer hover:-translate-y-0.5 transition-all duration-300 relative overflow-hidden flex flex-col justify-between px-[22px] py-5 min-h-[240px] ${isUserActive
                       ? "border-[#6C63FF]/50 shadow-md ring-1 ring-[#6C63FF]/20"
-                      : "border-gray-200 shadow-xs hover:border-gray-300"
+                      : "border-[#E2E8F0] shadow-[0_1px_3px_rgba(22,31,76,0.06)] hover:border-[#CBD5E1] hover:shadow-md"
                     }`}
                 >
                   {/* Active Indicator Top Tag */}
@@ -128,27 +128,27 @@ export default function RoadmapsListPage() {
                     onClick={(e) => handleDelete(e, roadmapId, r.subject)}
                     disabled={deletingId === roadmapId}
                     aria-label="Delete roadmap"
-                    className="absolute top-4 right-4 p-1.5 rounded-full text-gray-300 hover:text-[#FF6584] hover:bg-[#FFF0F3] transition-all duration-200 disabled:opacity-40"
+                    className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:text-[#FF6584] hover:bg-[#FFF0F3] transition-all duration-200 disabled:opacity-40"
                   >
                     <Trash2 size={15} />
                   </button>
 
                   <div>
                     {/* Meta info */}
-                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">
+                    <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block pr-12 truncate">
                       {r.goal}
                     </span>
-                    <h3 className="text-lg font-black text-[#1E1B4B] mt-0.5 leading-snug truncate pr-16">
+                    <h3 className="text-lg font-black text-[#161F4C] mt-1 leading-snug truncate pr-12">
                       {r.subject}
                     </h3>
 
                     {/* Progress details */}
                     <div className="grid grid-cols-2 gap-4 mt-4">
-                      <div className="flex items-center gap-2 text-xs font-semibold text-gray-500">
+                      <div className="flex items-center gap-2 text-xs font-semibold text-[#475569]">
                         <Activity size={14} className="text-[#43C6AC] shrink-0" />
                         <span>Week {getUnlockedWeeksCount(r)}/{r.weeks?.length || 1} Unlocked</span>
                       </div>
-                      <div className="flex items-center gap-2 text-xs font-semibold text-gray-500">
+                      <div className="flex items-center gap-2 text-xs font-semibold text-[#475569]">
                         <Clock size={14} className="text-[#FF6584] shrink-0" />
                         <span>{r.daily_study_time || "1 Hour"} Daily</span>
                       </div>
@@ -170,12 +170,12 @@ export default function RoadmapsListPage() {
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between pt-2 border-t border-gray-50">
+                    <div className="flex items-center justify-between pt-3 border-t border-[#EEF2F7]">
                       <span className="text-[10px] font-bold text-gray-400 flex items-center gap-1">
                         <Calendar size={10} />
                         {getCompletedSubtopicsCount(r)} topics read
                       </span>
-                      <span className="text-xs font-extrabold text-[#6C63FF] hover:text-[#1E1B4B] flex items-center gap-0.5 transition-all duration-200">
+                      <span className="text-xs font-extrabold text-[#6C63FF] hover:text-[#161F4C] flex items-center gap-0.5 transition-all duration-200">
                         Resume Study
                         <ArrowRight size={12} className="mt-0.5" />
                       </span>

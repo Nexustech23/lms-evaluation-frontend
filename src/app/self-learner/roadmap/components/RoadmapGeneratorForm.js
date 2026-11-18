@@ -54,12 +54,12 @@ export default function RoadmapGeneratorForm({ onSubmit }) {
   };
 
   return (
-    <div className="bg-white rounded-3xl border border-gray-200 shadow-sm p-6 md:p-8 max-w-4xl mx-auto">
-      <form onSubmit={handleSubmit} className="space-y-6">
+    <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-[0_1px_3px_rgba(22,31,76,0.06),0_4px_12px_rgba(22,31,76,0.04)] px-5 py-6 md:px-8 md:py-7 max-w-4xl mx-auto">
+      <form onSubmit={handleSubmit} className="space-y-5">
 
         {/* Subject input */}
         <div>
-          <label className="flex items-center gap-2 text-sm font-semibold text-[#1E1B4B] mb-2">
+          <label className="flex items-center gap-2 text-sm font-semibold text-[#161F4C] mb-2">
             <BookOpen size={16} className="text-[#6C63FF]" />
             What subject do you want to learn?
           </label>
@@ -68,22 +68,22 @@ export default function RoadmapGeneratorForm({ onSubmit }) {
             value={subject}
             onChange={(e) => setSubject(e.target.value)}
             placeholder="e.g. Python, DSA, DBMS, Operating Systems, Machine Learning..."
-            className="w-full border border-gray-200 rounded-2xl bg-[#FAFBFF] p-4 text-sm text-[#1E1B4B] placeholder-gray-400 outline-none focus:ring-2 focus:ring-violet-400 transition-all duration-200"
+            className="w-full h-[46px] border border-[#E2E8F0] rounded-xl bg-[#FAFBFF] px-4 text-sm text-[#161F4C] placeholder-[#94A3B8] outline-none focus:ring-2 focus:ring-violet-400 transition-all duration-200"
             required
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Learning Goal */}
           <div>
-            <label className="flex items-center gap-2 text-sm font-semibold text-[#1E1B4B] mb-2">
+            <label className="flex items-center gap-2 text-sm font-semibold text-[#161F4C] mb-2">
               <BarChart size={16} className="text-[#43C6AC]" />
               What is your learning goal?
             </label>
             <select
               value={goal}
               onChange={(e) => setGoal(e.target.value)}
-              className="w-full border border-gray-200 rounded-2xl bg-[#FAFBFF] p-4 text-sm text-[#1E1B4B] outline-none focus:ring-2 focus:ring-violet-400 cursor-pointer transition-all duration-200"
+              className="mcg-select w-full h-[46px] border border-[#E2E8F0] rounded-xl bg-[#FAFBFF] px-4 text-sm text-[#161F4C] outline-none focus:ring-2 focus:ring-violet-400 cursor-pointer transition-all duration-200"
             >
               <option value="Interview Preparation">Interview Preparation</option>
               <option value="Exam Preparation">Exam Preparation</option>
@@ -95,14 +95,14 @@ export default function RoadmapGeneratorForm({ onSubmit }) {
 
           {/* Daily Study Time */}
           <div>
-            <label className="flex items-center gap-2 text-sm font-semibold text-[#1E1B4B] mb-2">
+            <label className="flex items-center gap-2 text-sm font-semibold text-[#161F4C] mb-2">
               <Clock size={16} className="text-[#FF6584]" />
               Daily Study Time
             </label>
             <select
               value={dailyTime}
               onChange={(e) => setDailyTime(e.target.value)}
-              className="w-full border border-gray-200 rounded-2xl bg-[#FAFBFF] p-4 text-sm text-[#1E1B4B] outline-none focus:ring-2 focus:ring-violet-400 cursor-pointer transition-all duration-200"
+              className="mcg-select w-full h-[46px] border border-[#E2E8F0] rounded-xl bg-[#FAFBFF] px-4 text-sm text-[#161F4C] outline-none focus:ring-2 focus:ring-violet-400 cursor-pointer transition-all duration-200"
             >
               <option value="30 Minutes">30 Minutes</option>
               <option value="1 Hour">1 Hour</option>
@@ -115,7 +115,7 @@ export default function RoadmapGeneratorForm({ onSubmit }) {
 
         {/* Current Skill Level */}
         <div>
-          <label className="flex items-center gap-2 text-sm font-semibold text-[#1E1B4B] mb-3">
+          <label className="flex items-center gap-2 text-sm font-semibold text-[#161F4C] mb-3">
             <BarChart size={16} className="text-[#F7971E]" />
             What is your current skill level?
           </label>
@@ -125,10 +125,10 @@ export default function RoadmapGeneratorForm({ onSubmit }) {
                 key={level}
                 type="button"
                 onClick={() => setSkillLevel(level)}
-                className={`py-3 px-4 rounded-2xl border text-sm font-semibold transition-all duration-200 ${
+                className={`h-11 px-4 rounded-xl border text-sm font-semibold transition-all duration-200 ${
                   skillLevel === level
-                    ? "bg-[#F0EEFF] text-[#6C63FF] border-[#6C63FF]"
-                    : "bg-[#FAFBFF] text-gray-600 border-gray-200 hover:border-[#6C63FF]"
+                    ? "bg-[#F0EEFF] text-[#6C63FF] border-[1.5px] border-[#6C63FF]"
+                    : "bg-[#FAFBFF] text-[#475569] border-[#E2E8F0] hover:border-[#6C63FF]"
                 }`}
               >
                 {level}
@@ -139,7 +139,7 @@ export default function RoadmapGeneratorForm({ onSubmit }) {
 
         {/* Revision Frequency */}
         <div>
-          <label className="flex items-center gap-2 text-sm font-semibold text-[#1E1B4B] mb-3">
+          <label className="flex items-center gap-2 text-sm font-semibold text-[#161F4C] mb-3">
             <Calendar size={16} className="text-[#6C63FF]" />
             Choose Revision Frequency
           </label>
@@ -149,10 +149,10 @@ export default function RoadmapGeneratorForm({ onSubmit }) {
                 key={freq}
                 type="button"
                 onClick={() => setRevisionFreq(freq)}
-                className={`py-2.5 px-4 rounded-xl border text-xs font-semibold transition-all duration-200 ${
+                className={`h-10 px-4 rounded-xl border text-xs font-semibold transition-all duration-200 ${
                   revisionFreq === freq
-                    ? "bg-[#EDFAF5] text-[#43C6AC] border-[#43C6AC]"
-                    : "bg-[#FAFBFF] text-gray-600 border-gray-200 hover:border-[#43C6AC]"
+                    ? "bg-[#EDFAF5] text-[#43C6AC] border-[1.5px] border-[#43C6AC]"
+                    : "bg-[#FAFBFF] text-[#475569] border-[#E2E8F0] hover:border-[#43C6AC]"
                 }`}
               >
                 {freq}
@@ -161,23 +161,23 @@ export default function RoadmapGeneratorForm({ onSubmit }) {
           </div>
           {revisionFreq === "Custom" && (
             <div className="flex items-center gap-3 animate-fadeIn">
-              <span className="text-xs text-gray-500 font-medium">Revise every</span>
+              <span className="text-xs text-[#475569] font-medium">Revise every</span>
               <input
                 type="number"
                 min="1"
                 max="30"
                 value={customRevision}
                 onChange={(e) => setCustomRevision(Math.max(1, parseInt(e.target.value) || 1))}
-                className="w-20 border border-gray-200 rounded-xl bg-[#FAFBFF] p-2 text-center text-xs font-bold text-[#1E1B4B] outline-none focus:ring-1 focus:ring-violet-400"
+                className="w-20 border border-[#E2E8F0] rounded-lg bg-[#FAFBFF] h-9 text-center text-xs font-bold text-[#161F4C] outline-none focus:ring-1 focus:ring-violet-400"
               />
-              <span className="text-xs text-gray-500 font-medium">days</span>
+              <span className="text-xs text-[#475569] font-medium">days</span>
             </div>
           )}
         </div>
 
         {/* Assessment Mode */}
         <div>
-          <label className="flex items-center gap-2 text-sm font-semibold text-[#1E1B4B] mb-3">
+          <label className="flex items-center gap-2 text-sm font-semibold text-[#161F4C] mb-3">
             <FileQuestion size={16} className="text-[#FF6584]" />
             Would you like a quick knowledge check first?
           </label>
@@ -187,10 +187,10 @@ export default function RoadmapGeneratorForm({ onSubmit }) {
                 key={option}
                 type="button"
                 onClick={() => setAssessmentMode(option)}
-                className={`flex-1 py-3.5 px-6 rounded-2xl border text-sm font-semibold transition-all duration-200 ${
+                className={`flex-1 h-11 px-6 rounded-xl border text-sm font-semibold transition-all duration-200 ${
                   assessmentMode === option
-                    ? "bg-[#FFF0F3] text-[#FF6584] border-[#FF6584]"
-                    : "bg-[#FAFBFF] text-gray-600 border-gray-200 hover:border-[#FF6584]"
+                    ? "bg-[#EEF2FF] text-[#4338CA] border-[1.5px] border-[#6366F1]"
+                    : "bg-[#FAFBFF] text-[#475569] border-[#E2E8F0] hover:border-[#6366F1]"
                 }`}
               >
                 {option === "Yes" ? "Yes, evaluate my level" : "No, generate roadmap directly"}
@@ -198,7 +198,7 @@ export default function RoadmapGeneratorForm({ onSubmit }) {
             ))}
           </div>
           {assessmentMode === "Yes" && (
-            <p className="text-xs text-gray-400 mt-2 font-medium">
+            <p className="text-xs text-[#64748B] mt-2 font-medium">
               💡 Recommended: You'll get a 10-question beginner-level check to personalise your starting point.
             </p>
           )}
@@ -206,14 +206,14 @@ export default function RoadmapGeneratorForm({ onSubmit }) {
 
         {/* Course Material Upload (optional grounding document) */}
         <div>
-          <label className="flex items-center gap-2 text-sm font-semibold text-[#1E1B4B] mb-2">
+          <label className="flex items-center gap-2 text-sm font-semibold text-[#161F4C] mb-2">
             <FileUp size={16} className="text-[#43C6AC]" />
             Ground it in your own material (optional)
           </label>
           {!file ? (
-            <label className="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-gray-200 rounded-2xl bg-[#FAFBFF] p-6 text-center cursor-pointer hover:border-[#43C6AC] transition-all duration-200">
-              <FileUp size={22} className="text-gray-400" />
-              <span className="text-sm font-medium text-gray-500">
+            <label className="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-[#CBD5E1] rounded-xl bg-[#FAFBFF] px-5 py-7 text-center cursor-pointer hover:border-[#43C6AC] transition-all duration-200">
+              <FileUp size={22} className="text-[#64748B]" />
+              <span className="text-sm font-medium text-[#475569]">
                 Upload a syllabus, course profile, or textbook (PDF, DOCX, MD, TXT)
               </span>
               <input
@@ -225,15 +225,15 @@ export default function RoadmapGeneratorForm({ onSubmit }) {
               />
             </label>
           ) : (
-            <div className="flex items-center justify-between border border-gray-200 rounded-2xl bg-[#FAFBFF] p-4">
+            <div className="flex items-center justify-between border border-[#E2E8F0] rounded-xl bg-[#FAFBFF] px-4 py-3">
               <div className="flex items-center gap-2 min-w-0">
                 <FileUp size={18} className="text-[#43C6AC] shrink-0" />
-                <span className="text-sm font-medium text-[#1E1B4B] truncate">{file.name}</span>
+                <span className="text-sm font-medium text-[#161F4C] truncate">{file.name}</span>
               </div>
               <button
                 type="button"
                 onClick={clearFile}
-                className="p-1.5 rounded-full hover:bg-gray-100 text-gray-400 hover:text-[#FF6584] transition-all duration-200 shrink-0"
+                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400 hover:text-[#FF6584] transition-all duration-200 shrink-0"
                 aria-label="Remove file"
               >
                 <X size={16} />
@@ -244,7 +244,7 @@ export default function RoadmapGeneratorForm({ onSubmit }) {
 
         {/* Custom Instructions */}
         <div>
-          <label className="flex items-center gap-2 text-sm font-semibold text-[#1E1B4B] mb-2">
+          <label className="flex items-center gap-2 text-sm font-semibold text-[#161F4C] mb-2">
             <MessageSquarePlus size={16} className="text-[#6C63FF]" />
             Anything specific you want the roadmap to focus on? (optional)
           </label>
@@ -254,14 +254,14 @@ export default function RoadmapGeneratorForm({ onSubmit }) {
             placeholder="e.g. Focus purely on advanced neural networks and PyTorch implementation"
             maxLength={1000}
             rows={3}
-            className="w-full border border-gray-200 rounded-2xl bg-[#FAFBFF] p-4 text-sm text-[#1E1B4B] placeholder-gray-400 outline-none focus:ring-2 focus:ring-violet-400 transition-all duration-200 resize-none"
+            className="w-full border border-[#E2E8F0] rounded-xl bg-[#FAFBFF] px-4 py-3 text-sm text-[#161F4C] placeholder-[#94A3B8] outline-none focus:ring-2 focus:ring-violet-400 transition-all duration-200 resize-none"
           />
         </div>
 
         {/* Submit CTA */}
         <button
           type="submit"
-          className="w-full h-14 mt-4 rounded-2xl bg-[#1E1B4B] hover:bg-[#1e1b4b]/95 text-white text-sm font-bold flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all duration-200 active:scale-[0.99]"
+          className="w-full h-12 mt-3 rounded-xl bg-[#161F4C] hover:bg-[#252F6B] text-white text-sm font-semibold flex items-center justify-center gap-2 shadow-sm transition-colors duration-200"
         >
           <Sparkles size={18} />
           Generate Roadmap

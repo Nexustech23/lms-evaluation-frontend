@@ -27,7 +27,7 @@ export default function HandsOnTaskPanel({ task }) {
       </div>
 
       {task.title && (
-        <h5 className="text-sm font-black text-[#1E1B4B]">{task.title}</h5>
+        <h5 className="text-sm font-black text-[#161F4C]">{task.title}</h5>
       )}
 
       <ul className="space-y-1.5">

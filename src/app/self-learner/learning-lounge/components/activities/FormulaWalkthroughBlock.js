@@ -12,7 +12,7 @@ export default function FormulaWalkthroughBlock({ block }) {
 
   return (
     <ActivityShell icon={<Sigma size={17} />} eyebrow="Work through it" title={block.title} tone="amber">
-      <div className="rounded-xl bg-[#1E1B4B] px-4 py-3 text-center overflow-x-auto">
+      <div className="rounded-xl bg-[#161F4C] px-4 py-3 text-center overflow-x-auto">
         <code className="text-sm text-amber-200 font-bold whitespace-pre-wrap">{block.formula}</code>
       </div>
       {block.explanation && <p className="text-xs text-slate-600 font-medium leading-relaxed mt-3">{block.explanation}</p>}
@@ -21,7 +21,7 @@ export default function FormulaWalkthroughBlock({ block }) {
           <span className="text-[9px] uppercase tracking-widest font-black text-amber-600">Step {current + 1} of {steps.length}</span>
           <span className="text-[10px] font-bold text-slate-400">{step.label}</span>
         </div>
-        <code className="block mt-2 text-xs font-bold text-[#1E1B4B] bg-amber-50 rounded-lg p-3 overflow-x-auto">{step.expression}</code>
+        <code className="block mt-2 text-xs font-bold text-[#161F4C] bg-amber-50 rounded-lg p-3 overflow-x-auto">{step.expression}</code>
         {step.result && <p className="text-xs font-black text-emerald-600 mt-2">Result: {step.result}</p>}
         {step.explanation && <p className="text-xs text-slate-600 font-medium leading-relaxed mt-2">{step.explanation}</p>}
       </div>

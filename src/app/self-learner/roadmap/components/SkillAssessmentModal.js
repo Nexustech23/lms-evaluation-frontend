@@ -75,7 +75,7 @@ export default function SkillAssessmentModal({ subject, onClose, onFinish }) {
   const currentQuestion = questions[currentIdx];
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#1E1B4B]/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
+    <div className="fixed inset-0 z-50 bg-[#161F4C]/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
       <div className="bg-white rounded-3xl border border-gray-100 shadow-xl max-w-2xl w-full overflow-hidden">
 
         {/* Header */}
@@ -85,7 +85,7 @@ export default function SkillAssessmentModal({ subject, onClose, onFinish }) {
               <Award size={20} />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-[#1E1B4B]">Knowledge Check</h3>
+              <h3 className="text-lg font-bold text-[#161F4C]">Knowledge Check</h3>
               <p className="text-xs font-semibold text-gray-500">{subject} · Beginner Level</p>
             </div>
           </div>
@@ -114,7 +114,7 @@ export default function SkillAssessmentModal({ subject, onClose, onFinish }) {
             <p className="text-sm font-semibold text-gray-600">{loadError}</p>
             <button
               onClick={onClose}
-              className="mt-2 bg-[#1E1B4B] text-white px-6 py-3 rounded-2xl text-sm font-bold"
+              className="mt-2 bg-[#161F4C] text-white px-6 py-3 rounded-2xl text-sm font-bold"
             >
               Skip Assessment
             </button>
@@ -138,7 +138,7 @@ export default function SkillAssessmentModal({ subject, onClose, onFinish }) {
                 <span className="text-[#6C63FF]">{progressPercent}% COMPLETED</span>
               </div>
 
-              <h4 className="text-lg font-extrabold text-[#1E1B4B] leading-snug">
+              <h4 className="text-lg font-extrabold text-[#161F4C] leading-snug">
                 {currentQuestion.question}
               </h4>
 
@@ -152,7 +152,7 @@ export default function SkillAssessmentModal({ subject, onClose, onFinish }) {
                       onClick={() => handleSelectOption(optIdx)}
                       className={`w-full text-left p-4 rounded-2xl border text-sm font-semibold flex items-center justify-between transition-all duration-200 ${
                         isSelected
-                          ? "bg-[#F0EEFF] border-[#6C63FF] text-[#1E1B4B]"
+                          ? "bg-[#F0EEFF] border-[#6C63FF] text-[#161F4C]"
                           : "bg-[#FAFBFF] border-gray-200 text-gray-600 hover:border-gray-300"
                       }`}
                     >
@@ -172,7 +172,7 @@ export default function SkillAssessmentModal({ subject, onClose, onFinish }) {
               <button
                 onClick={handleNext}
                 disabled={answers[currentIdx] === undefined}
-                className="flex items-center justify-center gap-2 bg-[#1E1B4B] text-white px-6 py-3.5 rounded-2xl text-sm font-bold shadow-sm transition-all duration-200 hover:bg-[#1E1B4B]/95 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center justify-center gap-2 bg-[#161F4C] text-white px-6 py-3.5 rounded-2xl text-sm font-bold shadow-sm transition-all duration-200 hover:bg-[#161F4C]/95 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {currentIdx < questions.length - 1 ? (
                   <>Next Question <ChevronRight size={16} /></>

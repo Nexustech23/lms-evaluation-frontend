@@ -13,12 +13,12 @@ export default function GuidedWalkthroughBlock({ block }) {
 
   return (
     <ActivityShell icon={<Map size={17} />} eyebrow="Guided walkthrough" title={block.title} tone="blue">
-      <p className="text-xs font-medium leading-relaxed text-slate-600"><span className="font-black text-[#1E1B4B]">Purpose: </span>{block.purpose}</p>
+      <p className="text-xs font-medium leading-relaxed text-slate-600"><span className="font-black text-[#161F4C]">Purpose: </span>{block.purpose}</p>
 
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         <div className="rounded-xl border border-blue-200 bg-white p-4">
           <p className="text-[9px] font-black uppercase tracking-widest text-blue-600">Example</p>
-          <p className="mt-2 text-sm font-black leading-relaxed text-[#1E1B4B]">{block.example}</p>
+          <p className="mt-2 text-sm font-black leading-relaxed text-[#161F4C]">{block.example}</p>
         </div>
         <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
           <p className="text-[9px] font-black uppercase tracking-widest text-amber-700">Why this example?</p>
@@ -42,7 +42,7 @@ export default function GuidedWalkthroughBlock({ block }) {
 
       <div className="mt-3 rounded-xl border border-blue-200 bg-white p-4" aria-live="polite">
         <p className="text-[9px] font-black uppercase tracking-widest text-blue-600">Current focus · {current + 1}/{steps.length}</p>
-        <h5 className="mt-1 text-sm font-black text-[#1E1B4B]">{step.focus}</h5>
+        <h5 className="mt-1 text-sm font-black text-[#161F4C]">{step.focus}</h5>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <div className="rounded-lg bg-blue-50 p-3">
             <p className="text-[9px] font-black uppercase tracking-widest text-blue-700">What happens?</p>
@@ -56,7 +56,7 @@ export default function GuidedWalkthroughBlock({ block }) {
         {step.state && (
           <div className="mt-3 rounded-lg border border-gray-200 bg-slate-50 p-3">
             <p className="text-[9px] font-black uppercase tracking-widest text-slate-500">State after this step</p>
-            <pre className="mt-1 overflow-x-auto whitespace-pre-wrap text-xs font-bold text-[#1E1B4B]">{step.state}</pre>
+            <pre className="mt-1 overflow-x-auto whitespace-pre-wrap text-xs font-bold text-[#161F4C]">{step.state}</pre>
           </div>
         )}
       </div>

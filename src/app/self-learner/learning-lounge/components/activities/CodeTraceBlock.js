@@ -32,7 +32,7 @@ export default function CodeTraceBlock({ block }) {
       {activeStep ? (
         <div className="mt-3 rounded-xl border border-blue-200 bg-white p-4" aria-live="polite">
           <span className="text-[9px] font-black uppercase tracking-widest text-blue-600">Trace {current + 1} of {steps.length} · line {activeStep.line}</span>
-          {activeStep.focus && <h5 className="mt-1 text-xs font-black text-[#1E1B4B]">{activeStep.focus}</h5>}
+          {activeStep.focus && <h5 className="mt-1 text-xs font-black text-[#161F4C]">{activeStep.focus}</h5>}
           {activeStep.state && <code className="block mt-2 rounded-lg bg-blue-50 p-2 text-xs font-bold text-blue-800">State: {activeStep.state}</code>}
           <p className="text-xs text-slate-600 font-medium leading-relaxed mt-2">{activeStep.explanation}</p>
         </div>

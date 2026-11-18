@@ -47,7 +47,7 @@ export default function MiniProjectCard({ project, isCompleted, onCompleteProjec
           <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">
             Practical Project Milestone
           </span>
-          <h3 className="text-lg font-black text-[#1E1B4B] mt-0.5">
+          <h3 className="text-lg font-black text-[#161F4C] mt-0.5">
             {project.title}
           </h3>
         </div>
@@ -64,7 +64,7 @@ export default function MiniProjectCard({ project, isCompleted, onCompleteProjec
 
       {/* Objectives */}
       <div className="bg-[#FAFBFF] border border-gray-100 rounded-2xl p-5 space-y-3">
-        <h4 className="text-xs font-extrabold text-[#1E1B4B] flex items-center gap-1.5">
+        <h4 className="text-xs font-extrabold text-[#161F4C] flex items-center gap-1.5">
           <CheckCircle2 size={14} className="text-[#43C6AC]" />
           Project Key Objectives
         </h4>
@@ -82,14 +82,14 @@ export default function MiniProjectCard({ project, isCompleted, onCompleteProjec
       {!feedback && !isCompleted ? (
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-extrabold text-[#1E1B4B] mb-2">
+            <label className="block text-xs font-extrabold text-[#161F4C] mb-2">
               Submit Project Deliverables
             </label>
             <textarea
               value={submission}
               onChange={(e) => setSubmission(e.target.value)}
               placeholder="Paste your source code links (GitHub, CodePen), summary descriptions, or architectural decisions here..."
-              className="w-full h-32 rounded-2xl border border-gray-200 bg-[#FAFBFF] p-4 text-xs text-[#1E1B4B] outline-none focus:ring-2 focus:ring-violet-400 resize-none font-semibold"
+              className="w-full h-32 rounded-2xl border border-gray-200 bg-[#FAFBFF] p-4 text-xs text-[#161F4C] outline-none focus:ring-2 focus:ring-violet-400 resize-none font-semibold"
               required
             />
           </div>
@@ -97,7 +97,7 @@ export default function MiniProjectCard({ project, isCompleted, onCompleteProjec
           <button
             type="submit"
             disabled={loading || !submission.trim()}
-            className="w-full h-12 bg-[#1E1B4B] hover:bg-[#1E1B4B]/95 text-white text-xs font-extrabold rounded-xl flex items-center justify-center gap-2 shadow-xs transition-all duration-200 disabled:opacity-50"
+            className="w-full h-12 bg-[#161F4C] hover:bg-[#161F4C]/95 text-white text-xs font-extrabold rounded-xl flex items-center justify-center gap-2 shadow-xs transition-all duration-200 disabled:opacity-50"
           >
             {loading ? (
               <>
@@ -117,7 +117,7 @@ export default function MiniProjectCard({ project, isCompleted, onCompleteProjec
             <div className="flex justify-center mb-2">
               <Award size={36} className="text-[#43C6AC]" />
             </div>
-            <h4 className="text-sm font-extrabold text-[#1E1B4B]">
+            <h4 className="text-sm font-extrabold text-[#161F4C]">
               Project Grade: {feedback ? feedback.grade : "90"}/100
             </h4>
             <span className="text-[10px] font-bold text-[#43C6AC] uppercase tracking-widest block mt-0.5">
@@ -132,7 +132,7 @@ export default function MiniProjectCard({ project, isCompleted, onCompleteProjec
           {feedback && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
               <div className="bg-gray-50 p-4 rounded-xl border border-gray-150">
-                <h5 className="text-[10px] font-extrabold text-[#1E1B4B] uppercase tracking-wider mb-2 flex items-center gap-1">
+                <h5 className="text-[10px] font-extrabold text-[#161F4C] uppercase tracking-wider mb-2 flex items-center gap-1">
                   <CheckCircle2 size={12} className="text-[#43C6AC]" />
                   What you did well
                 </h5>
@@ -144,7 +144,7 @@ export default function MiniProjectCard({ project, isCompleted, onCompleteProjec
               </div>
 
               <div className="bg-gray-50 p-4 rounded-xl border border-gray-150">
-                <h5 className="text-[10px] font-extrabold text-[#1E1B4B] uppercase tracking-wider mb-2 flex items-center gap-1">
+                <h5 className="text-[10px] font-extrabold text-[#161F4C] uppercase tracking-wider mb-2 flex items-center gap-1">
                   <AlertCircle size={12} className="text-[#FF6584]" />
                   Room for Improvement
                 </h5>

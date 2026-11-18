@@ -130,7 +130,7 @@ export default function Page() {
   return (
     <div style={{
       display: "flex", minHeight: "100vh",
-      background: "#F4F6FB",
+      background: "#F5F7FB",
       fontFamily: "'Nunito', sans-serif",
     }}>
       <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
@@ -161,7 +161,7 @@ export default function Page() {
             {/* Welcome Banner */}
             <div style={{
               background: "linear-gradient(120deg, #6C63FF 0%, #8B83FF 50%, #5ECFBE 100%)",
-              borderRadius: 20, padding: "28px 32px",
+              borderRadius: 20, padding: "24px 28px",
               display: "flex", alignItems: "center", justifyContent: "space-between",
               overflow: "hidden", position: "relative",
               boxShadow: "0 4px 24px rgba(108,99,255,0.25)",
@@ -181,7 +181,7 @@ export default function Page() {
                 <div style={{
                   display: "inline-flex", alignItems: "center", gap: 8,
                   background: "rgba(255,255,255,0.18)", borderRadius: 25,
-                  padding: "8px 18px", fontSize: 13, fontWeight: 700, color: "#fff",
+                  padding: "6px 14px", fontSize: 13, fontWeight: 700, color: "#fff", lineHeight: 1.4,
                   backdropFilter: "blur(4px)",
                 }}>
                   Today's goal:&nbsp;
@@ -192,12 +192,12 @@ export default function Page() {
                 </div>
               </div>
 
-              <div style={{ flexShrink: 0, marginRight: 20 }}>
+              <div style={{ flexShrink: 0, marginRight: 8, display: "flex", alignItems: "center" }}>
                 <img
                   src={userProfile.profileImage?.url || defaultAvatar}
                   alt="Profile"
-                  className="w-24 h-24 rounded-full border-4 shadow-lg object-cover"
-                  style={{ borderColor: user?.color ? `${user.color}33` : '#fed7aa' }}
+                  className="w-24 h-24 rounded-full shadow-lg object-cover"
+                  style={{ border: "2px solid rgba(255,255,255,0.4)" }}
                   onError={(e) => { e.target.onerror = null; e.target.src = defaultAvatar; }}
                 />
               </div>
@@ -212,44 +212,44 @@ export default function Page() {
                 { label: "Weekly Goal", value: "68%", icon: "🎯", color: "#F7971E", bg: "#FFF8EE", prog: 68 },
               ].map(({ label, value, icon, color, bg, prog }) => (
                 <div key={label} style={{
-                  background: "#fff", borderRadius: 18, padding: "18px 16px",
-                  border: "1.5px solid #E8ECF4",
-                  boxShadow: "0 2px 12px rgba(30,27,75,0.05)",
+                  background: "#fff", borderRadius: 16, padding: "18px 20px",
+                  border: "1px solid #E2E8F0",
+                  boxShadow: "0 1px 3px rgba(22,31,76,0.06), 0 4px 12px rgba(22,31,76,0.04)",
                 }}>
                   <div style={{
-                    width: 42, height: 42, borderRadius: 12, background: bg,
+                    width: 38, height: 38, borderRadius: 10, background: bg,
                     display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: 20, marginBottom: 10,
+                    fontSize: 18, marginBottom: 10,
                   }}>{icon}</div>
-                  <div style={{ fontSize: 24, fontWeight: 900, color: "#1E1B4B", marginBottom: 2 }}>{value}</div>
-                  <div style={{ fontSize: 11, color: "#7C8DB5", fontWeight: 700, marginBottom: 8 }}>{label}</div>
-                  <div style={{ height: 4, background: "#F0EEFF", borderRadius: 10, overflow: "hidden" }}>
-                    <div style={{ height: "100%", width: `${prog}%`, background: color, borderRadius: 10 }} />
+                  <div style={{ fontSize: 24, fontWeight: 900, color: "#161F4C", lineHeight: 1.2, marginBottom: 2 }}>{value}</div>
+                  <div style={{ fontSize: 11, color: "#64748B", fontWeight: 700, marginBottom: 12 }}>{label}</div>
+                  <div style={{ height: 5, background: "#F0EEFF", borderRadius: 999, overflow: "hidden" }}>
+                    <div style={{ height: "100%", width: `${prog}%`, background: color, borderRadius: 999 }} />
                   </div>
                 </div>
               ))}
             </div>
 
             {/* Study Hours + Working Hours */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, alignItems: "stretch" }}>
 
               {/* Study Hours */}
-              <div style={{ background: "#fff", borderRadius: 20, padding: 22, border: "1.5px solid #E8ECF4", boxShadow: "0 2px 12px rgba(30,27,75,0.05)" }}>
+              <div style={{ background: "#fff", borderRadius: 16, padding: "20px 24px", border: "1px solid #E2E8F0", boxShadow: "0 1px 3px rgba(22,31,76,0.06), 0 4px 12px rgba(22,31,76,0.04)", display: "flex", flexDirection: "column" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
-                  <h3 style={{ fontWeight: 900, fontSize: 15, color: "#1E1B4B", margin: 0 }}>Study Hours</h3>
+                  <h3 style={{ fontWeight: 900, fontSize: 15, color: "#161F4C", margin: 0 }}>Study Hours</h3>
                   <div style={{ display: "flex", gap: 4 }}>
                     {["Today", "Week", "Month"].map(tab => (
                       <button key={tab} onClick={() => setActiveTab(tab.toLowerCase())} style={{
                         padding: "4px 10px", borderRadius: 20, border: "none", cursor: "pointer",
                         fontSize: 11, fontWeight: 700,
-                        background: activeTab === tab.toLowerCase() ? "#6C63FF" : "#F4F6FB",
-                        color: activeTab === tab.toLowerCase() ? "#fff" : "#7C8DB5",
+                        background: activeTab === tab.toLowerCase() ? "#6C63FF" : "#F5F7FB",
+                        color: activeTab === tab.toLowerCase() ? "#fff" : "#64748B",
                         transition: "all 0.2s",
                       }}>{tab}</button>
                     ))}
                   </div>
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 18, flex: 1 }}>
                   {/* Donut */}
                   <div style={{ position: "relative", width: 110, height: 110, flexShrink: 0 }}>
                     <svg width="110" height="110" viewBox="0 0 110 110">
@@ -267,8 +267,8 @@ export default function Page() {
                         strokeLinecap="round" transform="rotate(-90 55 55)" opacity="0.6" />
                     </svg>
                     <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-                      <span style={{ fontSize: 18, fontWeight: 900, color: "#1E1B4B" }}>80%</span>
-                      <span style={{ fontSize: 9, color: "#7C8DB5", fontWeight: 700 }}>of goal</span>
+                      <span style={{ fontSize: 18, fontWeight: 900, color: "#161F4C" }}>80%</span>
+                      <span style={{ fontSize: 9, color: "#64748B", fontWeight: 700 }}>of goal</span>
                     </div>
                   </div>
                   {/* Bars */}
@@ -278,8 +278,8 @@ export default function Page() {
                         <span style={{ fontSize: 14 }}>{subj.icon}</span>
                         <div style={{ flex: 1 }}>
                           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}>
-                            <span style={{ fontSize: 11, fontWeight: 700, color: "#1E1B4B" }}>{subj.name}</span>
-                            <span style={{ fontSize: 11, fontWeight: 800, color: subj.color }}>{subj.hours}h</span>
+                            <span style={{ fontSize: 11, fontWeight: 700, color: "#161F4C", minWidth: 72 }}>{subj.name}</span>
+                            <span style={{ fontSize: 11, fontWeight: 800, color: subj.color, textAlign: "right", minWidth: 32 }}>{subj.hours}h</span>
                           </div>
                           <div style={{ height: 5, borderRadius: 10, background: "#F0EEFF", overflow: "hidden" }}>
                             <div style={{ height: "100%", width: `${(subj.hours / 4) * 100}%`, background: subj.color, borderRadius: 10 }} />
@@ -292,16 +292,17 @@ export default function Page() {
               </div>
 
              {/* Study Progress */}
-              <div style={{ background: "#fff", borderRadius: 20, padding: 22, border: "1.5px solid #E8ECF4", boxShadow: "0 2px 12px rgba(30,27,75,0.05)" }}>
+              <div style={{ background: "#fff", borderRadius: 16, padding: "20px 24px", border: "1px solid #E2E8F0", boxShadow: "0 1px 3px rgba(22,31,76,0.06), 0 4px 12px rgba(22,31,76,0.04)", display: "flex", flexDirection: "column" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
-                  <h3 style={{ fontWeight: 900, fontSize: 15, color: "#1E1B4B", margin: 0 }}>Study hours</h3>
+                  <h3 style={{ fontWeight: 900, fontSize: 15, color: "#161F4C", margin: 0 }}>Study hours</h3>
                   <div style={{
                     display: "flex", alignItems: "center", gap: 4,
                     background: "#FFF8EE", border: "1px solid #F7971E22",
                     borderRadius: 20, padding: "4px 10px", fontSize: 11, fontWeight: 700, color: "#F7971E",
                   }}>Today ▾</div>
                 </div>
-                <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: 16 }}>
+                <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", gap: 16 }}>
+                <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                   <div style={{ position: "relative", width: 120, height: 120 }}>
                     <svg width="120" height="120" viewBox="0 0 120 120">
                       <circle cx="60" cy="60" r="46" fill="none" stroke="#F0EEFF" strokeWidth="13" />
@@ -314,29 +315,30 @@ export default function Page() {
                         strokeLinecap="round" transform="rotate(-90 60 60)" opacity="0.8" />
                     </svg>
                     <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-                      <span style={{ fontSize: 22, fontWeight: 900, color: "#1E1B4B" }}>84%</span>
+                      <span style={{ fontSize: 22, fontWeight: 900, color: "#161F4C" }}>84%</span>
                     </div>
                   </div>
                 </div>
-                <div style={{ display: "flex", justifyContent: "center", gap: 24 }}>
+                <div style={{ display: "flex", justifyContent: "center", gap: 28 }}>
                   <div style={{ textAlign: "center" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
                       <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#F7971E", display: "inline-block" }} />
-                      <span style={{ fontSize: 12, color: "#7C8DB5", fontWeight: 700 }}>
+                      <span style={{ fontSize: 12, color: "#64748B", fontWeight: 700 }}>
   Study Time
 </span>
                     </div>
-                    <div style={{ fontSize: 16, fontWeight: 900, color: "#1E1B4B" }}>7.2 Hours</div>
+                    <div style={{ fontSize: 16, fontWeight: 900, color: "#161F4C" }}>7.2 Hours</div>
                   </div>
                   <div style={{ textAlign: "center" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
                       <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#6C63FF", display: "inline-block" }} />
-                     <span style={{ fontSize: 12, color: "#7C8DB5", fontWeight: 700 }}>
+                     <span style={{ fontSize: 12, color: "#64748B", fontWeight: 700 }}>
   Completed
 </span>
                     </div>
-                    <div style={{ fontSize: 16, fontWeight: 900, color: "#1E1B4B" }}>5 Modules</div>
+                    <div style={{ fontSize: 16, fontWeight: 900, color: "#161F4C" }}>5 Modules</div>
                   </div>
+                </div>
                 </div>
               </div>
             </div>
@@ -345,9 +347,9 @@ export default function Page() {
           {/* Header row */}
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
             <div>
-              <h3 style={{ fontWeight: 900, fontSize: 15, color: "#1E1B4B", margin: 0 }}>🗺️ My Learning Path</h3>
+              <h3 style={{ fontWeight: 900, fontSize: 15, color: "#161F4C", margin: 0 }}>🗺️ My Learning Path</h3>
               {activeRoadmap && (
-                <p style={{ fontSize: 11, color: "#7C8DB5", fontWeight: 700, margin: "3px 0 0" }}>
+                <p style={{ fontSize: 11, color: "#64748B", fontWeight: 700, margin: "3px 0 0" }}>
                   {activeRoadmap.subject} · {activeRoadmap.progress?.overallProgress ?? 0}% complete
                 </p>
               )}
@@ -355,14 +357,14 @@ export default function Page() {
             {activeRoadmap ? (
               <button
                 onClick={() => router.push(`/self-learner/roadmap/${activeRoadmap._id}`)}
-                style={{ background: "#F0EEFF", border: "none", borderRadius: 10, padding: "6px 14px", fontSize: 11, fontWeight: 800, color: "#6C63FF", cursor: "pointer" }}
+                style={{ background: "#F0EEFF", border: "none", borderRadius: 999, padding: "6px 14px", fontSize: 11, fontWeight: 800, color: "#6C63FF", cursor: "pointer", lineHeight: 1.4 }}
               >
                 Continue →
               </button>
             ) : (
               <button
                 onClick={() => router.push("/self-learner/roadmap/create")}
-                style={{ background: "#1E1B4B", border: "none", borderRadius: 10, padding: "6px 14px", fontSize: 11, fontWeight: 800, color: "#fff", cursor: "pointer" }}
+                style={{ background: "#161F4C", border: "none", borderRadius: 999, padding: "6px 14px", fontSize: 11, fontWeight: 800, color: "#fff", cursor: "pointer", lineHeight: 1.4 }}
               >
                 Create Path
               </button>
@@ -370,7 +372,7 @@ export default function Page() {
           </div>
 
           {/* Single current-in-progress-week card (full week-by-week board lives on the roadmap detail page) */}
-          <div style={{ background: "#FAFBFF", border: "1.5px solid #E8ECF4", borderRadius: 18, padding: 20, position: "relative", overflow: "hidden" }}>
+          <div style={{ background: "#FAFBFF", border: "1px solid #E2E8F0", borderRadius: 16, padding: "20px 24px", position: "relative", overflow: "hidden" }}>
             <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: 5, background: currentWeekCard.color }} />
 
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
@@ -378,11 +380,11 @@ export default function Page() {
                 <div style={{ fontSize: 11, fontWeight: 800, color: currentWeekCard.color, marginBottom: 6 }}>
                   {currentWeekCard.week ? `Week ${currentWeekCard.week}` : "No Active Week"}
                 </div>
-                <h4 style={{ margin: 0, fontSize: 17, fontWeight: 900, color: "#1E1B4B" }}>{currentWeekCard.title}</h4>
+                <h4 style={{ margin: 0, fontSize: 17, fontWeight: 900, color: "#161F4C" }}>{currentWeekCard.title}</h4>
               </div>
               <div
                 style={{
-                  display: "inline-flex", alignItems: "center", padding: "6px 12px", borderRadius: 30,
+                  display: "inline-flex", alignItems: "center", padding: "6px 12px", borderRadius: 999,
                   fontSize: 10, fontWeight: 800, whiteSpace: "nowrap",
                   background: currentWeekCard.status === "Completed" ? "#EDFAF5" : currentWeekCard.status === "In Progress" ? "#F0EEFF" : "#FFF4F4",
                   color: currentWeekCard.status === "Completed" ? "#43C6AC" : currentWeekCard.status === "In Progress" ? "#6C63FF" : "#FF6584",
@@ -392,13 +394,13 @@ export default function Page() {
               </div>
             </div>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 16, marginBottom: 16 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 16, marginBottom: 18 }}>
               {currentWeekCard.subtopics.map((sub, i) => (
                 <div
                   key={i}
                   style={{
-                    background: "#fff", border: "1px solid #E8ECF4", borderRadius: 10, padding: "8px 10px",
-                    fontSize: 11, fontWeight: 700, color: sub.done ? "#43C6AC" : "#4A5678",
+                    background: "#fff", border: "1px solid #E2E8F0", borderRadius: 10, padding: "10px 14px",
+                    fontSize: 12, fontWeight: 700, color: sub.done ? "#43C6AC" : "#4A5678",
                   }}
                 >
                   {sub.done ? "✓" : "•"} {sub.title}
@@ -409,7 +411,7 @@ export default function Page() {
             {activeRoadmap && currentWeekCard.week && (
               <button
                 onClick={() => router.push(`/self-learner/learning-lounge?roadmapId=${activeRoadmap._id}&week=${currentWeekCard.week}`)}
-                style={{ background: "#1E1B4B", border: "none", borderRadius: 10, padding: "10px 16px", fontSize: 11, fontWeight: 800, color: "#fff", cursor: "pointer" }}
+                style={{ background: "#161F4C", border: "none", borderRadius: 10, height: 42, padding: "0 20px", fontSize: 12, fontWeight: 700, color: "#fff", cursor: "pointer", display: "inline-flex", alignItems: "center" }}
               >
                 Go to Learning Lounge →
               </button>
@@ -422,19 +424,19 @@ export default function Page() {
   style={{
     display: "flex",
     flexDirection: "column",
-    gap: 18,
+    gap: 20,
     alignSelf: "stretch",
   }}
 >
 
             {/* Calendar */}
-            <div style={{ background: "#fff", borderRadius: 20, padding: 22, border: "1.5px solid #E8ECF4", boxShadow: "0 2px 12px rgba(30,27,75,0.05)" }}>
+            <div style={{ background: "#fff", borderRadius: 16, padding: "20px 24px", border: "1px solid #E2E8F0", boxShadow: "0 1px 3px rgba(22,31,76,0.06), 0 4px 12px rgba(22,31,76,0.04)" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
                <h3
   style={{
     fontWeight: 900,
     fontSize: 15,
-    color: "#1E1B4B",
+    color: "#161F4C",
     margin: 0,
   }}
 >
@@ -449,14 +451,14 @@ export default function Page() {
       setCurrentDate(new Date(year, month - 1, 1))
     }
     style={{
-      background: "#F4F6FB",
+      background: "#F5F7FB",
       border: "none",
       borderRadius: 8,
       width: 28,
       height: 28,
       cursor: "pointer",
       fontWeight: 800,
-      color: "#1E1B4B",
+      color: "#161F4C",
       fontSize: 14,
     }}
   >
@@ -468,14 +470,14 @@ export default function Page() {
       setCurrentDate(new Date(year, month + 1, 1))
     }
     style={{
-      background: "#F4F6FB",
+      background: "#F5F7FB",
       border: "none",
       borderRadius: 8,
       width: 28,
       height: 28,
       cursor: "pointer",
       fontWeight: 800,
-      color: "#1E1B4B",
+      color: "#161F4C",
       fontSize: 14,
     }}
   >
@@ -485,7 +487,7 @@ export default function Page() {
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 2, textAlign: "center" }}>
                 {["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"].map(d => (
-                  <div key={d} style={{ fontSize: 10, fontWeight: 800, color: "#7C8DB5", padding: "4px 0" }}>{d}</div>
+                  <div key={d} style={{ fontSize: 10, fontWeight: 800, color: "#64748B", padding: "4px 0" }}>{d}</div>
                 ))}
                 {/* Jan 2025 starts on Wednesday = index 2 */}
                 {Array.from({ length: 2 }).map((_, i) => (
@@ -504,7 +506,7 @@ export default function Page() {
                       display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto",
                       cursor: "pointer",
                       background: isToday ? "#6C63FF" : "transparent",
-                      color: isToday ? "#fff" : studied ? "#6C63FF" : "#1E1B4B",
+                      color: isToday ? "#fff" : studied ? "#6C63FF" : "#161F4C",
                       position: "relative",
                     }}>
                       {day}
@@ -521,35 +523,36 @@ export default function Page() {
                 })}
               </div>
               <div style={{ display: "flex", gap: 16, marginTop: 12 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "#7C8DB5", fontWeight: 600 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "#64748B", fontWeight: 600 }}>
                   <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#6C63FF", display: "inline-block" }} /> Studied 
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "#7C8DB5", fontWeight: 600 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "#64748B", fontWeight: 600 }}>
                   <span style={{ width: 8, height: 8, borderRadius: "50%", background: "rgba(108,99,255,0.3)", display: "inline-block" }} /> Today
                 </div>
               </div>
             </div>
 
             {/* Tasks */}
-            <div style={{ background: "#fff", borderRadius: 20, padding: 22, border: "1.5px solid #E8ECF4", boxShadow: "0 2px 12px rgba(30,27,75,0.05)"  }}>
+            <div style={{ background: "#fff", borderRadius: 16, padding: "20px 24px", border: "1px solid #E2E8F0", boxShadow: "0 1px 3px rgba(22,31,76,0.06), 0 4px 12px rgba(22,31,76,0.04)"  }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-                <h3 style={{ fontWeight: 900, fontSize: 15, color: "#1E1B4B", margin: 0 }}>📝 Today's Tasks</h3>
+                <h3 style={{ fontWeight: 900, fontSize: 15, color: "#161F4C", margin: 0 }}>📝 Today's Tasks</h3>
                 <span style={{ fontSize: 12, color: "#6C63FF", fontWeight: 700, cursor: "pointer" }}>View All</span>
               </div>
 
               {/* Add task */}
-              <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
                 <select
   value={priority}
   onChange={(e) => setPriority(e.target.value)}
   style={{
-    border: "1.5px solid #E8ECF4",
+    border: "1px solid #E2E8F0",
     borderRadius: 10,
-    padding: "8px 10px",
+    height: 38,
+    padding: "0 10px",
     fontSize: 11,
     fontWeight: 700,
     background: "#FAFBFF",
-    color: "#1E1B4B",
+    color: "#161F4C",
     outline: "none",
     cursor: "pointer",
   }}
@@ -564,16 +567,17 @@ export default function Page() {
                   onKeyDown={e => e.key === "Enter" && addTodo()}
                   placeholder=" Add a new task..."
                   style={{
-                    flex: 1, border: "1.5px solid #E8ECF4", borderRadius: 10,
-                    padding: "8px 12px", fontSize: 12, fontFamily: "inherit",
-                    outline: "none", color: "#1E1B4B", fontWeight: 600,
+                    flex: 1, minWidth: 0, border: "1px solid #E2E8F0", borderRadius: 10,
+                    height: 38, padding: "0 12px", fontSize: 12, fontFamily: "inherit",
+                    outline: "none", color: "#161F4C", fontWeight: 600,
                     background: "#FAFBFF",
                   }}
                 />
                 <button onClick={addTodo} style={{
                   background: "#6C63FF", color: "#fff", border: "none",
-                  borderRadius: 10, padding: "8px 14px",
-                  fontWeight: 900, fontSize: 18, cursor: "pointer",
+                  borderRadius: 10, width: 38, height: 38, padding: 0, flexShrink: 0,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontWeight: 900, fontSize: 18, lineHeight: 1, cursor: "pointer",
                 }}>+</button>
               </div>
 
@@ -589,9 +593,9 @@ export default function Page() {
                 {todos.map(todo => (
                   <div key={todo.id} style={{
                     display: "flex", alignItems: "center", gap: 10,
-                    padding: "10px 12px", borderRadius: 12,
+                    padding: "10px 12px", borderRadius: 10,
                     background: todo.done ? "#F9FAF9" : priorityBg[todo.priority],
-                    border: `1.5px solid ${todo.done ? "#E8ECF4" : priorityColor[todo.priority]}30`,
+                    border: `1.5px solid ${todo.done ? "#E2E8F0" : priorityColor[todo.priority]}30`,
                     transition: "all 0.2s",
                   }}>
                     <div
@@ -605,7 +609,7 @@ export default function Page() {
                     >{todo.done ? "✓" : ""}</div>
                     <span style={{
                       flex: 1, fontSize: 12, fontWeight: 700,
-                      color: todo.done ? "#A0AEC0" : "#1E1B4B",
+                      color: todo.done ? "#A0AEC0" : "#161F4C",
                       textDecoration: todo.done ? "line-through" : "none",
                     }}>{todo.text}</span>
                     <span style={{
@@ -615,7 +619,7 @@ export default function Page() {
                     }}>{priorityLabel[todo.priority]}</span>
                     <button onClick={() => deleteTodo(todo.id)} style={{
                       background: "none", border: "none", cursor: "pointer",
-                      color: "#CBD5E0", fontSize: 14, lineHeight: 1, flexShrink: 0,
+                      color: "#94A3B8", fontSize: 14, lineHeight: 1, flexShrink: 0, width: 24, height: 24, display: "flex", alignItems: "center", justifyContent: "center",
                     }}>✕</button>
                   </div>
                 ))}
@@ -624,7 +628,7 @@ export default function Page() {
               {/* Progress bar */}
               <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1.5px solid #F0F0F8" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                  <span style={{ fontSize: 12, fontWeight: 800, color: "#7C8DB5" }}>{doneTasks}/{totalTasks} done</span>
+                  <span style={{ fontSize: 12, fontWeight: 800, color: "#64748B" }}>{doneTasks}/{totalTasks} done</span>
                   <span style={{ fontSize: 12, fontWeight: 900, color: "#43C6AC" }}>{taskPercent}%</span>
                 </div>
                 <div style={{ height: 6, background: "#F0EEFF", borderRadius: 20, overflow: "hidden" }}>

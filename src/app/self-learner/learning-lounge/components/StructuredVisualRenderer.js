@@ -29,7 +29,7 @@ function VisualHeader({ visual }) {
         <Icon size={15} />
         <span className="text-[9px] font-black uppercase tracking-[0.18em]">Explore the visual · {visual.kind}</span>
       </div>
-      <h4 className="mt-2 text-base font-black text-[#1E1B4B]">{visual.title}</h4>
+      <h4 className="mt-2 text-base font-black text-[#161F4C]">{visual.title}</h4>
       <p className="mt-2 text-xs font-medium leading-relaxed text-slate-600">{visual.purpose}</p>
       <p className="mt-3 flex items-start gap-2 rounded-xl bg-[#F3F1FF] p-3 text-xs font-bold leading-relaxed text-[#4F46E5]">
         <MousePointerClick size={14} className="mt-0.5 shrink-0" /> {visual.interactionPrompt}
@@ -68,7 +68,7 @@ function GridOrTableVisual({ visual }) {
           {rows.flatMap((row, rowIndex) => [
             <div
               key={`label-${row.label}-${rowIndex}`}
-              className={`flex min-h-14 items-center justify-center rounded-xl px-2 text-center text-[10px] font-black transition ${selected?.row === rowIndex ? "bg-[#1E1B4B] text-white" : "bg-slate-100 text-slate-600"}`}
+              className={`flex min-h-14 items-center justify-center rounded-xl px-2 text-center text-[10px] font-black transition ${selected?.row === rowIndex ? "bg-[#161F4C] text-white" : "bg-slate-100 text-slate-600"}`}
             >
               {row.label}
             </div>,
@@ -95,7 +95,7 @@ function GridOrTableVisual({ visual }) {
         <div className="mt-3 grid gap-2 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 sm:grid-cols-3">
           <p className="text-xs font-semibold text-slate-600"><span className="block text-[9px] font-black uppercase tracking-wider text-emerald-700">Row</span>{selectedRow.label}</p>
           <p className="text-xs font-semibold text-slate-600"><span className="block text-[9px] font-black uppercase tracking-wider text-emerald-700">Column</span>{selectedColumn}</p>
-          <p className="text-xs font-black text-[#1E1B4B]"><span className="block text-[9px] font-black uppercase tracking-wider text-emerald-700">Value at intersection</span>{selectedValue}</p>
+          <p className="text-xs font-black text-[#161F4C]"><span className="block text-[9px] font-black uppercase tracking-wider text-emerald-700">Value at intersection</span>{selectedValue}</p>
         </div>
       ) : (
         <p className="mt-3 text-center text-[10px] font-semibold text-slate-400">Select any cell to highlight its row, column, and intersection.</p>
@@ -158,7 +158,7 @@ function SelectedItem({ item }) {
   return (
     <div className="mt-3 rounded-2xl border border-blue-200 bg-blue-50 p-4">
       <p className="text-[9px] font-black uppercase tracking-wider text-blue-700">Current focus</p>
-      <p className="mt-1 text-xs font-black text-[#1E1B4B]">{item.label}{item.value ? ` · ${item.value}` : ""}</p>
+      <p className="mt-1 text-xs font-black text-[#161F4C]">{item.label}{item.value ? ` · ${item.value}` : ""}</p>
       <p className="mt-1 text-xs font-medium leading-relaxed text-slate-600">{item.description}</p>
     </div>
   );

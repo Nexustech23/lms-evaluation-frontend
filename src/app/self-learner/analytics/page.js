@@ -118,14 +118,14 @@ function deriveStats(attempts) {
 
 function PillTabs({ tabs, active, onChange, color }) {
   return (
-    <div className="flex gap-1 p-1 bg-gray-100 rounded-xl">
+    <div className="flex gap-1 p-1 bg-[#EEF2F7] rounded-[10px]">
       {tabs.map((t) => (
         <button key={t.value} type="button" onClick={() => onChange(t.value)}
-          className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 whitespace-nowrap"
+          className="px-3.5 h-8 rounded-lg text-xs font-semibold transition-all duration-150 whitespace-nowrap"
           style={
             active === t.value
-              ? { backgroundColor: "#fff", color, boxShadow: "0 1px 4px rgba(0,0,0,0.08)" }
-              : { color: "#9ca3af" }
+              ? { backgroundColor: "#fff", color: "#1D4ED8", boxShadow: "0 1px 3px rgba(22,31,76,0.14)" }
+              : { color: "#64748B" }
           }>
           {t.label}
         </button>
@@ -140,14 +140,14 @@ function PillTabs({ tabs, active, onChange, color }) {
 
 function StatCard({ icon, label, value, accent }) {
   return (
-    <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex items-center gap-3">
+    <div className="bg-white rounded-2xl px-5 py-[18px] shadow-[0_1px_3px_rgba(22,31,76,0.06),0_4px_12px_rgba(22,31,76,0.04)] border border-[#E2E8F0] flex items-center gap-3 h-full">
       <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0"
         style={{ backgroundColor: accent + "15" }}>
         {icon}
       </div>
       <div className="min-w-0">
         <p className="text-xl font-bold leading-tight" style={{ color: accent }}>{value}</p>
-        <p className="text-xs font-medium text-gray-500 truncate">{label}</p>
+        <p className="text-xs font-medium text-[#475569] truncate">{label}</p>
       </div>
     </div>
   );
@@ -157,23 +157,23 @@ function StatCard({ icon, label, value, accent }) {
 // Section Card
 // ─────────────────────────────────────────────────────────────
 
-function SectionCard({ title, icon, children, action }) {
+function SectionCard({ title, icon, children, action, fill }) {
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-      <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 flex-wrap gap-2">
+    <div className={"bg-white rounded-2xl shadow-[0_1px_3px_rgba(22,31,76,0.06),0_4px_12px_rgba(22,31,76,0.04)] border border-[#E2E8F0] overflow-hidden" + (fill ? " flex flex-col h-full" : "")}>
+      <div className="flex items-center justify-between px-5 py-4 border-b border-[#EEF2F7] flex-wrap gap-2">
         <div className="flex items-center gap-2">
           <span>{icon}</span>
-          <h3 className="text-sm font-bold text-gray-800">{title}</h3>
+          <h3 className="text-sm font-bold text-[#161F4C]">{title}</h3>
         </div>
         {action}
       </div>
-      <div className="p-5">{children}</div>
+      <div className={"p-5" + (fill ? " flex-1 flex flex-col justify-center" : "")}>{children}</div>
     </div>
   );
 }
 
 function Empty({ text }) {
-  return <div className="text-center py-8 text-gray-400 text-sm">{text}</div>;
+  return <div className="text-center py-8 text-[#64748B] text-sm">{text}</div>;
 }
 
 // ScoreTrendChart / SubjectPerformanceChart (recharts) live in
@@ -225,8 +225,8 @@ function SourceBreakdownBar({ breakdown, sourceFilter, onPick }) {
               style={{ opacity: isActive ? 1 : 0.4 }}
             >
               <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: cfg.color }} />
-              <span className="text-gray-600">{cfg.label}</span>
-              <span className="text-gray-400">{breakdown[key] || 0}</span>
+              <span className="text-[#475569]">{cfg.label}</span>
+              <span className="text-[#64748B]">{breakdown[key] || 0}</span>
             </button>
           );
         })}
@@ -245,34 +245,33 @@ function AttemptRow({ attempt, color, onReview, onDetailedFeedback }) {
   const src = SOURCE_CONFIG[attempt.sourceType] || SOURCE_CONFIG.practice_test;
 
   return (
-    <div className="flex items-center gap-3 py-3 border-b border-gray-100 last:border-0 flex-wrap">
-      <div className="w-9 h-9 rounded-lg flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
+    <div className="flex items-center gap-3 px-[18px] py-[14px] border-b border-[#EEF2F7] last:border-0 flex-wrap">
+      <div className="w-[38px] h-[38px] rounded-lg flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
         style={{ backgroundColor: gc }}>{grade}</div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <p className="text-sm font-semibold text-gray-800 truncate">{attempt.testTitle}</p>
+          <p className="text-sm font-semibold text-[#161F4C] truncate">{attempt.testTitle}</p>
           <span className="text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0"
             style={{ backgroundColor: src.bg, color: src.color }}>
             {src.label}
           </span>
         </div>
-        <p className="text-xs text-gray-400">{attempt.subjectName} · {attempt.date ? new Date(attempt.date).toLocaleDateString() : "—"}</p>
+        <p className="text-xs text-[#64748B]">{attempt.subjectName} · {attempt.date ? new Date(attempt.date).toLocaleDateString() : "—"}</p>
       </div>
       <div className="text-right flex-shrink-0">
         <p className="text-sm font-bold" style={{ color }}>{attempt.scored}/{attempt.totalMarks}</p>
-        <p className="text-xs text-gray-400">{p}%</p>
+        <p className="text-xs text-[#64748B]">{p}%</p>
       </div>
-      <div className="flex gap-1.5 flex-shrink-0">
+      <div className="flex gap-2 flex-shrink-0 items-center">
         {attempt.test_id && (
           <button onClick={() => onReview(attempt)}
-            className="text-xs px-3 py-1.5 rounded-lg border font-medium"
-            style={{ borderColor: color, color }}>
+            className="text-xs h-9 px-3.5 min-w-[76px] rounded-lg border font-semibold bg-white hover:bg-[#EFF6FF] transition-colors"
+            style={{ borderColor: "#CBD5E1", color: "#1D4ED8" }}>
             Review
           </button>
         )}
         <button onClick={() => onDetailedFeedback(attempt)}
-          className="text-xs px-3 py-1.5 rounded-lg text-white font-medium"
-          style={{ backgroundColor: color }}>
+          className="text-xs h-9 px-3.5 min-w-[175px] rounded-lg text-white font-semibold bg-[#1D4ED8] hover:bg-[#1E40AF] transition-colors">
           {attempt.hasInsight ? "View Feedback" : "Get Detailed Feedback"}
         </button>
       </div>
@@ -338,10 +337,10 @@ export default function Analytics() {
   );
 
   if (loading) return (
-    <div className="flex items-center justify-center h-screen" style={{ backgroundColor: color }}>
-      <div className="bg-white rounded-2xl p-10 flex flex-col items-center gap-4 shadow-xl">
+    <div className="flex items-center justify-center h-screen" style={{ backgroundColor: "#F5F7FB" }}>
+      <div className="bg-white rounded-2xl border border-[#E2E8F0] p-10 flex flex-col items-center gap-4 shadow-md">
         <Spinner />
-        <p className="text-sm text-gray-400">Loading your analytics…</p>
+        <p className="text-sm text-[#64748B]">Loading your analytics…</p>
       </div>
     </div>
   );
@@ -350,14 +349,14 @@ export default function Analytics() {
   const { grade: overallGrade, color: gradeColor } = getGrade(overallPct);
 
   return (
-    <div className="flex flex-col min-h-screen" style={{ backgroundColor: color }}>
-      <div className="flex-1 p-4 sm:p-6 space-y-4">
+    <div className="flex flex-col min-h-screen" style={{ backgroundColor: "#F5F7FB" }}>
+      <div className="flex-1 p-4 sm:p-6 space-y-5">
 
         {/* ── Header + Filter Row (scopes everything below) ── */}
-        <div className="bg-white rounded-xl shadow-sm px-5 py-4 flex flex-wrap items-center justify-between gap-3">
+        <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-[0_1px_3px_rgba(22,31,76,0.06),0_4px_12px_rgba(22,31,76,0.04)] px-6 py-[18px] flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 className="text-xl font-bold" style={{ color }}>Analytics</h2>
-            <p className="text-xs text-gray-400">Every scored attempt — tests, roadmap tests, and weekly quizzes — in one place</p>
+            <h2 className="text-xl font-bold leading-tight" style={{ color: "#161F4C" }}>Analytics</h2>
+            <p className="text-xs text-[#64748B] mt-1">Every scored attempt — tests, roadmap tests, and weekly quizzes — in one place</p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <PillTabs
@@ -375,17 +374,17 @@ export default function Analytics() {
         </div>
 
         {/* ── Grade + Stats ── */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-stretch">
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex flex-col items-center justify-center text-center md:col-span-1">
-            <div className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold text-white mb-3 shadow-md"
+          <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(22,31,76,0.06),0_4px_12px_rgba(22,31,76,0.04)] border border-[#E2E8F0] px-5 py-[18px] flex flex-col items-center justify-center text-center md:col-span-1">
+            <div className="w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold text-white mb-2 shadow-md"
               style={{ backgroundColor: gradeColor }}>{overallGrade}</div>
-            <p className="text-xs text-gray-400 font-medium">Overall Grade</p>
-            <p className="text-2xl font-bold mt-1" style={{ color }}>{overallPct}%</p>
-            <p className="text-xs text-gray-400 mt-0.5">avg score</p>
+            <p className="text-xs text-[#64748B] font-medium">Overall Grade</p>
+            <p className="text-2xl font-bold mt-0.5 leading-tight" style={{ color }}>{overallPct}%</p>
+            <p className="text-xs text-[#64748B]">avg score</p>
           </div>
 
-          <div className="md:col-span-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="md:col-span-4 grid grid-cols-2 sm:grid-cols-4 gap-4 items-stretch">
             <StatCard icon="📝" label="Attempts" value={summary.testsAttempted} accent={color} />
             <StatCard icon="❓" label="Questions Solved" value={summary.totalQuestions} accent="#3b82f6" />
             <StatCard icon="🎯" label="Avg Accuracy" value={`${summary.avgAccuracy || 0}%`} accent="#22c55e" />
@@ -394,12 +393,12 @@ export default function Analytics() {
         </div>
 
         {/* ── Score Trend + Source Breakdown ── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <SectionCard title="Score Trend" icon="📈">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-stretch">
+          <SectionCard title="Score Trend" icon="📈" fill>
             <ScoreTrendChart trend={trend} />
           </SectionCard>
 
-          <SectionCard title="Where Your Attempts Come From" icon="🧩">
+          <SectionCard title="Where Your Attempts Come From" icon="🧩" fill>
             <SourceBreakdownBar breakdown={sourceBreakdown} sourceFilter={sourceFilter} onPick={setSourceFilter} />
           </SectionCard>
         </div>
@@ -410,14 +409,14 @@ export default function Analytics() {
         </SectionCard>
 
         {/* ── Strengths & Improvements ── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-stretch">
 
-          <SectionCard title="Your Strengths" icon="💪">
+          <SectionCard title="Your Strengths" icon="💪" fill>
             {strengths.length === 0
               ? <Empty text="Attempt more tests to identify strengths." />
-              : <ul className="space-y-2">
+              : <ul className="space-y-2.5">
                 {strengths.map((s, i) => (
-                  <li key={i} className="flex items-start gap-3 p-3 rounded-xl"
+                  <li key={i} className="flex items-start gap-2.5 px-4 py-3 rounded-[10px]"
                     style={{ backgroundColor: "#f0fdf4", border: "1px solid #bbf7d0" }}>
                     <span className="text-green-500 mt-0.5">✓</span>
                     <div>
@@ -430,12 +429,12 @@ export default function Analytics() {
             }
           </SectionCard>
 
-          <SectionCard title="Areas to Improve" icon="🎯">
+          <SectionCard title="Areas to Improve" icon="🎯" fill>
             {improvements.length === 0
               ? <Empty text="Attempt more tests to see improvement areas." />
-              : <ul className="space-y-2">
+              : <ul className="space-y-2.5">
                 {improvements.map((s, i) => (
-                  <li key={i} className="flex items-start gap-3 p-3 rounded-xl"
+                  <li key={i} className="flex items-start gap-2.5 px-4 py-3 rounded-[10px]"
                     style={{ backgroundColor: "#fff7ed", border: "1px solid #fed7aa" }}>
                     <span className="text-orange-500 mt-0.5">↑</span>
                     <div>
@@ -454,11 +453,10 @@ export default function Analytics() {
           {filteredAttempts.length === 0 ? (
             <div className="text-center py-10">
               <p className="text-4xl mb-3">📭</p>
-              <p className="text-sm font-medium text-gray-600">No attempts yet.</p>
-              <p className="text-xs text-gray-400 mb-4">Start a test or quiz to see your history here.</p>
+              <p className="text-sm font-medium text-[#475569]">No attempts yet.</p>
+              <p className="text-xs text-[#64748B] mb-4">Start a test or quiz to see your history here.</p>
               <button onClick={() => router.push("/self-learner/test-engine/create-test")}
-                className="px-5 py-2 text-white rounded-xl text-sm font-semibold"
-                style={{ backgroundColor: color }}>
+                className="h-11 px-5 text-white rounded-[10px] text-sm font-semibold bg-[#161F4C] hover:bg-[#252F6B] transition-colors">
                 Create a Test
               </button>
             </div>
@@ -473,16 +471,16 @@ export default function Analytics() {
 
         {/* ── Motivation Banner ── */}
         {summary.testsAttempted > 0 && (
-          <div className="rounded-xl p-5 text-center"
-            style={{ backgroundColor: "rgba(255, 255, 255, 0.12)", border: "1px solid rgba(255, 255, 255, 0.2)" }}>
-            <p className="text-base font-bold text-white">
+          <div className="rounded-2xl px-6 py-5 text-center"
+            style={{ backgroundColor: "#EEF2FF", border: "1px solid #C7D2FE" }}>
+            <p className="text-base font-bold text-[#161F4C]">
               {overallPct >= 80
                 ? "🌟 Outstanding performance! Keep it up."
                 : overallPct >= 60
                   ? "💪 Good progress! A little more practice will get you there."
                   : "📚 Keep practising! Consistency is the key to improvement."}
             </p>
-            <p className="text-xs text-white/80 mt-1.5">
+            <p className="text-xs text-[#475569] mt-1.5">
               You've made <strong>{summary.testsAttempted}</strong> attempt{summary.testsAttempted !== 1 ? "s" : ""} and solved <strong>{summary.totalQuestions}</strong> questions.
             </p>
           </div>

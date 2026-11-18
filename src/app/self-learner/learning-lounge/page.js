@@ -110,11 +110,11 @@ function useReadAloud() {
 // ─── AI Notes Renderer ────────────────────────────────────────────────────────
 
 const markdownComponents = {
-  strong: ({ node, ...props }) => <strong className="font-bold text-[#1E1B4B]" {...props} />,
-  h1: ({ node, ...props }) => <h3 className="text-lg font-black text-[#1E1B4B] mt-4 mb-2" {...props} />,
-  h2: ({ node, ...props }) => <h4 className="text-base font-black text-[#1E1B4B] mt-3 mb-2" {...props} />,
-  h3: ({ node, ...props }) => <h5 className="text-sm font-bold text-[#1E1B4B] mt-2 mb-1" {...props} />,
-  h4: ({ node, ...props }) => <h6 className="text-xs font-bold text-[#1E1B4B] mt-2 mb-1" {...props} />,
+  strong: ({ node, ...props }) => <strong className="font-bold text-[#161F4C]" {...props} />,
+  h1: ({ node, ...props }) => <h3 className="text-lg font-black text-[#161F4C] mt-4 mb-2" {...props} />,
+  h2: ({ node, ...props }) => <h4 className="text-base font-black text-[#161F4C] mt-3 mb-2" {...props} />,
+  h3: ({ node, ...props }) => <h5 className="text-sm font-bold text-[#161F4C] mt-2 mb-1" {...props} />,
+  h4: ({ node, ...props }) => <h6 className="text-xs font-bold text-[#161F4C] mt-2 mb-1" {...props} />,
   p: ({ node, ...props }) => <p className="mb-2 last:mb-0" {...props} />,
   ul: ({ node, ...props }) => <ul className="list-disc pl-4 mb-2" {...props} />,
   ol: ({ node, ...props }) => <ol className="list-decimal pl-4 mb-2" {...props} />,
@@ -127,7 +127,7 @@ function DetailedExplanationContent({ explanation }) {
       {explanation.map((section, index) => (
         <div key={index}>
           {section.heading && (
-            <h5 className="text-xs font-black text-[#1E1B4B] uppercase tracking-wide mb-1.5 border-b border-gray-100 pb-1">
+            <h5 className="text-xs font-black text-[#161F4C] uppercase tracking-wide mb-1.5 border-b border-gray-100 pb-1">
               {section.heading}
             </h5>
           )}
@@ -167,7 +167,7 @@ function AINotesDisplay({ notes, isCompleted, onToggleComplete, onDiagramError, 
       <div className="flex justify-end">
         <button
           onClick={() => (speaking ? stop() : speak(notesToSpeechText(notes)))}
-          className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-[#6C63FF] bg-[#F0EEFF] hover:bg-[#E4E1FF] px-3 py-2 rounded-xl transition-all duration-200"
+          className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-[#6C63FF] bg-[#F0EEFF] hover:bg-[#E4E1FF] px-3.5 h-8 rounded-full transition-all duration-200"
         >
           {speaking ? <Square size={12} /> : <Volume2 size={12} />}
           {speaking ? "Stop Reading" : "Read Aloud"}
@@ -175,7 +175,7 @@ function AINotesDisplay({ notes, isCompleted, onToggleComplete, onDiagramError, 
       </div>
 
       {/* Summary */}
-      <div className="bg-[#F0EEFF] border border-[#6C63FF]/20 rounded-2xl p-5">
+      <div className="bg-[#F0EEFF] border border-[#6C63FF]/20 rounded-xl px-5 py-4">
         <div className="flex items-center gap-2 mb-2">
           <BookOpen size={14} className="text-[#6C63FF]" />
           <span className="text-[10px] font-black text-[#6C63FF] uppercase tracking-widest">Overview</span>
@@ -203,7 +203,7 @@ function AINotesDisplay({ notes, isCompleted, onToggleComplete, onDiagramError, 
       {/* Detailed Explanation */}
       {notes.detailedExplanation && (
         notes.interactiveLesson?.schemaVersion >= 3 ? (
-          <details className="group bg-white border border-gray-100 rounded-2xl p-5 shadow-xs">
+          <details className="group bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-[0_1px_3px_rgba(22,31,76,0.06),0_4px_12px_rgba(22,31,76,0.04)]">
             <summary className="cursor-pointer list-none flex items-center justify-between gap-3">
               <span>
                 <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Deep Reading</span>
@@ -216,7 +216,7 @@ function AINotesDisplay({ notes, isCompleted, onToggleComplete, onDiagramError, 
             </div>
           </details>
         ) : (
-          <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-xs">
+          <div className="bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-[0_1px_3px_rgba(22,31,76,0.06),0_4px_12px_rgba(22,31,76,0.04)]">
             <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-4">Detailed Explanation</span>
             <DetailedExplanationContent explanation={notes.detailedExplanation} />
           </div>
@@ -225,7 +225,7 @@ function AINotesDisplay({ notes, isCompleted, onToggleComplete, onDiagramError, 
 
       {/* Key Points */}
       {notes.keyPoints?.length > 0 && (
-        <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-xs">
+        <div className="bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-[0_1px_3px_rgba(22,31,76,0.06),0_4px_12px_rgba(22,31,76,0.04)]">
           <div className="flex items-center gap-2 mb-3">
             <Lightbulb size={13} className="text-amber-500" />
             <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Key Points</span>
@@ -243,13 +243,13 @@ function AINotesDisplay({ notes, isCompleted, onToggleComplete, onDiagramError, 
 
       {/* Formulas / Rules */}
       {notes.formulasOrRules?.length > 0 && (
-        <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-xs">
+        <div className="bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-[0_1px_3px_rgba(22,31,76,0.06),0_4px_12px_rgba(22,31,76,0.04)]">
           <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-3">
             Formulas &amp; Rules
           </span>
           <div className="space-y-3">
             {notes.formulasOrRules.map((fr, i) => (
-              <div key={i} className="bg-[#FAFBFF] border border-gray-100 rounded-xl p-3">
+              <div key={i} className="bg-[#FAFBFF] border border-[#E2E8F0] rounded-xl p-3">
                 <span className="block text-[10px] font-black text-[#6C63FF] uppercase tracking-wider">
                   {fr.name}
                 </span>
@@ -263,7 +263,7 @@ function AINotesDisplay({ notes, isCompleted, onToggleComplete, onDiagramError, 
 
       {/* Code Example */}
       {notes.codeExample?.code && notes.codeExample.code !== "N/A" && (
-        <div className="bg-[#1E1B4B] rounded-2xl p-5">
+        <div className="bg-[#161F4C] rounded-2xl p-5">
           <div className="flex items-center gap-2 mb-3">
             <Code2 size={13} className="text-[#6C63FF]" />
             <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
@@ -327,7 +327,7 @@ function AINotesDisplay({ notes, isCompleted, onToggleComplete, onDiagramError, 
 
       {/* Revision Checklist */}
       {notes.revisionChecklist?.length > 0 && (
-        <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-xs">
+        <div className="bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-[0_1px_3px_rgba(22,31,76,0.06),0_4px_12px_rgba(22,31,76,0.04)]">
           <div className="flex items-center gap-2 mb-3">
             <ClipboardList size={13} className="text-[#6C63FF]" />
             <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
@@ -349,9 +349,9 @@ function AINotesDisplay({ notes, isCompleted, onToggleComplete, onDiagramError, 
       <div className="flex flex-col items-center gap-2">
         <button
           onClick={handleToggle}
-          className={`w-full h-11 rounded-xl text-xs font-black flex items-center justify-center gap-2 transition-all duration-200 hover:scale-[1.01] ${isCompleted
+          className={`w-full h-[46px] rounded-xl text-xs font-bold flex items-center justify-center gap-2.5 transition-colors duration-200 ${isCompleted
             ? "bg-[#EDFAF5] text-[#43C6AC] border border-[#43C6AC]/30"
-            : "bg-[#1E1B4B] text-white hover:bg-black"
+            : "bg-[#161F4C] text-white hover:bg-[#252F6B]"
             }`}
         >
           <CheckCircle2 size={14} />
@@ -384,7 +384,7 @@ function PracticeQuestionsPanel({ questions, loading, error, roadmapId, week, su
 
   if (loading) {
     return (
-      <div className="bg-white rounded-3xl border border-gray-200 shadow-sm p-6 flex items-center justify-center gap-3 text-gray-500">
+      <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-[0_1px_3px_rgba(22,31,76,0.06),0_4px_12px_rgba(22,31,76,0.04)] p-6 flex items-center justify-center gap-3 text-gray-500">
         <Loader2 size={18} className="animate-spin text-[#6C63FF]" />
         <span className="text-xs font-bold">Generating practice questions…</span>
       </div>
@@ -441,9 +441,9 @@ function PracticeQuestionsPanel({ questions, loading, error, roadmapId, week, su
   const verdictStyle = evalResult ? VERDICT_STYLE[evalResult.verdict] || VERDICT_STYLE.incorrect : null;
 
   return (
-    <div className="bg-white rounded-3xl border border-gray-200 shadow-sm p-5 space-y-4">
+    <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-[0_1px_3px_rgba(22,31,76,0.06),0_4px_12px_rgba(22,31,76,0.04)] p-5 space-y-4">
       <div className="flex items-center justify-between">
-        <h4 className="text-xs font-black text-[#1E1B4B] uppercase tracking-wider">
+        <h4 className="text-xs font-black text-[#161F4C] uppercase tracking-wider">
           Practice Questions
         </h4>
         <span className="text-[10px] text-gray-400 font-bold">
@@ -498,7 +498,7 @@ function PracticeQuestionsPanel({ questions, loading, error, roadmapId, week, su
       {isMCQ && !revealed && selected !== null && (
         <button
           onClick={() => setRevealed(true)}
-          className="w-full h-9 bg-[#6C63FF] text-white rounded-xl text-xs font-black hover:bg-[#5B52EE] transition-all"
+          className="w-full h-11 bg-[#4F46E5] text-white rounded-[10px] text-xs font-bold hover:bg-[#4338CA] transition-colors"
         >
           Check Answer
         </button>
@@ -508,14 +508,14 @@ function PracticeQuestionsPanel({ questions, loading, error, roadmapId, week, su
           <button
             onClick={handleSubmitForFeedback}
             disabled={!studentAnswer.trim() || evaluating}
-            className="flex-1 h-9 bg-[#6C63FF] text-white rounded-xl text-xs font-black hover:bg-[#5B52EE] transition-all disabled:opacity-40 flex items-center justify-center gap-2"
+            className="flex-1 h-11 bg-[#4F46E5] text-white rounded-[10px] text-xs font-bold hover:bg-[#4338CA] transition-colors disabled:bg-[#E2E8F0] disabled:text-[#64748B] disabled:hover:bg-[#E2E8F0] disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {evaluating ? <Loader2 size={14} className="animate-spin" /> : null}
             {evaluating ? "Evaluating…" : "Submit for Feedback"}
           </button>
           <button
             onClick={() => setRevealed(true)}
-            className="px-4 h-9 bg-[#FAFBFF] hover:bg-gray-100 text-gray-500 border border-gray-200 rounded-xl text-xs font-bold transition-all"
+            className="px-5 h-11 bg-[#FAFBFF] hover:bg-gray-100 text-[#475569] border border-[#E2E8F0] rounded-[10px] text-xs font-bold transition-colors"
           >
             Just show answer
           </button>
@@ -543,7 +543,7 @@ function PracticeQuestionsPanel({ questions, loading, error, roadmapId, week, su
       )}
 
       {revealed && q.explanation && (
-        <div className="bg-[#FAFBFF] border border-gray-100 rounded-xl p-3">
+        <div className="bg-[#FAFBFF] border border-[#E2E8F0] rounded-xl p-3">
           <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1">Explanation</p>
           <div className="text-xs font-semibold text-slate-700 leading-relaxed">
             <ReactMarkdown components={markdownComponents}>{q.explanation}</ReactMarkdown>
@@ -551,18 +551,18 @@ function PracticeQuestionsPanel({ questions, loading, error, roadmapId, week, su
         </div>
       )}
 
-      <div className="flex justify-between pt-1">
+      <div className="flex justify-between items-center pt-2 border-t border-[#EEF2F7]">
         <button
           onClick={handlePrev}
           disabled={currentIdx === 0}
-          className="text-[10px] font-black text-gray-400 hover:text-[#6C63FF] disabled:opacity-30 transition"
+          className="h-8 px-2 -mx-2 rounded-lg text-[11px] font-bold text-[#64748B] hover:text-[#6C63FF] disabled:opacity-30 transition"
         >
           ← Prev
         </button>
         <button
           onClick={handleNext}
           disabled={currentIdx === questions.length - 1}
-          className="text-[10px] font-black text-gray-400 hover:text-[#6C63FF] disabled:opacity-30 transition"
+          className="h-8 px-2 -mx-2 rounded-lg text-[11px] font-bold text-[#64748B] hover:text-[#6C63FF] disabled:opacity-30 transition"
         >
           Next →
         </button>
@@ -866,7 +866,7 @@ function LearningLoungeContent() {
         <p className="text-red-500 font-bold">This roadmap has no weeks yet.</p>
         <button
           onClick={() => router.push("/self-learner/roadmap")}
-          className="bg-[#1E1B4B] text-white px-5 py-2.5 rounded-xl font-bold text-xs"
+          className="bg-[#161F4C] hover:bg-[#252F6B] text-white h-11 px-5 rounded-xl font-semibold text-xs"
         >
           Back to Roadmaps
         </button>
@@ -890,10 +890,10 @@ function LearningLoungeContent() {
         />
       )}
 
-      <div className="max-w-6xl mx-auto space-y-6">
+      <div className="max-w-6xl mx-auto space-y-5">
 
         {/* Header bar */}
-        <div className="flex flex-wrap justify-between items-center gap-3 bg-white rounded-3xl border border-gray-200 shadow-sm p-4">
+        <div className="flex flex-wrap justify-between items-center gap-3 bg-white rounded-2xl border border-[#E2E8F0] shadow-[0_1px_3px_rgba(22,31,76,0.06),0_4px_12px_rgba(22,31,76,0.04)] px-5 py-3">
           <button
             onClick={() => router.push(`/self-learner/roadmap/${roadmapId}`)}
             className="flex items-center gap-1.5 text-xs font-bold text-gray-500 hover:text-[#6C63FF] transition-all duration-200"
@@ -905,7 +905,7 @@ function LearningLoungeContent() {
             {difficulty && (
               <button
                 onClick={() => setShowPicker(true)}
-                className="flex items-center gap-1.5 text-[10px] font-bold text-[#6C63FF] bg-[#F0EEFF] px-3 py-1.5 rounded-full hover:bg-[#E4E1FF] transition-all"
+                className="flex items-center gap-1.5 text-[11px] font-bold text-[#6C63FF] bg-[#F0EEFF] h-8 px-3.5 rounded-full hover:bg-[#E4E1FF] transition-all"
                 title="Change learning style / difficulty"
               >
                 <Pencil size={11} /> {difficulty}
@@ -916,7 +916,7 @@ function LearningLoungeContent() {
             <div className="relative">
               <button
                 onClick={() => setShowSwitcher((s) => !s)}
-                className="flex items-center gap-1.5 text-xs font-black text-[#1E1B4B] bg-[#FAFBFF] border border-gray-200 px-3 py-1.5 rounded-full hover:border-[#6C63FF]/40 transition-all"
+                className="flex items-center gap-1.5 text-xs font-bold text-[#161F4C] bg-[#FAFBFF] border border-[#E2E8F0] h-9 px-4 rounded-full hover:border-[#6C63FF]/40 transition-all"
               >
                 {roadmap.subject} <ChevronDown size={12} />
               </button>
@@ -945,7 +945,7 @@ function LearningLoungeContent() {
         </div>
 
         {/* Compact week selector */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1">
+        <div className="flex items-center gap-2 overflow-x-auto pb-2">
           {roadmap.weeks.map((wk) => {
             const isUnlocked = unlockedWeeks.includes(wk.week);
             const isActive = wk.week === weekNum;
@@ -954,10 +954,10 @@ function LearningLoungeContent() {
                 key={wk.week}
                 disabled={!isUnlocked}
                 onClick={() => handleSelectWeek(wk.week)}
-                className={`shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[11px] font-black transition-all duration-200 ${isActive
-                  ? "bg-[#1E1B4B] text-white"
+                className={`shrink-0 flex items-center justify-center gap-1.5 h-[34px] px-3.5 rounded-full text-[11px] font-bold transition-all duration-200 ${isActive
+                  ? "bg-[#161F4C] text-white"
                   : isUnlocked
-                    ? "bg-white border border-gray-200 text-gray-600 hover:border-[#6C63FF]/40"
+                    ? "bg-white border border-[#E2E8F0] text-[#475569] hover:border-[#6C63FF]/40"
                     : "bg-gray-100 text-gray-400 cursor-not-allowed"
                   }`}
               >
@@ -972,21 +972,21 @@ function LearningLoungeContent() {
             column on the right scrolls independently in its own box, so
             reading a long note never requires re-scrolling past the week
             intro / subtopic list to get back to them. */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-start">
 
           {/* ── Sidebar syllabus menu ── */}
           <div className="space-y-4 md:sticky md:top-6 md:self-start">
-            <div className="bg-white rounded-3xl border border-gray-200 shadow-sm p-5 space-y-4">
-              <h4 className="text-xs font-black text-[#1E1B4B] uppercase tracking-wider border-b border-gray-100 pb-2">
+            <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-[0_1px_3px_rgba(22,31,76,0.06),0_4px_12px_rgba(22,31,76,0.04)] p-5 space-y-4">
+              <h4 className="text-xs font-black text-[#161F4C] uppercase tracking-wider border-b border-[#EEF2F7] pb-3">
                 Week {weekNum}: {weekData.title}
               </h4>
               {weekData.introDescription && (
-                <p className="text-[11px] font-semibold text-gray-400 leading-relaxed -mt-2 pb-2 border-b border-gray-100">
+                <p className="text-[11px] font-semibold text-[#64748B] leading-relaxed -mt-2 pb-2 border-b border-gray-100">
                   {weekData.introDescription}
                 </p>
               )}
 
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 {weekData.subtopics.map((sub, sIdx) => {
                   const subKey = `${weekNum}-${sIdx}-${sub.title}`;
                   const isDone = (roadmap.progress?.completedSubtopics || []).includes(subKey);
@@ -996,14 +996,14 @@ function LearningLoungeContent() {
                     <button
                       key={sIdx}
                       onClick={() => handleSelectSubtopic(sIdx)}
-                      className={`w-full text-left p-2.5 rounded-xl text-xs font-bold flex items-center justify-between transition-all duration-200 ${isCurrent
+                      className={`w-full text-left px-3.5 py-2.5 rounded-[10px] text-xs font-bold flex items-center justify-between gap-2 transition-all duration-200 ${isCurrent
                         ? "bg-[#F0EEFF] text-[#6C63FF]"
-                        : "hover:bg-gray-50 text-gray-600"
+                        : "hover:bg-gray-50 text-[#475569]"
                         }`}
                     >
-                      <span className="truncate pl-2">• {sub.title}</span>
+                      <span className="truncate">• {sub.title}</span>
                       {isDone && (
-                        <CheckCircle2 size={12} className="text-[#43C6AC] shrink-0 ml-2" />
+                        <CheckCircle2 size={18} className="text-[#43C6AC] shrink-0" />
                       )}
                     </button>
                   );
@@ -1014,17 +1014,17 @@ function LearningLoungeContent() {
           </div>
 
           {/* ── Main workspace ── */}
-          <div className="md:col-span-2 space-y-6">
+          <div className="md:col-span-2 space-y-5">
 
             {activeSubtopic && (
               <>
 
                 {/* Subtopic title bar — stays put, only the notes below it scroll */}
-                <div className="bg-white rounded-3xl border border-gray-200 shadow-sm p-5">
+                <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-[0_1px_3px_rgba(22,31,76,0.06),0_4px_12px_rgba(22,31,76,0.04)] p-5">
                   <span className="text-[10px] font-black text-[#6C63FF] uppercase tracking-widest block">
                     Week {weekNum} — {weekData.title}
                   </span>
-                  <h2 className="text-base font-black text-[#1E1B4B] mt-1">
+                  <h2 className="text-base font-black text-[#161F4C] mt-1">
                     {activeSubtopic.title}
                   </h2>
                   {activeSubtopic.difficulty && (
@@ -1041,10 +1041,10 @@ function LearningLoungeContent() {
 
                   {/* Notes area */}
                   {notesLoading ? (
-                    <div className="bg-white rounded-3xl border border-gray-200 shadow-sm p-10 flex flex-col items-center gap-4 text-center">
+                    <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-[0_1px_3px_rgba(22,31,76,0.06),0_4px_12px_rgba(22,31,76,0.04)] p-10 flex flex-col items-center gap-4 text-center">
                       <Loader2 size={36} className="animate-spin text-[#6C63FF]" />
                       <div>
-                        <p className="text-sm font-black text-[#1E1B4B]">
+                        <p className="text-sm font-black text-[#161F4C]">
                           Guru is generating your study notes…
                         </p>
                         <p className="text-xs text-gray-400 font-semibold mt-1">
@@ -1071,7 +1071,7 @@ function LearningLoungeContent() {
                       </button>
                     </div>
                   ) : notes ? (
-                    <div className="bg-white rounded-3xl border border-gray-200 shadow-sm p-5">
+                    <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-[0_1px_3px_rgba(22,31,76,0.06),0_4px_12px_rgba(22,31,76,0.04)] p-5">
                       <AINotesDisplay
                         notes={notes}
                         isCompleted={isCompleted}

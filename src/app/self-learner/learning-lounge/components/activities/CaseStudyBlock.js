@@ -9,7 +9,7 @@ export default function CaseStudyBlock({ block }) {
 
   return (
     <ActivityShell icon={<BriefcaseBusiness size={17} />} eyebrow="Case study" title={block.title} tone="blue">
-      <p className="text-sm font-semibold leading-relaxed text-[#1E1B4B]">{block.scenario}</p>
+      <p className="text-sm font-semibold leading-relaxed text-[#161F4C]">{block.scenario}</p>
       <div className="mt-4 rounded-xl border border-blue-200 bg-white p-4">
         <p className="text-[9px] font-black uppercase tracking-widest text-blue-600">What you know</p>
         <ul className="mt-2 grid gap-2 sm:grid-cols-2">
@@ -18,9 +18,9 @@ export default function CaseStudyBlock({ block }) {
       </div>
       <div className="mt-3 rounded-xl border border-violet-200 bg-violet-50 p-4">
         <p className="text-[9px] font-black uppercase tracking-widest text-violet-700">Your decision</p>
-        <p className="mt-2 text-xs font-bold leading-relaxed text-[#1E1B4B]">{block.decision}</p>
+        <p className="mt-2 text-xs font-bold leading-relaxed text-[#161F4C]">{block.decision}</p>
       </div>
-      <button type="button" onClick={() => setRevealed((value) => !value)} className="mt-3 flex w-full items-center justify-between rounded-xl bg-[#1E1B4B] px-4 py-3 text-left text-xs font-black text-white" aria-expanded={revealed}>
+      <button type="button" onClick={() => setRevealed((value) => !value)} className="mt-3 flex w-full items-center justify-between rounded-xl bg-[#161F4C] px-4 py-3 text-left text-xs font-black text-white" aria-expanded={revealed}>
         <span>{revealed ? "Hide recommended approach" : "Think first, then reveal the approach"}</span>
         <ChevronDown size={15} className={`transition-transform ${revealed ? "rotate-180" : ""}`} />
       </button>

@@ -275,8 +275,8 @@ const UserProfile = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen" style={{ backgroundColor: user?.color }}>
-        <Navbar title="User Profile" hideLogo />
+      <div className="min-h-screen" style={{ backgroundColor: "#F5F7FB" }}>
+        <Navbar title="User Profile" hideLogo tone="light" />
         <div className="flex flex-1 items-center justify-center p-6 mt-20">
           <Spinner />
         </div>
@@ -285,11 +285,11 @@ const UserProfile = () => {
   }
 
   return (
-    <div className="flex flex-col min-h-screen" style={{ backgroundColor: user?.color }}>
-      <Navbar title="User Profile" hideLogo />
+    <div className="flex flex-col min-h-screen" style={{ backgroundColor: "#F5F7FB" }}>
+      <Navbar title="User Profile" hideLogo tone="light" />
 
       <div className="p-6 w-[600px] mx-auto">
-        <div className="bg-white rounded-xl w-full shadow-xl overflow-hidden">
+        <div className="bg-white rounded-2xl w-full border border-[#E2E8F0] shadow-[0_1px_3px_rgba(22,31,76,0.06),0_4px_12px_rgba(22,31,76,0.04)] overflow-hidden">
 
           {/* Tab Navigation */}
           <div className="flex border-b">
@@ -301,7 +301,7 @@ const UserProfile = () => {
                   ? "bg-orange-50 border-b-2"
                   : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
                   }`}
-                style={activeTab === tab ? { color: user?.color, borderBottomColor: user?.color } : {}}
+                style={activeTab === tab ? { color: "#1D4ED8", borderBottomColor: "#1D4ED8", backgroundColor: "#EFF6FF" } : { color: "#475569" }}
               >
                 {tab === "profile" ? "👤 Profile" : tab === "edit" ? "✏️ Edit" : "🔒 Password"}
               </button>
@@ -321,7 +321,7 @@ const UserProfile = () => {
                       src={userProfile.profileImage?.url || defaultAvatar}
                       alt="Profile"
                       className="w-24 h-24 rounded-full border-4 shadow-lg object-cover"
-                      style={{ borderColor: user?.color ? `${user.color}33` : '#fed7aa' }}
+                      style={{ borderColor: "#DBEAFE" }}
                       onError={(e) => { e.target.onerror = null; e.target.src = defaultAvatar; }}
                     />
                     <button
@@ -351,13 +351,13 @@ const UserProfile = () => {
                     />
                     <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-400 rounded-full border-2 border-white" />
                   </div>
-                  <h2 className="mt-4 text-xl font-bold text-gray-800">{userProfile.fullName || "User"}</h2>
-                  <p className="text-gray-500 text-sm mt-1">{userProfile.email}</p>
+                  <h2 className="mt-4 text-xl font-bold text-[#161F4C]">{userProfile.fullName || "User"}</h2>
+                  <p className="text-[#475569] text-sm mt-1">{userProfile.email}</p>
 
                   {userProfile.faculty_profile?.designation && (
                     <span
                       className="mt-2 px-3 py-1 rounded-full text-xs font-semibold"
-                      style={{ backgroundColor: user?.color ? `${user.color}1a` : '#fff7ed', color: user?.color }}
+                      style={{ backgroundColor: "#EFF6FF", color: "#1D4ED8" }}
                     >
                       {userProfile.faculty_profile.designation}
                       {userProfile.faculty_profile.specialization && ` · ${userProfile.faculty_profile.specialization}`}
@@ -408,7 +408,7 @@ const UserProfile = () => {
                 <div className="mt-auto">
                   <button
                     onClick={() => setShowLogoutModal(true)}
-                    className="w-full py-2.5 bg-red-50 text-red-600 border border-red-200 rounded-lg text-sm font-semibold hover:bg-red-100 transition"
+                    className="w-full h-11 bg-red-50 text-red-600 border border-red-200 rounded-[10px] text-sm font-semibold hover:bg-red-100 transition"
                   >
                     🚪 Logout
                   </button>
@@ -504,8 +504,8 @@ const UserProfile = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-2.5 text-white rounded-lg text-sm font-semibold transition disabled:opacity-60"
-                  style={{ backgroundColor: user?.color }}
+                  className="w-full h-11 text-white rounded-[10px] text-sm font-semibold transition disabled:opacity-60"
+                  style={{ backgroundColor: "#161F4C" }}
                 >
                   {isSubmitting ? "Saving..." : "Save Changes"}
                 </button>
@@ -559,7 +559,7 @@ const UserProfile = () => {
                         <div
                           key={i}
                           className="flex-1 h-1.5 rounded-full transition-colors"
-                          style={{ backgroundColor: valid ? user?.color || '#4ade80' : '#e5e7eb' }}
+                          style={{ backgroundColor: valid ? '#1D4ED8' : '#e5e7eb' }}
                         />
                       ))}
                     </div>
@@ -572,7 +572,7 @@ const UserProfile = () => {
                         ["special", "Special character"],
                       ].map(([key, label]) => (
                         <p key={key} className={`text-xs flex items-center gap-1 ${passwordStrength[key] ? "" : "text-gray-400"}`}
-                          style={passwordStrength[key] ? { color: user?.color } : {}}>
+                          style={passwordStrength[key] ? { color: "#1D4ED8" } : {}}>
                           {passwordStrength[key] ? "✓" : "·"} {label}
                         </p>
                       ))}
@@ -617,8 +617,8 @@ const UserProfile = () => {
                   <button
                     type="submit"
                     disabled={isSubmitting || !Object.values(passwordStrength).every(Boolean)}
-                    className="flex-1 py-2.5 text-white rounded-lg text-sm font-semibold transition disabled:opacity-60"
-                    style={{ backgroundColor: user?.color }}
+                    className="flex-1 h-11 text-white rounded-[10px] text-sm font-semibold transition disabled:opacity-60"
+                    style={{ backgroundColor: "#161F4C" }}
                   >
                     {isSubmitting ? "Updating..." : "Change Password"}
                   </button>
@@ -637,8 +637,8 @@ const UserProfile = () => {
             <div className="p-6">
               <div className="text-center mb-4">
                 <p className="text-4xl mb-2">🚪</p>
-                <h3 className="text-lg font-bold text-gray-800">Confirm Logout</h3>
-                <p className="text-gray-500 text-sm mt-1">Are you sure you want to log out?</p>
+                <h3 className="text-lg font-bold text-[#161F4C]">Confirm Logout</h3>
+                <p className="text-[#475569] text-sm mt-1">Are you sure you want to log out?</p>
               </div>
               <div className="flex gap-3 mt-6">
                 <button

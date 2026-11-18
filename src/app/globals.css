@@ -92,3 +92,46 @@ html {
   border-radius: 999px;
   min-height: 48px;
 }
+
+/* ── MyCareerGuru (self-learner) UI polish helpers ───────────────────────── */
+/* Select with a custom chevron that keeps a 14px gap from the right border */
+.mcg-select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  padding-right: 36px !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 14px;
+}
+/* Range slider: 6px track, 16px thumb with ring; colour via --mcg-slider */
+.mcg-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  outline: none;
+  cursor: pointer;
+  background: linear-gradient(to right, var(--mcg-slider, #6366F1) var(--mcg-fill, 0%), #E2E8F0 var(--mcg-fill, 0%));
+}
+.mcg-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--mcg-slider, #6366F1);
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px var(--mcg-slider, #6366F1), 0 1px 4px rgba(22, 31, 76, 0.25);
+}
+.mcg-range::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--mcg-slider, #6366F1);
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px var(--mcg-slider, #6366F1), 0 1px 4px rgba(22, 31, 76, 0.25);
+}
+.mcg-range::-moz-range-track { background: transparent; height: 6px; }

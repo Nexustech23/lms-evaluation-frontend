@@ -27,7 +27,7 @@ export default function AINotesCard({ subtopic, isCompleted, onToggleComplete })
           <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">
             Generated Study Notes
           </span>
-          <h3 className="text-lg font-black text-[#1E1B4B] mt-0.5">
+          <h3 className="text-lg font-black text-[#161F4C] mt-0.5">
             {subtopic.title}
           </h3>
         </div>
@@ -36,7 +36,7 @@ export default function AINotesCard({ subtopic, isCompleted, onToggleComplete })
           onClick={onToggleComplete}
           className={`flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 hover:scale-102 ${isCompleted
             ? "bg-[#EDFAF5] text-[#43C6AC] border border-[#43C6AC]/30"
-            : "bg-[#1E1B4B] hover:bg-[#1E1B4B]/95 text-white border border-transparent shadow-xs"
+            : "bg-[#161F4C] hover:bg-[#161F4C]/95 text-white border border-transparent shadow-xs"
             }`}
         >
           <CheckCircle size={14} />
@@ -55,7 +55,7 @@ export default function AINotesCard({ subtopic, isCompleted, onToggleComplete })
               onClick={() => setActiveTab(tab.name)}
               className={`flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 ${isActive
                 ? "bg-white text-[#6C63FF] shadow-2xs font-extrabold"
-                : "text-gray-500 hover:text-[#1E1B4B]"
+                : "text-gray-500 hover:text-[#161F4C]"
                 }`}
             >
               <Icon size={12} />
