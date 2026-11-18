@@ -137,7 +137,8 @@ export const getSidebarLinks = (role, user, t) => {
             },
           ]),
         {
-          label: "Relative Grading",
+          // A school grades by marks bands, not by class ranking, so its page is just "Grading".
+          label: isSchool(user) ? "Grading" : "Relative Grading",
           href: "/admin/relativeGrades",
           icon: <IconChartBar />,
         },

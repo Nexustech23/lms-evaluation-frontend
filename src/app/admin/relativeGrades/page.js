@@ -7,6 +7,8 @@ import Spinner from "@/components/ui/Spinner";
 import toast from "react-hot-toast";
 import { useTranslations } from "next-intl";
 import { AuthContext } from "@/app/AuthContext";
+import { isSchool } from "@/institute/instituteKind";
+import SchoolGrading from "@/school/SchoolGrading";
 
 /* =========================================================
    HELPERS
@@ -93,7 +95,16 @@ function GradeRow({ label, value, onChange, color }) {
    PAGE
 ========================================================= */
 
-export default function RelativeGrading() {
+// A school grades by marks bands (CBSE scale by default); only a college grades by class ranking.
+export default function GradingPage() {
+    const { user, loading } = useContext(AuthContext);
+    if (loading) {
+        return <div className="flex min-h-screen items-center justify-center"><Spinner /></div>;
+    }
+    return isSchool(user) ? <SchoolGrading /> : <RelativeGrading />;
+}
+
+function RelativeGrading() {
     const { user } = useContext(AuthContext);
     const color = user?.color || "#ff7f10";
     const t = useTranslations("relativeGrading");
