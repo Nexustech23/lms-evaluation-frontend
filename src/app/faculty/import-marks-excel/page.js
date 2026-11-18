@@ -394,9 +394,9 @@ export default function ImportMarksExcel() {
 
           <div className="grid gap-5 md:grid-cols-2">
             <div>
-              <span className="mb-2 block text-sm font-semibold text-gray-700">Relative Grading Configuration</span>
+              <span className="mb-2 block text-sm font-semibold text-gray-700">{isSchool ? "Grading" : "Relative Grading Configuration"}</span>
               <div className="flex min-h-11 items-center rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm text-gray-700">
-                Current institute configuration will be applied {importType === "transcript" ? "separately to every subject" : "to the overall total"}.
+                {isSchool ? "The school's grading scale will be applied" : "Current institute configuration will be applied"} {importType === "transcript" ? "separately to every subject" : "to the overall total"}.
               </div>
             </div>
             <div>

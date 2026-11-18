@@ -92,6 +92,15 @@ const GRADE_STYLES = {
     C: { bg: "rgba(249,115,22,0.12)", color: "#ea580c" },
     D: { bg: "rgba(239,68,68,0.13)", color: "#b91c1c" },
     U: { bg: "rgba(239,68,68,0.13)", color: "#b91c1c" },
+    // A school's CBSE nine-point scale
+    A1: { bg: "rgba(34,197,94,0.14)", color: "#15803d" },
+    A2: { bg: "rgba(34,197,94,0.12)", color: "#16a34a" },
+    B1: { bg: "rgba(234,179,8,0.14)", color: "#a16207" },
+    B2: { bg: "rgba(234,179,8,0.12)", color: "#b45309" },
+    C1: { bg: "rgba(249,115,22,0.14)", color: "#c2410c" },
+    C2: { bg: "rgba(249,115,22,0.12)", color: "#ea580c" },
+    E1: { bg: "rgba(239,68,68,0.13)", color: "#b91c1c" },
+    E2: { bg: "rgba(239,68,68,0.13)", color: "#b91c1c" },
 };
 
 function GradeBadge({ grade }) {
