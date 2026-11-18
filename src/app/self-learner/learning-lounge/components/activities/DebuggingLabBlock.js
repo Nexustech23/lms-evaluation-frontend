@@ -21,7 +21,7 @@ export default function DebuggingLabBlock({ block }) {
         {hintCount > 0 && <ul className="mt-2 space-y-2">{hints.slice(0, hintCount).map((hint, index) => <li key={index} className="flex gap-2 text-xs font-medium text-slate-700"><Lightbulb size={13} className="mt-0.5 shrink-0 text-amber-600" />{hint}</li>)}</ul>}
         {hintCount < hints.length && <button type="button" onClick={() => setHintCount((value) => value + 1)} className="mt-3 text-[10px] font-black uppercase tracking-wider text-amber-700">Show hint {hintCount + 1}</button>}
       </div>
-      <button type="button" onClick={() => setSolutionVisible((value) => !value)} className="mt-3 flex w-full items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-3 text-xs font-black text-[#1E1B4B]" aria-expanded={solutionVisible}>
+      <button type="button" onClick={() => setSolutionVisible((value) => !value)} className="mt-3 flex w-full items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-3 text-xs font-black text-[#161F4C]" aria-expanded={solutionVisible}>
         <span>{solutionVisible ? "Hide solution" : "Reveal solution"}</span>
         <ChevronDown size={15} className={`transition-transform ${solutionVisible ? "rotate-180" : ""}`} />
       </button>

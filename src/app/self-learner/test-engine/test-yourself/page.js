@@ -34,16 +34,16 @@ function TestCard({ test, color, onAttempt, onDelete }) {
   const isScheduled = test.scheduleDate && new Date(test.scheduleDate) > new Date();
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
+    <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-[0_1px_3px_rgba(22,31,76,0.06),0_4px_12px_rgba(22,31,76,0.04)] hover:shadow-md transition-all duration-200 overflow-hidden">
       <div className="h-1.5 w-full" style={{ backgroundColor: diffColor }} />
       <div className="p-5">
         <div className="flex items-start justify-between gap-3 mb-3">
           <div className="min-w-0">
-            <h3 className="text-base font-bold text-gray-900 truncate">
+            <h3 className="text-base font-bold text-[#161F4C] truncate">
               {test.subjectName || "Untitled Test"}
             </h3>
             {test.topic && (
-              <p className="text-xs text-gray-400 mt-0.5 truncate">📌 {test.topic}</p>
+              <p className="text-xs text-[#64748B] mt-0.5 truncate">📌 {test.topic}</p>
             )}
           </div>
           <span className="flex-shrink-0 text-xs font-semibold px-2.5 py-1 rounded-full"
@@ -62,7 +62,7 @@ function TestCard({ test, color, onAttempt, onDelete }) {
               style={{ backgroundColor: color + "08" }}>
               <p className="text-base">{s.icon}</p>
               <p className="text-sm font-bold text-gray-800">{s.value}</p>
-              <p className="text-xs text-gray-400">{s.label}</p>
+              <p className="text-xs text-[#64748B]">{s.label}</p>
             </div>
           ))}
         </div>
@@ -99,13 +99,13 @@ function TestCard({ test, color, onAttempt, onDelete }) {
           <button
             onClick={() => onAttempt(test._id)}
             disabled={isScheduled}
-            className="flex-1 py-2 rounded-xl text-white text-sm font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 h-10 rounded-[10px] text-white text-sm font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ backgroundColor: isScheduled ? "#9ca3af" : color }}>
             {test.status === "submitted" ? "Attempt Again" : "Start Test →"}
           </button>
           <button
             onClick={() => onDelete(test._id)}
-            className="px-3 py-2 rounded-xl border border-gray-200 text-gray-400 hover:text-red-500 hover:border-red-200 text-sm transition-all">
+            className="w-10 h-10 flex items-center justify-center rounded-[10px] border border-[#E2E8F0] text-gray-400 hover:text-red-500 hover:border-red-200 text-sm transition-all">
             🗑
           </button>
         </div>
@@ -120,16 +120,15 @@ function TestCard({ test, color, onAttempt, onDelete }) {
 
 function EmptyListState({ color, onCreate }) {
   return (
-    <div className="flex flex-col items-center justify-center py-20 text-center">
+    <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
       <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-4xl mb-5"
         style={{ backgroundColor: color + "15" }}>📝</div>
-      <h3 className="text-lg font-bold text-gray-800 mb-2">No tests yet</h3>
-      <p className="text-sm text-gray-400 mb-6 max-w-xs leading-relaxed">
+      <h3 className="text-lg font-bold text-[#161F4C] mb-2">No tests yet</h3>
+      <p className="text-sm text-[#64748B] mb-6 max-w-xs leading-relaxed">
         Create your first practice test and start preparing smarter with AI-generated questions.
       </p>
       <button onClick={onCreate}
-        className="px-6 py-2.5 text-white rounded-xl font-semibold text-sm shadow-md"
-        style={{ backgroundColor: color }}>
+        className="h-11 px-6 inline-flex items-center justify-center text-white rounded-[10px] font-semibold text-sm shadow-sm bg-[#1D4ED8] hover:bg-[#1E40AF] transition-colors">
         + Create Your First Test
       </button>
     </div>
@@ -186,30 +185,30 @@ export default function TestYourselfList() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen" style={{ backgroundColor: color }}>
+    <div className="flex flex-col min-h-screen overflow-x-hidden" style={{ backgroundColor: "#F5F7FB" }}>
       <div className="flex-1 p-4 sm:p-6">
 
         {/* Header */}
-        <div className="bg-white rounded-2xl shadow-sm px-5 py-4 flex flex-wrap items-center justify-between gap-3 mb-4">
+        <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-[0_1px_3px_rgba(22,31,76,0.06),0_4px_12px_rgba(22,31,76,0.04)] px-6 py-[18px] flex flex-wrap items-center justify-between gap-3 mb-5">
           <div>
-            <h2 className="text-xl font-bold" style={{ color }}>Evaluate Yourself</h2>
-            <p className="text-xs text-gray-400 mt-0.5">
+            <h2 className="text-xl font-bold leading-tight" style={{ color: "#161F4C" }}>Evaluate Yourself</h2>
+            <p className="text-xs text-[#64748B] mt-1">
               {tests.length} test{tests.length !== 1 ? "s" : ""} created
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <div className="flex gap-1 p-1 bg-gray-100 rounded-xl">
+            <div className="flex gap-1 p-[3px] h-9 items-stretch bg-[#EEF2F7] rounded-[10px]">
               {[
                 { value: "all", label: `All (${counts.all})` },
                 { value: "pending", label: `New (${counts.pending})` },
                 { value: "submitted", label: `Done (${counts.submitted})` },
               ].map((tab) => (
                 <button key={tab.value} onClick={() => setFilter(tab.value)}
-                  className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+                  className="px-3.5 rounded-lg text-xs font-semibold transition-all flex items-center"
                   style={
                     filter === tab.value
-                      ? { backgroundColor: "#fff", color, boxShadow: "0 1px 4px rgba(0,0,0,0.08)" }
-                      : { color: "#9ca3af" }
+                      ? { backgroundColor: "#fff", color: "#1D4ED8", boxShadow: "0 1px 3px rgba(22,31,76,0.12)" }
+                      : { color: "#64748B" }
                   }>
                   {tab.label}
                 </button>
@@ -217,8 +216,7 @@ export default function TestYourselfList() {
             </div>
             <button
               onClick={() => router.push("/self-learner/test-engine/create-test")}
-              className="px-4 py-2 text-white rounded-xl text-sm font-semibold shadow-sm"
-              style={{ backgroundColor: color }}>
+              className="h-[38px] px-4 inline-flex items-center justify-center text-white rounded-[10px] text-sm font-semibold shadow-sm bg-[#1D4ED8] hover:bg-[#1E40AF] transition-colors">
               + New Test
             </button>
           </div>
@@ -233,14 +231,14 @@ export default function TestYourselfList() {
             </div>
           </div>
         ) : filtered.length === 0 ? (
-          <div className="bg-white rounded-2xl shadow-sm">
+          <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-[0_1px_3px_rgba(22,31,76,0.06),0_4px_12px_rgba(22,31,76,0.04)]">
             <EmptyListState
               color={color}
               onCreate={() => router.push("/self-learner/test-engine/create-test")}
             />
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {filtered.map((test) => (
               <TestCard
                 key={test._id}

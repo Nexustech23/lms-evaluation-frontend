@@ -185,10 +185,10 @@ export default function CreateRoadmapPage() {
 
         {/* ── AI Generating Spinner ── */}
         {step === "generating" && (
-          <div className="bg-white rounded-3xl border border-gray-200 shadow-md p-10 flex flex-col items-center gap-5 text-center">
+          <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-md p-10 flex flex-col items-center gap-5 text-center">
             <Loader2 size={48} className="animate-spin text-[#6C63FF]" />
             <div>
-              <h3 className="text-lg font-black text-[#1E1B4B]">
+              <h3 className="text-lg font-black text-[#161F4C]">
                 Building Your Learning Path…
               </h3>
               <p className="text-xs text-gray-500 font-semibold mt-2 leading-relaxed max-w-sm">

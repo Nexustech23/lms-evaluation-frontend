@@ -49,6 +49,10 @@ export function SidebarDemo({ children }) {
   const [openDropdown, setOpenDropdown] = useState(null);
 
   const color = user?.color || "#ff7f10";
+  // MyCareerGuru (self-learner) uses a fixed blue active state + clean pill geometry
+  const isSL = pathname?.startsWith("/self-learner");
+  const activeBg = isSL ? "#1D4ED8" : color;
+  const pillStyle = isSL ? { borderRadius: 10, padding: "10px 14px", marginBottom: 4, outline: "none", border: "none", boxShadow: "none" } : {};
   const role = user?.role;
   const PROFILE_ROUTES = {
     [ROLES.SUPER_ADMIN]: "/super-admin/profile",
@@ -136,12 +140,13 @@ export function SidebarDemo({ children }) {
                             router.push(link?.defaultHref);
                           setOpenDropdown(isOpen ? null : idx);
                         }}
-                        className="flex items-center justify-between px-3 py-3 rounded-xl cursor-pointer transition-colors"
-                        style={
-                          highlighted
-                            ? { backgroundColor: color, color: "#fff" }
-                            : { color: darkenColor(color) }
-                        }
+                        className={cn("flex items-center justify-between cursor-pointer transition-colors outline-none focus:outline-none", !isSL && "px-3 py-3 rounded-xl")}
+                        style={{
+                          ...pillStyle,
+                          ...(highlighted
+                            ? { backgroundColor: activeBg, color: "#fff" }
+                            : { color: darkenColor(color) }),
+                        }}
                         onMouseEnter={(e) => {
                           if (!highlighted)
                             e.currentTarget.style.backgroundColor = withAlpha(
@@ -181,22 +186,24 @@ export function SidebarDemo({ children }) {
 
                       {/* Child links */}
                       {isOpen && (
-                        <div className="mt-1 ml-3 space-y-1 p-2">
+                        <div className={isSL ? "mt-1 mb-1 space-y-1" : "mt-1 ml-3 space-y-1 p-2"} style={isSL ? { paddingLeft: 22 } : undefined}>
                           {link?.children.map((child, i) => {
                             const cActive = isActive(child?.href);
                             return (
                               <Link
                                 key={i}
                                 href={child?.href}
-                                className="flex items-center gap-2 px-3 py-2 text-sm rounded-xl transition-all duration-150"
+                                className={cn("flex items-center gap-2 text-sm transition-all duration-150 outline-none focus:outline-none", isSL ? "" : "px-3 py-2 rounded-xl")}
                                 style={
                                   cActive
                                     ? {
-                                      backgroundColor: withAlpha(color, 0.12),
-                                      color: color,
+                                      ...(isSL ? { borderRadius: 10, padding: "9px 14px", border: "none", outline: "none", boxShadow: "none" } : {}),
+                                      backgroundColor: isSL ? "#EFF6FF" : withAlpha(color, 0.12),
+                                      color: isSL ? "#1D4ED8" : color,
                                       fontWeight: 600,
                                     }
                                     : {
+                                      ...(isSL ? { borderRadius: 10, padding: "9px 14px" } : {}),
                                       backgroundColor: "#fff",
                                       color: darkenColor(color),
                                     }
@@ -216,7 +223,7 @@ export function SidebarDemo({ children }) {
                                   React.cloneElement(child.icon, {
                                     className: "h-4 w-4",
                                     style: {
-                                      color: cActive ? color : darkenColor(color),
+                                      color: cActive ? (isSL ? "#1D4ED8" : color) : darkenColor(color),
                                     },
                                   })}
                                 {child.label}
@@ -235,12 +242,13 @@ export function SidebarDemo({ children }) {
                     key={idx}
                     href={link?.href}
                     onClick={() => setOpenDropdown(null)}
-                    className="flex items-center gap-3 px-3 py-3 rounded-xl transition-colors"
-                    style={
-                      active
-                        ? { backgroundColor: color, color: "#fff" }
-                        : { color: darkenColor(color) }
-                    }
+                    className={cn("flex items-center gap-3 transition-colors outline-none focus:outline-none", !isSL && "px-3 py-3 rounded-xl")}
+                    style={{
+                      ...pillStyle,
+                      ...(active
+                        ? { backgroundColor: activeBg, color: "#fff" }
+                        : { color: darkenColor(color) }),
+                    }}
                     onMouseEnter={(e) => {
                       if (!active)
                         e.currentTarget.style.backgroundColor = withAlpha(

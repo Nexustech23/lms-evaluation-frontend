@@ -42,22 +42,22 @@ export default function SelfReviewHubPage() {
         showReset={false}
       />
 
-      <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+      <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-5 mt-6">
         {TILES.map(({ title, desc, icon: Icon, color, bg, href }) => (
           <button
             key={title}
             onClick={() => router.push(href)}
-            className="text-left bg-white rounded-3xl border border-gray-200 shadow-sm p-6 hover:-translate-y-1 hover:shadow-md transition-all duration-300 flex flex-col justify-between h-[220px]"
+            className="text-left bg-white rounded-2xl border border-[#E2E8F0] shadow-[0_1px_3px_rgba(22,31,76,0.06),0_4px_12px_rgba(22,31,76,0.04)] p-6 hover:-translate-y-0.5 hover:shadow-md transition-all duration-300 flex flex-col justify-between gap-5 min-h-[220px] h-full"
           >
             <div>
               <div
-                className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4"
+                className="w-11 h-11 rounded-xl flex items-center justify-center mb-4"
                 style={{ backgroundColor: bg, color }}
               >
                 <Icon size={22} />
               </div>
-              <h3 className="text-base font-black text-[#1E1B4B]">{title}</h3>
-              <p className="text-xs font-semibold text-gray-500 mt-2 leading-relaxed">{desc}</p>
+              <h3 className="text-base font-black text-[#161F4C]">{title}</h3>
+              <p className="text-xs font-semibold text-[#475569] mt-2 leading-relaxed">{desc}</p>
             </div>
             <span className="text-xs font-extrabold flex items-center gap-1" style={{ color }}>
               Open <ArrowRight size={14} />

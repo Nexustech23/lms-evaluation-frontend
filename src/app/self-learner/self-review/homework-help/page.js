@@ -174,14 +174,14 @@ export default function Page() {
     <div className="min-h-screen bg-[#F5F7FB] p-4 md:p-6">
 
       {/* MAIN CONTAINER */}
-      <div className="max-w-5xl mx-auto bg-white rounded-3xl border border-gray-200 shadow-sm p-5 md:p-8">
+      <div className="max-w-5xl mx-auto bg-white rounded-2xl border border-[#E2E8F0] shadow-[0_1px_3px_rgba(22,31,76,0.06),0_4px_12px_rgba(22,31,76,0.04)] px-5 py-6 md:px-8 md:py-7">
 
         {/* HEADING */}
         <div className="mb-6">
-          <h1 className="text-2xl md:text-3xl font-bold text-[#1E1B4B]">
+          <h1 className="text-2xl md:text-3xl font-bold text-[#161F4C]">
             Homework Help AI
           </h1>
-          <p className="text-sm text-gray-600 mt-2 font-medium">
+          <p className="text-sm text-[#475569] mt-2 font-medium">
             Add homework instructions, upload PDFs, or describe what help you need.
           </p>
         </div>
@@ -196,14 +196,14 @@ Solve my homework questions.
 Explain answers step by step.
 Generate easy explanations.
 Help with programming homework.`}
-            className="w-full h-[260px] rounded-3xl border border-gray-200 bg-[#FAFBFF] p-6 pr-24 md:pr-32 text-sm text-[#1E1B4B] placeholder:text-gray-400 outline-none resize-none focus:ring-2 focus:ring-violet-400"
+            className="w-full h-[260px] rounded-xl border border-[#E2E8F0] bg-[#FAFBFF] p-5 pr-20 pb-16 text-sm text-[#161F4C] placeholder:text-[#94A3B8] outline-none resize-none focus:ring-2 focus:ring-violet-400"
           />
 
           {/* MIC BUTTON */}
-          <div className="absolute bottom-6 right-6">
+          <div className="absolute bottom-[14px] right-[14px]">
             <button
               onClick={isListening ? stopListening : startListening}
-              className={`w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition ${isListening ? "bg-red-500 hover:bg-red-600" : "bg-violet-500 hover:bg-violet-600"
+              className={`w-10 h-10 rounded-full flex items-center justify-center shadow-md transition ${isListening ? "bg-red-500 hover:bg-red-600" : "bg-violet-500 hover:bg-violet-600"
                 } text-white`}
             >
               {isListening ? <Square size={16} /> : <Mic size={18} />}
@@ -220,17 +220,17 @@ Help with programming homework.`}
         </div>
 
         {/* OPTIONS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
 
           {/* HOMEWORK TYPE */}
           <div>
-            <label className="block text-sm font-semibold text-[#1E1B4B] mb-2">
+            <label className="block text-sm font-semibold text-[#161F4C] mb-2">
               Homework Type
             </label>
             <select
               value={homeworkType}
               onChange={(e) => setHomeworkType(e.target.value)}
-              className="w-full border border-gray-200 rounded-2xl bg-[#FAFBFF] p-4 text-sm text-[#1E1B4B] outline-none focus:ring-2 focus:ring-violet-400"
+              className="mcg-select w-full h-[46px] border border-[#E2E8F0] rounded-xl bg-[#FAFBFF] px-4 text-sm text-[#161F4C] outline-none focus:ring-2 focus:ring-violet-400 cursor-pointer"
             >
               <option>Detailed Solution</option>
               <option>Short Explanation</option>
@@ -241,13 +241,13 @@ Help with programming homework.`}
 
           {/* RESPONSE MODE */}
           <div>
-            <label className="block text-sm font-semibold text-[#1E1B4B] mb-2">
+            <label className="block text-sm font-semibold text-[#161F4C] mb-2">
               Response Style
             </label>
             <select
               value={responseStyle}
               onChange={(e) => setResponseStyle(e.target.value)}
-              className="w-full border border-gray-200 rounded-2xl bg-[#FAFBFF] p-4 text-sm text-[#1E1B4B] outline-none focus:ring-2 focus:ring-violet-400"
+              className="mcg-select w-full h-[46px] border border-[#E2E8F0] rounded-xl bg-[#FAFBFF] px-4 text-sm text-[#161F4C] outline-none focus:ring-2 focus:ring-violet-400 cursor-pointer"
             >
               <option>Simple</option>
               <option>Student Friendly</option>
@@ -269,7 +269,7 @@ Help with programming homework.`}
         <button
           onClick={handleGenerate}
           disabled={loading}
-          className="w-full mt-8 h-14 rounded-2xl bg-[#1E1B4B] text-white text-sm font-semibold hover:opacity-90 transition disabled:opacity-50"
+          className="w-full mt-6 h-12 rounded-xl bg-[#161F4C] text-white text-sm font-semibold hover:bg-[#252F6B] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? "Generating Homework Help..." : "Generate Homework Help"}
         </button>

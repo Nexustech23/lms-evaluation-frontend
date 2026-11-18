@@ -451,32 +451,32 @@ function StepSchedule({ form, setField, color }) {
 
 function ModePicker({ color, onSelect }) {
   return (
-    <div className="flex flex-col min-h-screen items-center justify-center p-5" style={{ backgroundColor: color }}>
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden">
-        <div className="px-6 pt-6 pb-5 text-center" style={{ borderBottom: "1.5px solid #f3f4f6" }}>
-          <h2 className="text-xl font-bold text-gray-900">Create a Test</h2>
-          <p className="text-sm text-gray-400 mt-1">Choose how you want to test yourself.</p>
+    <div className="flex flex-col min-h-screen items-center justify-center p-5" style={{ backgroundColor: "#F5F7FB" }}>
+      <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-[0_1px_3px_rgba(22,31,76,0.06),0_8px_24px_rgba(22,31,76,0.06)] overflow-hidden w-full max-w-2xl">
+        <div className="px-8 pt-8 pb-5 text-center" style={{ borderBottom: "1px solid #E2E8F0" }}>
+          <h2 className="text-xl font-bold text-[#161F4C]">Create a Test</h2>
+          <p className="text-sm text-[#64748B] mt-1">Choose how you want to test yourself.</p>
         </div>
-        <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="p-8 grid grid-cols-1 sm:grid-cols-2 gap-4 items-stretch">
           <button
             type="button"
             onClick={() => onSelect("subject")}
-            className="text-left rounded-2xl border-2 p-5 transition-all duration-150 hover:-translate-y-0.5"
-            style={{ borderColor: "#e5e7eb" }}
+            className="text-left rounded-[14px] border-2 p-[22px] h-full transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md"
+            style={{ borderColor: "#E2E8F0" }}
           >
-            <div className="text-2xl mb-2">📚</div>
-            <h3 className="font-bold text-gray-900">Practice Test</h3>
-            <p className="text-xs text-gray-500 mt-1">Test yourself on any subject or topic — Generated, fully configurable.</p>
+            <div className="w-10 h-10 rounded-[10px] bg-[#EEF2FF] flex items-center justify-center text-xl mb-3">📚</div>
+            <h3 className="font-bold text-[#161F4C]">Practice Test</h3>
+            <p className="text-xs text-[#475569] mt-1.5 leading-relaxed">Test yourself on any subject or topic — Generated, fully configurable.</p>
           </button>
           <button
             type="button"
             onClick={() => onSelect("roadmap")}
-            className="text-left rounded-2xl border-2 p-5 transition-all duration-150 hover:-translate-y-0.5"
+            className="text-left rounded-[14px] border-2 p-[22px] h-full transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md"
             style={{ borderColor: color }}
           >
-            <div className="text-2xl mb-2">🗺️</div>
-            <h3 className="font-bold text-gray-900">Roadmap Test</h3>
-            <p className="text-xs text-gray-500 mt-1">Test yourself on a week range from one of your active roadmaps.</p>
+            <div className="w-10 h-10 rounded-[10px] bg-[#ECFDF5] flex items-center justify-center text-xl mb-3">🗺️</div>
+            <h3 className="font-bold text-[#161F4C]">Roadmap Test</h3>
+            <p className="text-xs text-[#475569] mt-1.5 leading-relaxed">Test yourself on a week range from one of your active roadmaps.</p>
           </button>
         </div>
       </div>
@@ -551,7 +551,7 @@ function RoadmapTestWizard({ color, onBack }) {
 
   if (showConfig) {
     return (
-      <div className="flex flex-col min-h-screen items-center justify-center p-5" style={{ backgroundColor: color }}>
+      <div className="flex flex-col min-h-screen items-center justify-center p-5" style={{ backgroundColor: "#F5F7FB" }}>
         <div className="w-full max-w-xl space-y-3">
           <button
             type="button"
@@ -567,11 +567,11 @@ function RoadmapTestWizard({ color, onBack }) {
   }
 
   return (
-    <div className="flex flex-col min-h-screen items-center justify-center p-5" style={{ backgroundColor: color }}>
+    <div className="flex flex-col min-h-screen items-center justify-center p-5" style={{ backgroundColor: "#F5F7FB" }}>
       <div className="w-full max-w-xl">
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-          <div className="px-6 pt-6 pb-5" style={{ borderBottom: "1.5px solid #f3f4f6" }}>
-            <h2 className="text-xl font-bold text-gray-900">Roadmap Test</h2>
+        <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-[0_1px_3px_rgba(22,31,76,0.06),0_8px_24px_rgba(22,31,76,0.06)] overflow-hidden">
+          <div className="px-8 pt-8 pb-5" style={{ borderBottom: "1px solid #E2E8F0" }}>
+            <h2 className="text-xl font-bold text-[#161F4C]">Roadmap Test</h2>
             <p className="text-sm text-gray-400 mt-0.5">Pick a roadmap and week range</p>
           </div>
 
@@ -652,7 +652,7 @@ function RoadmapTestWizard({ color, onBack }) {
             )}
           </div>
 
-          <div className="px-6 py-4 flex items-center justify-between" style={{ borderTop: "1.5px solid #f3f4f6", backgroundColor: "#fafafa" }}>
+          <div className="px-6 py-4 flex items-center justify-between" style={{ borderTop: "1px solid #E2E8F0", backgroundColor: "#fafafa" }}>
             <button type="button" onClick={onBack} className="text-sm text-gray-400 hover:text-gray-600 transition-colors">
               ← Back
             </button>
@@ -777,19 +777,19 @@ export default function StudentCreateTest() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen" style={{ backgroundColor: color }}>
+    <div className="flex flex-col min-h-screen" style={{ backgroundColor: "#F5F7FB" }}>
       <div className="flex-1 flex items-start justify-center p-5 pt-8">
         <div className="w-full max-w-xl">
 
           {/* Card */}
-          <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+          <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-[0_1px_3px_rgba(22,31,76,0.06),0_8px_24px_rgba(22,31,76,0.06)] overflow-hidden">
 
             {/* Card header */}
-            <div className="px-6 pt-6 pb-5" style={{ borderBottom: "1.5px solid #f3f4f6" }}>
+            <div className="px-8 pt-8 pb-5" style={{ borderBottom: "1px solid #E2E8F0" }}>
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h2 className="text-xl font-bold text-gray-900">Create a Practice Test</h2>
-                  <p className="text-sm text-gray-400 mt-0.5">{STEP_LABELS[step]}</p>
+                  <h2 className="text-xl font-bold text-[#161F4C]">Create a Practice Test</h2>
+                  <p className="text-sm text-[#64748B] mt-0.5">{STEP_LABELS[step]}</p>
                 </div>
                 <Steps current={step} total={STEPS_TOTAL} color={color} />
               </div>
@@ -804,7 +804,7 @@ export default function StudentCreateTest() {
             </div>
 
             {/* Card body */}
-            <div className="px-6 py-6">
+            <div className="px-8 py-6">
               {step === 0 && (
                 <StepSubject
                   form={form}
@@ -823,8 +823,8 @@ export default function StudentCreateTest() {
             </div>
 
             {/* Card footer */}
-            <div className="px-6 py-4 flex items-center justify-between"
-              style={{ borderTop: "1.5px solid #f3f4f6", backgroundColor: "#fafafa" }}>
+            <div className="px-8 py-4 flex items-center justify-between"
+              style={{ borderTop: "1px solid #E2E8F0", backgroundColor: "#F8FAFC" }}>
               {step > 0 ? (
                 <button
                   type="button"
@@ -847,8 +847,8 @@ export default function StudentCreateTest() {
                 <button
                   type="button"
                   onClick={handleNext}
-                  className="flex items-center gap-2 px-5 py-2 rounded-xl text-white text-sm font-semibold shadow transition-opacity duration-150"
-                  style={{ backgroundColor: color, opacity: canAdvance() ? 1 : 0.5 }}
+                  className="flex items-center justify-center gap-2 px-5 h-11 rounded-[10px] text-white text-sm font-semibold shadow-sm transition-opacity duration-150 hover:brightness-110"
+                  style={{ backgroundColor: "#161F4C", opacity: canAdvance() ? 1 : 0.5 }}
                 >
                   Next →
                 </button>
@@ -857,8 +857,8 @@ export default function StudentCreateTest() {
                   type="button"
                   onClick={handleSubmit}
                   disabled={isSubmitting}
-                  className="flex items-center gap-2 px-6 py-2 rounded-xl text-white text-sm font-semibold shadow disabled:opacity-60 transition-all"
-                  style={{ backgroundColor: color }}
+                  className="flex items-center justify-center gap-2 px-6 h-11 rounded-[10px] text-white text-sm font-semibold shadow-sm disabled:opacity-60 transition-all hover:brightness-110"
+                  style={{ backgroundColor: "#161F4C" }}
                 >
                   {isSubmitting ? (
                     <><Spinner className="w-4 h-4" /> Creating…</>
@@ -871,7 +871,7 @@ export default function StudentCreateTest() {
           </div>
 
           {/* Help nudge */}
-          <p className="text-center text-xs mt-4" style={{ color: color + "bb" }}>
+          <p className="text-center text-xs mt-4" style={{ color: "#64748B" }}>
             Test questions are auto-generated from your syllabusS.
           </p>
         </div>

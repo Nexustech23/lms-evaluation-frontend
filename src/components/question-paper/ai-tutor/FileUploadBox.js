@@ -14,9 +14,9 @@ export default function FileUploadBox({
 
   return (
 
-    <div className="mt-8">
+    <div className="mt-6">
 
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex items-center gap-2 mb-3">
 
         <FileText
           size={16}
@@ -27,7 +27,7 @@ export default function FileUploadBox({
           className="
             text-sm
             font-semibold
-            text-[#1E1B4B]
+            text-[#161F4C]
           "
         >
           {title}
@@ -36,7 +36,7 @@ export default function FileUploadBox({
         <span
           className="
             text-xs
-            text-gray-400
+            text-[#64748B]
           "
         >
           (optional)
@@ -62,10 +62,11 @@ export default function FileUploadBox({
         className="
           border
           border-dashed
-          border-gray-300
-          rounded-3xl
+          border-[#CBD5E1]
+          rounded-xl
           bg-[#FAFBFF]
-          p-6
+          px-5
+          py-[18px]
           flex
           flex-col
           md:flex-row
@@ -81,7 +82,7 @@ export default function FileUploadBox({
             className="
               text-sm
               font-semibold
-              text-[#1E1B4B]
+              text-[#161F4C]
             "
           >
             Upload File
@@ -90,7 +91,7 @@ export default function FileUploadBox({
           <p
             className="
               text-xs
-              text-gray-400
+              text-[#64748B]
               mt-1
             "
           >
@@ -103,8 +104,11 @@ export default function FileUploadBox({
           htmlFor="fileUpload"
           className="
             px-6
-            py-3
-            rounded-2xl
+            h-[38px]
+            inline-flex
+            items-center
+            justify-center
+            rounded-lg
             bg-violet-600
             text-white
             text-sm
@@ -133,7 +137,7 @@ export default function FileUploadBox({
             bg-gray-50
             border
             border-gray-200
-            rounded-3xl
+            rounded-xl
             p-4
           "
         >
@@ -142,9 +146,9 @@ export default function FileUploadBox({
 
           <div
             className="
-              w-14
-              h-14
-              rounded-2xl
+              w-12
+              h-12
+              rounded-xl
               bg-red-100
               flex
               items-center
@@ -165,7 +169,7 @@ export default function FileUploadBox({
               className="
                 text-sm
                 font-semibold
-                text-[#1E1B4B]
+                text-[#161F4C]
                 truncate
               "
             >
@@ -175,7 +179,7 @@ export default function FileUploadBox({
             <p
               className="
                 text-xs
-                text-gray-400
+                text-[#64748B]
                 mt-1
               "
             >

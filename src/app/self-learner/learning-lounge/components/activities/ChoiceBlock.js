@@ -24,7 +24,7 @@ export default function ChoiceBlock({ block, mode = "check" }) {
       title={block.title}
       tone={isPrediction ? "violet" : "emerald"}
     >
-      <p className="text-sm font-bold text-[#1E1B4B] leading-relaxed">{block.question}</p>
+      <p className="text-sm font-bold text-[#161F4C] leading-relaxed">{block.question}</p>
       <div className="grid gap-2 mt-4">
         {options.map((option, index) => {
           const isSelected = selected === index;
@@ -36,7 +36,7 @@ export default function ChoiceBlock({ block, mode = "check" }) {
               key={index}
               onClick={() => !submitted && setSelected(index)}
               disabled={submitted}
-              className={`w-full rounded-xl border px-3 py-3 text-left text-xs font-semibold transition-all ${isCorrectOption ? "border-emerald-400 bg-emerald-50 text-emerald-800" : isWrongSelection ? "border-rose-300 bg-rose-50 text-rose-700" : isSelected ? "border-[#6C63FF] bg-[#F0EEFF] text-[#1E1B4B]" : "border-gray-200 bg-white text-slate-600 hover:border-[#6C63FF]/50"}`}
+              className={`w-full rounded-xl border px-3 py-3 text-left text-xs font-semibold transition-all ${isCorrectOption ? "border-emerald-400 bg-emerald-50 text-emerald-800" : isWrongSelection ? "border-rose-300 bg-rose-50 text-rose-700" : isSelected ? "border-[#6C63FF] bg-[#F0EEFF] text-[#161F4C]" : "border-gray-200 bg-white text-slate-600 hover:border-[#6C63FF]/50"}`}
             >
               <span className="flex items-center gap-2">
                 <span className="w-5 h-5 rounded-full border border-current/30 flex items-center justify-center text-[9px] font-black shrink-0">{String.fromCharCode(65 + index)}</span>
@@ -47,7 +47,7 @@ export default function ChoiceBlock({ block, mode = "check" }) {
         })}
       </div>
       {!submitted ? (
-        <button type="button" onClick={() => setSubmitted(true)} disabled={selected === null} className="mt-4 w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#1E1B4B] text-white text-xs font-black disabled:opacity-40">
+        <button type="button" onClick={() => setSubmitted(true)} disabled={selected === null} className="mt-4 w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#161F4C] text-white text-xs font-black disabled:opacity-40">
           Check answer
         </button>
       ) : (

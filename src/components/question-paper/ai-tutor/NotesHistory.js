@@ -20,8 +20,8 @@ export default function NotesHistory({
   }
 
   return (
-    <div className="mt-8">
-      <h2 className="text-sm font-bold text-[#1E1B4B] mb-3">Recent Notes</h2>
+    <div className="mt-6">
+      <h2 className="text-sm font-bold text-[#161F4C] mb-3">Recent Notes</h2>
 
       <div className="flex flex-col gap-2 max-h-80 overflow-y-auto pr-1">
         {notes.map((note) => {
@@ -35,21 +35,21 @@ export default function NotesHistory({
               role="button"
               tabIndex={0}
               onKeyDown={(e) => e.key === "Enter" && !disabled && onSelect(note.id)}
-              className={`w-full flex items-center gap-3 rounded-2xl border p-4 transition cursor-pointer ${
+              className={`w-full flex items-center gap-3 rounded-xl border px-[18px] py-[14px] transition cursor-pointer ${
                 isActive
                   ? "border-violet-400 bg-violet-50"
-                  : "border-gray-200 bg-[#FAFBFF] hover:border-violet-200"
+                  : "border-[#E2E8F0] bg-[#FAFBFF] hover:border-violet-200"
               } ${disabled ? "opacity-50 pointer-events-none" : ""}`}
             >
-              <div className="w-9 h-9 rounded-xl bg-violet-100 text-violet-600 flex items-center justify-center shrink-0">
+              <div className="w-9 h-9 rounded-[10px] bg-violet-100 text-violet-600 flex items-center justify-center shrink-0">
                 <NotebookText size={16} />
               </div>
 
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-[#1E1B4B] truncate">
+                <p className="text-sm font-semibold text-[#161F4C] truncate">
                   {note.title || "Untitled Notes"}
                 </p>
-                <p className="text-xs text-gray-400 mt-0.5">
+                <p className="text-xs text-[#64748B] mt-0.5">
                   {note.notes_type}
                   {note.created_at ? ` · ${new Date(note.created_at).toLocaleString()}` : ""}
                 </p>
@@ -63,7 +63,7 @@ export default function NotesHistory({
                 }}
                 disabled={isDeleting || disabled}
                 title="Delete note"
-                className="shrink-0 p-2 rounded-xl text-gray-400 hover:text-red-500 hover:bg-red-50 transition disabled:opacity-50"
+                className="shrink-0 w-9 h-9 flex items-center justify-center rounded-[10px] text-gray-400 hover:text-red-500 hover:bg-red-50 transition disabled:opacity-50"
               >
                 {isDeleting ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
               </button>

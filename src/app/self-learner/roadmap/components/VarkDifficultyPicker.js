@@ -4,10 +4,10 @@ import { useMemo, useState } from "react";
 import { Eye, Headphones, BookOpen, Hand, ArrowRight, ArrowLeft, Sparkles } from "lucide-react";
 
 const STYLES = [
-  { key: "visual", label: "Visual", desc: "Diagrams, structure, spatial layout", icon: Eye, color: "#6C63FF" },
-  { key: "auditory", label: "Auditory", desc: "Narrated, conversational explanations", icon: Headphones, color: "#43C6AC" },
-  { key: "reading", label: "Reading", desc: "Dense, reference-style text", icon: BookOpen, color: "#F7971E" },
-  { key: "kinesthetic", label: "Kinesthetic", desc: "Hands-on, action-oriented practice", icon: Hand, color: "#FF6584" },
+  { key: "visual", label: "Visual", desc: "Diagrams, structure, spatial layout", icon: Eye, color: "#6366F1" },
+  { key: "auditory", label: "Auditory", desc: "Narrated, conversational explanations", icon: Headphones, color: "#10B981" },
+  { key: "reading", label: "Reading", desc: "Dense, reference-style text", icon: BookOpen, color: "#F59E0B" },
+  { key: "kinesthetic", label: "Kinesthetic", desc: "Hands-on, action-oriented practice", icon: Hand, color: "#EC4899" },
 ];
 
 const DIFFICULTIES = [
@@ -74,7 +74,7 @@ export default function VarkDifficultyPicker({ initialBlend, initialDifficulty, 
 
   return (
     <div className="fixed inset-0 z-50 bg-[#F5F7FB] flex items-center justify-center p-4 md:p-6 overflow-y-auto">
-      <div className="bg-white rounded-3xl border border-gray-200 shadow-xl max-w-2xl w-full p-6 md:p-8 space-y-6 my-auto">
+      <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-[0_8px_30px_rgba(22,31,76,0.10)] max-w-[560px] w-full p-6 md:p-8 space-y-6 my-auto">
 
         {/* Step indicator */}
         <div className="flex items-center justify-center gap-2">
@@ -85,26 +85,26 @@ export default function VarkDifficultyPicker({ initialBlend, initialDifficulty, 
         {step === "vark" ? (
           <>
             <div className="text-center space-y-1">
-              <h2 className="text-lg font-black text-[#1E1B4B]">How do you learn best?</h2>
-              <p className="text-xs font-semibold text-gray-500">
+              <h2 className="text-lg font-black text-[#161F4C]">How do you learn best?</h2>
+              <p className="text-xs font-semibold text-[#475569] leading-relaxed">
                 Blend your learning style — we'll personalize your notes around whichever style dominates.
               </p>
             </div>
 
             <div className="space-y-5">
               {STYLES.map(({ key, label, desc, icon: Icon, color }) => (
-                <div key={key} className="space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${color}1A`, color }}>
-                        <Icon size={14} />
+                <div key={key} className="space-y-2.5">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 shrink-0 rounded-[10px] flex items-center justify-center" style={{ backgroundColor: `${color}1A`, color }}>
+                        <Icon size={16} />
                       </div>
                       <div>
-                        <span className="text-xs font-black text-[#1E1B4B] block">{label}</span>
-                        <span className="text-[10px] font-semibold text-gray-400">{desc}</span>
+                        <span className="text-xs font-black text-[#161F4C] block leading-tight">{label}</span>
+                        <span className="text-[11px] font-semibold text-[#64748B] block leading-tight mt-0.5">{desc}</span>
                       </div>
                     </div>
-                    <span className="text-sm font-black" style={{ color }}>{blend[key]}%</span>
+                    <span className="text-sm font-black tabular-nums min-w-[44px] text-right" style={{ color }}>{blend[key]}%</span>
                   </div>
                   <input
                     type="range"
@@ -112,13 +112,14 @@ export default function VarkDifficultyPicker({ initialBlend, initialDifficulty, 
                     max="100"
                     value={blend[key]}
                     onChange={(e) => handleSlide(key, parseInt(e.target.value, 10))}
-                    className="w-full accent-[#6C63FF]"
+                    className="mcg-range"
+                    style={{ "--mcg-slider": color, "--mcg-fill": `${Math.min(100, blend[key])}%` }}
                   />
                 </div>
               ))}
             </div>
 
-            <div className={`rounded-xl p-3 text-center text-xs font-bold ${isOver ? "bg-[#FFF0F3] text-[#FF6584]" : "bg-[#FAFBFF] text-gray-500"}`}>
+            <div className={`rounded-[10px] min-h-[40px] px-4 flex items-center justify-center text-center text-xs font-bold ${isOver ? "bg-[#FFF0F3] text-[#FF6584]" : "bg-[#F5F7FB] border border-[#E2E8F0] text-[#475569]"}`}>
               {isOver
                 ? `Total is ${total}% — reduce a slider to 100% or less to continue.`
                 : `Total: ${total}%`}
@@ -127,8 +128,8 @@ export default function VarkDifficultyPicker({ initialBlend, initialDifficulty, 
         ) : (
           <>
             <div className="text-center space-y-1">
-              <h2 className="text-lg font-black text-[#1E1B4B]">Pick your difficulty</h2>
-              <p className="text-xs font-semibold text-gray-500">
+              <h2 className="text-lg font-black text-[#161F4C]">Pick your difficulty</h2>
+              <p className="text-xs font-semibold text-[#475569]">
                 How much should we assume you already know?
               </p>
             </div>
@@ -139,10 +140,10 @@ export default function VarkDifficultyPicker({ initialBlend, initialDifficulty, 
                   key={key}
                   type="button"
                   onClick={() => setDifficulty(key)}
-                  className={`text-left p-4 rounded-2xl border transition-all duration-200 ${
+                  className={`text-left p-4 rounded-xl border transition-all duration-200 ${
                     difficulty === key
-                      ? "bg-[#F0EEFF] border-[#6C63FF] text-[#6C63FF]"
-                      : "bg-[#FAFBFF] border-gray-200 text-gray-600 hover:border-[#6C63FF]/40"
+                      ? "bg-[#F0EEFF] border-[1.5px] border-[#6C63FF] text-[#6C63FF]"
+                      : "bg-[#FAFBFF] border-[#E2E8F0] text-[#475569] hover:border-[#6C63FF]/40"
                   }`}
                 >
                   <span className="text-sm font-black block">{label}</span>
@@ -158,7 +159,7 @@ export default function VarkDifficultyPicker({ initialBlend, initialDifficulty, 
           {step === "difficulty" ? (
             <button
               onClick={() => setStep("vark")}
-              className="flex items-center gap-1.5 text-xs font-bold text-gray-400 hover:text-[#6C63FF] transition-all"
+              className="flex items-center gap-1.5 text-xs font-bold h-11 px-2 text-[#64748B] hover:text-[#6C63FF] transition-all"
             >
               <ArrowLeft size={14} /> Back
             </button>
@@ -168,7 +169,7 @@ export default function VarkDifficultyPicker({ initialBlend, initialDifficulty, 
           <button
             onClick={handleContinue}
             disabled={step === "vark" && isOver}
-            className="flex items-center gap-1.5 bg-[#1E1B4B] hover:bg-black text-white px-6 py-3 rounded-xl text-xs font-black shadow-sm transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
+            className="flex items-center justify-center gap-1.5 bg-[#161F4C] hover:bg-[#252F6B] text-white h-11 px-6 rounded-xl text-xs font-semibold shadow-sm transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {step === "vark" ? (
               <>Continue <ArrowRight size={14} /></>

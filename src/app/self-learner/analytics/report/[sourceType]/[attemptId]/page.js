@@ -22,7 +22,7 @@ function QuestionCard({ q, index }) {
   return (
     <div className="bg-white rounded-3xl border border-gray-200 shadow-xs p-5 space-y-4">
       <div className="flex items-start justify-between gap-3">
-        <p className="text-sm font-bold text-[#1E1B4B] leading-relaxed flex-1">
+        <p className="text-sm font-bold text-[#161F4C] leading-relaxed flex-1">
           <span className="text-gray-400 mr-1.5">Q{index + 1}.</span>{q.question}
         </p>
         <span
@@ -54,7 +54,7 @@ function QuestionCard({ q, index }) {
         </div>
         <div className="rounded-xl px-3 py-2.5 bg-[#EDFAF5] border border-[#43C6AC]/20">
           <p className="text-[10px] font-black text-[#43C6AC] uppercase mb-1">Correct / Model Answer</p>
-          <p className="font-semibold text-[#1E1B4B]">{q.correctAnswer || "—"}</p>
+          <p className="font-semibold text-[#161F4C]">{q.correctAnswer || "—"}</p>
         </div>
       </div>
 
@@ -120,7 +120,7 @@ export default function AttemptInsightReportPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#1E1B4B] text-white flex flex-col items-center justify-center p-6 gap-5">
+      <div className="min-h-screen bg-[#F5F7FB] text-[#161F4C] flex flex-col items-center justify-center p-6 gap-5">
         <Loader2 size={48} className="animate-spin text-[#6C63FF]" />
         <div className="text-center">
           <h3 className="text-base font-black">Analyzing your answers…</h3>
@@ -136,11 +136,11 @@ export default function AttemptInsightReportPage() {
     return (
       <div className="min-h-screen bg-[#F5F7FB] p-6 flex items-center justify-center">
         <div className="bg-white rounded-3xl border border-gray-200 shadow-sm p-10 text-center space-y-4 max-w-md">
-          <h3 className="text-base font-black text-[#1E1B4B]">Couldn't load this report</h3>
+          <h3 className="text-base font-black text-[#161F4C]">Couldn't load this report</h3>
           <p className="text-xs font-semibold text-gray-500 leading-relaxed">{error || "Attempt not found."}</p>
           <button
             onClick={() => router.push("/self-learner/analytics")}
-            className="inline-flex items-center gap-1.5 bg-[#1E1B4B] text-white px-6 py-3 rounded-2xl text-xs font-extrabold shadow-sm"
+            className="inline-flex items-center gap-1.5 bg-[#161F4C] text-white px-6 py-3 rounded-2xl text-xs font-extrabold shadow-sm"
           >
             Back to Analytics
           </button>
@@ -167,7 +167,7 @@ export default function AttemptInsightReportPage() {
             <span className="text-[10px] font-black uppercase tracking-wider text-[#6C63FF]">
               {SOURCE_LABEL[sourceType] || "Attempt"} · Detailed Feedback
             </span>
-            <h1 className="text-xl font-black text-[#1E1B4B] mt-1">{attempt.testTitle}</h1>
+            <h1 className="text-xl font-black text-[#161F4C] mt-1">{attempt.testTitle}</h1>
             <p className="text-xs font-semibold text-gray-400 mt-1">
               {attempt.subjectName}{attempt.date ? ` · ${new Date(attempt.date).toLocaleString()}` : ""}
             </p>

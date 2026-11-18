@@ -17,7 +17,7 @@ export default function ConceptBlock({ block }) {
       </div>
       {block.realWorldConnection && (
         <p className="mt-3 text-xs font-semibold leading-relaxed text-slate-600">
-          <span className="font-black text-[#1E1B4B]">Real-world connection: </span>{block.realWorldConnection}
+          <span className="font-black text-[#161F4C]">Real-world connection: </span>{block.realWorldConnection}
         </p>
       )}
     </ActivityShell>

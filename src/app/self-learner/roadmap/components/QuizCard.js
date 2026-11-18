@@ -66,7 +66,7 @@ export default function QuizCard({ level, questions = [], onPassQuiz }) {
         </div>
 
         <div>
-          <h3 className="text-lg font-black text-[#1E1B4B]">
+          <h3 className="text-lg font-black text-[#161F4C]">
             {passed ? "Stage Quiz Passed!" : "Stage Quiz Failed"}
           </h3>
           <p className="text-xs font-semibold text-gray-500 mt-1">
@@ -90,7 +90,7 @@ export default function QuizCard({ level, questions = [], onPassQuiz }) {
           {!passed ? (
             <button
               onClick={handleRestart}
-              className="flex-1 bg-[#1E1B4B] hover:bg-[#1E1B4B]/95 text-white px-5 py-3 rounded-xl text-xs font-bold transition-all duration-200 hover:scale-102"
+              className="flex-1 bg-[#161F4C] hover:bg-[#161F4C]/95 text-white px-5 py-3 rounded-xl text-xs font-bold transition-all duration-200 hover:scale-102"
             >
               Try Again
             </button>
@@ -117,7 +117,7 @@ export default function QuizCard({ level, questions = [], onPassQuiz }) {
           <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">
             Level {level} Assessment
           </span>
-          <h3 className="text-sm font-bold text-[#1E1B4B] mt-0.5">
+          <h3 className="text-sm font-bold text-[#161F4C] mt-0.5">
             End-of-Level Quiz
           </h3>
         </div>
@@ -127,7 +127,7 @@ export default function QuizCard({ level, questions = [], onPassQuiz }) {
       </div>
 
       {/* Question */}
-      <div className="text-sm font-extrabold text-[#1E1B4B] leading-relaxed">
+      <div className="text-sm font-extrabold text-[#161F4C] leading-relaxed">
         {q.question}
       </div>
 
@@ -141,7 +141,7 @@ export default function QuizCard({ level, questions = [], onPassQuiz }) {
               onClick={() => setSelectedOpt(idx)}
               className={`w-full text-left p-4 rounded-2xl border text-xs font-bold flex items-center justify-between transition-all duration-200 ${
                 isSelected
-                  ? "bg-[#F0EEFF] border-[#6C63FF] text-[#1E1B4B]"
+                  ? "bg-[#F0EEFF] border-[#6C63FF] text-[#161F4C]"
                   : "bg-[#FAFBFF] border-gray-200 text-gray-600 hover:border-gray-300"
               }`}
             >
@@ -164,7 +164,7 @@ export default function QuizCard({ level, questions = [], onPassQuiz }) {
         <button
           onClick={handleNext}
           disabled={selectedOpt === null}
-          className="flex items-center gap-1 bg-[#1E1B4B] hover:bg-[#1E1B4B]/95 text-white px-5 py-3 rounded-xl text-xs font-bold transition-all duration-200 disabled:opacity-50"
+          className="flex items-center gap-1 bg-[#161F4C] hover:bg-[#161F4C]/95 text-white px-5 py-3 rounded-xl text-xs font-bold transition-all duration-200 disabled:opacity-50"
         >
           {currentIdx === questions.length - 1 ? "Finish Quiz" : "Next"}
           <ArrowRight size={12} />

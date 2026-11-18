@@ -40,7 +40,7 @@ export default function WorkedExampleBlock({ block }) {
         </div>
         <div className="min-h-44 rounded-xl border border-emerald-200 bg-white p-4" aria-live="polite">
           <p className="text-[9px] font-black uppercase tracking-widest text-emerald-600">Step {current + 1} of {steps.length}</p>
-          <h5 className="mt-1 text-sm font-black text-[#1E1B4B]">{step.label}</h5>
+          <h5 className="mt-1 text-sm font-black text-[#161F4C]">{step.label}</h5>
           <p className="mt-3 text-xs font-bold leading-relaxed text-slate-700">{step.action}</p>
           <p className="mt-2 text-xs font-medium leading-relaxed text-slate-600"><span className="font-black">Why: </span>{step.explanation}</p>
           {step.result && <p className="mt-3 rounded-lg bg-emerald-50 p-3 text-xs font-black text-emerald-800">Result: {step.result}</p>}

@@ -45,7 +45,7 @@ export default function ResourcesPanel({ resources, loading, error }) {
     <div className="bg-white rounded-3xl border border-gray-200 shadow-sm p-5 space-y-4">
       <div className="flex items-center gap-2">
         <Compass size={13} className="text-[#6C63FF]" />
-        <h4 className="text-xs font-black text-[#1E1B4B] uppercase tracking-wider">
+        <h4 className="text-xs font-black text-[#161F4C] uppercase tracking-wider">
           Recommended Resources
         </h4>
       </div>
@@ -70,7 +70,7 @@ export default function ResourcesPanel({ resources, loading, error }) {
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-[#1E1B4B] truncate">
+                      <span className="text-xs font-bold text-[#161F4C] truncate">
                         {item.title}
                       </span>
                       <span className="shrink-0 text-[9px] font-black text-gray-400 uppercase tracking-wide bg-gray-100 rounded-full px-2 py-0.5">

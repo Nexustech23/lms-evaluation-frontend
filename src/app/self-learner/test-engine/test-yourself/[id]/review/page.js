@@ -94,7 +94,7 @@ export default function ReviewPage() {
     }, [testId]);
 
     if (loading) return (
-        <div className="flex items-center justify-center h-screen" style={{ backgroundColor: color }}>
+        <div className="flex items-center justify-center h-screen" style={{ backgroundColor: "#F5F7FB" }}>
             <div className="bg-white rounded-2xl px-10 py-8 flex flex-col items-center gap-4 shadow-xl">
                 <Spinner />
                 <p className="text-sm text-gray-500">Loading review…</p>
@@ -103,7 +103,7 @@ export default function ReviewPage() {
     );
 
     if (error || !attempt) return (
-        <div className="flex items-center justify-center h-screen" style={{ backgroundColor: color }}>
+        <div className="flex items-center justify-center h-screen" style={{ backgroundColor: "#F5F7FB" }}>
             <div className="bg-white rounded-2xl p-10 text-center shadow-xl max-w-sm">
                 <p className="text-4xl mb-3">⚠️</p>
                 <p className="text-lg font-bold text-gray-800 mb-2">Review not available</p>
@@ -157,7 +157,7 @@ export default function ReviewPage() {
     };
 
     return (
-        <div className="flex flex-col min-h-screen" style={{ backgroundColor: color }}>
+        <div className="flex flex-col min-h-screen" style={{ backgroundColor: "#F5F7FB" }}>
 
             {/* ── Top Bar ── */}
             <div className="bg-white border-b border-gray-200 px-5 py-3 flex items-center justify-between shadow-sm flex-shrink-0">

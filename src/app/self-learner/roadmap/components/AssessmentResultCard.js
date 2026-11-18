@@ -25,7 +25,7 @@ export default function AssessmentResultCard({ results, onProceed }) {
 
       {/* Title */}
       <div>
-        <h2 className="text-2xl font-black text-[#1E1B4B]">Assessment Completed!</h2>
+        <h2 className="text-2xl font-black text-[#161F4C]">Assessment Completed!</h2>
         <p className="text-sm font-medium text-gray-500 mt-1">
           Our engine has evaluated your current level.
         </p>
@@ -45,7 +45,7 @@ export default function AssessmentResultCard({ results, onProceed }) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
         {/* Strengths */}
         <div className="bg-[#FAFBFF] border border-gray-150 p-5 rounded-2xl">
-          <h4 className="text-sm font-bold text-[#1E1B4B] flex items-center gap-2 mb-3">
+          <h4 className="text-sm font-bold text-[#161F4C] flex items-center gap-2 mb-3">
             <CheckCircle size={16} className="text-[#43C6AC]" />
             Areas Mastered
           </h4>
@@ -61,7 +61,7 @@ export default function AssessmentResultCard({ results, onProceed }) {
 
         {/* Weaknesses */}
         <div className="bg-[#FAFBFF] border border-gray-150 p-5 rounded-2xl">
-          <h4 className="text-sm font-bold text-[#1E1B4B] flex items-center gap-2 mb-3">
+          <h4 className="text-sm font-bold text-[#161F4C] flex items-center gap-2 mb-3">
             <AlertTriangle size={16} className="text-[#FF6584]" />
             Recommended Focus
           </h4>
@@ -81,14 +81,14 @@ export default function AssessmentResultCard({ results, onProceed }) {
         <ShieldCheck size={24} className="text-[#6C63FF] shrink-0" />
         <div>
           <span className="block text-xs font-bold text-gray-400 uppercase">Recommended Starting Point</span>
-          <span className="text-sm font-extrabold text-[#1E1B4B]">{recommendedLevel}</span>
+          <span className="text-sm font-extrabold text-[#161F4C]">{recommendedLevel}</span>
         </div>
       </div>
 
       {/* Proceed button */}
       <button
         onClick={onProceed}
-        className="w-full h-14 rounded-2xl bg-[#1E1B4B] hover:bg-[#1E1B4B]/95 text-white text-sm font-bold flex items-center justify-center gap-2 shadow-sm transition-all duration-200 hover:scale-[1.01]"
+        className="w-full h-14 rounded-2xl bg-[#161F4C] hover:bg-[#161F4C]/95 text-white text-sm font-bold flex items-center justify-center gap-2 shadow-sm transition-all duration-200 hover:scale-[1.01]"
       >
         Build My Roadmap
         <ArrowRight size={18} />

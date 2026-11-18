@@ -17,7 +17,7 @@ export default function CommonMistakesBlock({ block }) {
           return (
             <div key={index} className="overflow-hidden rounded-xl border border-amber-200 bg-white">
               <button type="button" onClick={() => setOpen(expanded ? -1 : index)} aria-expanded={expanded} className="flex w-full items-center justify-between gap-3 p-4 text-left">
-                <span className="text-xs font-black text-[#1E1B4B]">{item.mistake}</span>
+                <span className="text-xs font-black text-[#161F4C]">{item.mistake}</span>
                 <ChevronDown size={15} className={`shrink-0 text-amber-600 transition-transform ${expanded ? "rotate-180" : ""}`} />
               </button>
               {expanded && (

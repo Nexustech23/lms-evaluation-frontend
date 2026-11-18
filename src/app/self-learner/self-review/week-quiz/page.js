@@ -159,24 +159,24 @@ function WeekQuizContent() {
 
   if (phase === "loading") {
     return (
-      <div className="min-h-screen bg-[#1E1B4B] text-white flex flex-col items-center justify-center p-6 gap-5">
+      <div className="min-h-screen bg-[#F5F7FB] text-[#161F4C] flex flex-col items-center justify-center p-6 gap-5">
         <Loader2 size={48} className="animate-spin text-[#6C63FF]" />
-        <p className="text-xs text-gray-400 font-semibold">Checking your progress…</p>
+        <p className="text-xs text-[#64748B] font-semibold">Checking your progress…</p>
       </div>
     );
   }
 
   if (loadError) {
     return (
-      <div className="min-h-screen bg-[#1E1B4B] text-white flex flex-col items-center justify-center p-6 gap-5">
-        <ShieldAlert size={48} className="text-red-400" />
+      <div className="min-h-screen bg-[#F5F7FB] text-[#161F4C] flex flex-col items-center justify-center p-6 gap-5">
+        <ShieldAlert size={48} className="text-red-500" />
         <div className="text-center">
-          <h3 className="text-base font-black text-red-400">Couldn't Load Weekly Quiz</h3>
-          <p className="text-xs text-gray-400 font-semibold mt-1 max-w-xs">{loadError}</p>
+          <h3 className="text-base font-black text-red-500">Couldn't Load Weekly Quiz</h3>
+          <p className="text-xs text-[#64748B] font-semibold mt-1 max-w-xs">{loadError}</p>
         </div>
         <button
           onClick={() => router.push("/self-learner/roadmap")}
-          className="bg-white/10 border border-white/10 px-5 py-2.5 rounded-xl text-xs font-bold"
+          className="bg-[#161F4C] hover:bg-[#252F6B] text-white h-11 px-5 rounded-[10px] text-xs font-semibold"
         >
           Back to Roadmaps
         </button>
@@ -187,17 +187,17 @@ function WeekQuizContent() {
   if (phase === "gated") {
     return (
       <div className="min-h-screen bg-[#F5F7FB] flex flex-col items-center justify-center p-6 gap-5 text-center">
-        <div className="bg-white rounded-3xl border border-gray-200 shadow-xl max-w-md w-full p-8 space-y-4">
+        <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-md max-w-md w-full p-8 space-y-4">
           <div className="w-14 h-14 rounded-full bg-[#FFF8EE] text-[#F7971E] flex items-center justify-center mx-auto">
             <BookOpen size={26} />
           </div>
-          <h3 className="text-lg font-black text-[#1E1B4B]">Finish Studying First</h3>
+          <h3 className="text-lg font-black text-[#161F4C]">Finish Studying First</h3>
           <p className="text-xs font-semibold text-gray-500 leading-relaxed">
             Complete every subtopic for Week {weekNum} in the Learning Lounge before taking this week's quiz.
           </p>
           <button
             onClick={() => router.push(`/self-learner/learning-lounge?roadmapId=${roadmapId}&week=${weekNum}`)}
-            className="w-full h-12 bg-[#1E1B4B] hover:bg-black text-white text-xs font-bold rounded-xl transition-all duration-200"
+            className="w-full h-12 bg-[#161F4C] hover:bg-[#252F6B] text-white text-xs font-semibold rounded-xl transition-all duration-200"
           >
             Go to Learning Lounge
           </button>
@@ -216,11 +216,11 @@ function WeekQuizContent() {
 
   if (phase === "generating") {
     return (
-      <div className="min-h-screen bg-[#1E1B4B] text-white flex flex-col items-center justify-center p-6 gap-5">
+      <div className="min-h-screen bg-[#F5F7FB] text-[#161F4C] flex flex-col items-center justify-center p-6 gap-5">
         <Loader2 size={48} className="animate-spin text-[#6C63FF]" />
         <div className="text-center">
           <h3 className="text-base font-black">Generating Week {weekNum} Quiz…</h3>
-          <p className="text-xs text-gray-400 font-semibold mt-1 max-w-xs">
+          <p className="text-xs text-[#64748B] font-semibold mt-1 max-w-xs">
             The Guru is crafting personalised questions based on your curriculum. ~10-20 seconds.
           </p>
         </div>
@@ -230,10 +230,10 @@ function WeekQuizContent() {
 
   if (phase === "grading") {
     return (
-      <div className="min-h-screen bg-[#1E1B4B] text-white flex flex-col items-center justify-center p-6 space-y-4">
+      <div className="min-h-screen bg-[#F5F7FB] text-[#161F4C] flex flex-col items-center justify-center p-6 space-y-4">
         <Loader2 size={48} className="animate-spin text-[#6C63FF]" />
         <h3 className="text-lg font-black">Evaluating Your Answers…</h3>
-        <p className="text-xs text-gray-400 font-semibold max-w-xs text-center leading-relaxed">
+        <p className="text-xs text-[#64748B] font-semibold max-w-xs text-center leading-relaxed">
           The backend is grading your responses (written answers are graded by Guru) and updating your progress.
         </p>
       </div>
@@ -257,7 +257,7 @@ function WeekQuizContent() {
           </div>
 
           <div>
-            <h3 className="text-xl font-black text-[#1E1B4B]">
+            <h3 className="text-xl font-black text-[#161F4C]">
               {passed ? "Week Passed! 🎉" : "Keep Studying 📚"}
             </h3>
             <p className="text-xs font-semibold text-gray-500 mt-2 leading-relaxed">
@@ -290,7 +290,7 @@ function WeekQuizContent() {
 
           <button
             onClick={() => router.push(`/self-learner/roadmap/${roadmapId}`)}
-            className="w-full h-12 bg-[#1E1B4B] hover:bg-black text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all duration-200"
+            className="w-full h-12 bg-[#161F4C] hover:bg-[#252F6B] text-white text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 transition-all duration-200"
           >
             <CheckCircle2 size={14} />
             Back to Roadmap
@@ -299,7 +299,7 @@ function WeekQuizContent() {
 
         {results?.length > 0 && (
           <div className="max-w-2xl w-full bg-white rounded-3xl border border-gray-200 shadow-sm p-6">
-            <h4 className="text-xs font-black text-[#1E1B4B] uppercase tracking-wider mb-4">
+            <h4 className="text-xs font-black text-[#161F4C] uppercase tracking-wider mb-4">
               Question Breakdown
             </h4>
             <div className="space-y-3">
@@ -309,7 +309,7 @@ function WeekQuizContent() {
                   className={`p-3 rounded-xl border text-xs ${r.isCorrect ? "bg-[#EDFAF5] border-[#43C6AC]/30" : "bg-[#FFF0F3] border-[#FF6584]/30"}`}
                 >
                   <div className="flex items-center justify-between mb-1">
-                    <span className="font-black text-[#1E1B4B]">
+                    <span className="font-black text-[#161F4C]">
                       Q{i + 1} <span className="text-[9px] font-bold text-gray-400 uppercase ml-1">{r.type}</span>
                     </span>
                     <span className={`font-black ${r.isCorrect ? "text-[#43C6AC]" : "text-[#FF6584]"}`}>
@@ -335,39 +335,39 @@ function WeekQuizContent() {
   const answeredCount = questions.filter((_, idx) => isAnswered(idx)).length;
 
   return (
-    <div className="min-h-screen bg-[#1E1B4B] text-white flex flex-col justify-between p-6">
+    <div className="min-h-screen bg-[#F5F7FB] text-[#161F4C] flex flex-col justify-between p-6">
 
-      <div className="flex items-center justify-between border-b border-white/10 pb-4">
+      <div className="flex items-center justify-between border-b border-[#E2E8F0] pb-4">
         <div>
-          <span className="text-[10px] font-bold text-[#6C63FF] uppercase tracking-widest block">
+          <span className="text-[10px] font-bold text-[#4F46E5] uppercase tracking-widest block">
             grAdelytics Exam Portal
           </span>
-          <h2 className="text-base font-extrabold mt-0.5">Week {weekNum} Assessment</h2>
+          <h2 className="text-base font-extrabold mt-0.5 text-[#161F4C]">Week {weekNum} Assessment</h2>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="bg-white/10 border border-white/5 px-3 py-1.5 rounded-xl text-[10px] font-bold text-gray-300">
+          <div className="bg-white border border-[#E2E8F0] px-3 h-9 flex items-center rounded-[10px] text-[11px] font-bold text-[#475569]">
             {answeredCount}/{questions.length} answered
           </div>
-          <div className="flex items-center gap-2 bg-white/10 border border-white/5 px-4 py-2.5 rounded-2xl">
-            <Clock size={16} className={timeLeft <= 60 ? "text-red-400 animate-pulse" : "text-emerald-400"} />
-            <span className={`text-sm font-mono font-black ${timeLeft <= 60 ? "text-red-400 animate-pulse" : "text-white"}`}>
+          <div className="flex items-center gap-2 bg-white border border-[#E2E8F0] px-4 h-11 rounded-[10px]">
+            <Clock size={16} className={timeLeft <= 60 ? "text-red-500 animate-pulse" : "text-emerald-500"} />
+            <span className={`text-sm font-mono font-black ${timeLeft <= 60 ? "text-red-500 animate-pulse" : "text-[#161F4C]"}`}>
               {formatTime(timeLeft)}
             </span>
           </div>
         </div>
       </div>
 
-      <div className="max-w-3xl w-full mx-auto bg-white/5 border border-white/5 rounded-3xl p-6 md:p-8 space-y-6 my-6">
+      <div className="max-w-3xl w-full mx-auto bg-white border border-[#E2E8F0] shadow-[0_1px_3px_rgba(22,31,76,0.06),0_4px_12px_rgba(22,31,76,0.04)] rounded-2xl p-6 md:p-8 space-y-6 my-6">
 
-        <div className="flex justify-between items-center text-[10px] font-bold text-gray-400">
+        <div className="flex justify-between items-center text-[10px] font-bold text-[#64748B]">
           <span>QUESTION {currentIdx + 1} OF {questions.length}</span>
-          <span className="text-[#6C63FF] uppercase">
+          <span className="text-[#4F46E5] uppercase">
             {q.type} • {q.difficulty || "—"} • {q.topic || ""}
           </span>
         </div>
 
-        <h3 className="text-base md:text-lg font-black leading-snug">{q.question}</h3>
+        <h3 className="text-base md:text-lg font-black leading-snug text-[#161F4C]">{q.question}</h3>
 
         {q.type === "mcq" ? (
           <div className="space-y-3 pt-2">
@@ -378,14 +378,14 @@ function WeekQuizContent() {
                   key={optIdx}
                   type="button"
                   onClick={() => handleSelectOption(optIdx)}
-                  className={`w-full text-left p-4 rounded-2xl border text-xs font-bold flex items-center justify-between transition-all duration-200 ${isSelected
-                    ? "bg-[#6C63FF] border-[#6C63FF] text-white shadow-md"
-                    : "bg-white/5 border-white/10 text-gray-300 hover:bg-white/10"
+                  className={`w-full text-left px-4 py-3.5 rounded-xl border text-xs font-bold flex items-center justify-between transition-all duration-200 ${isSelected
+                    ? "bg-[#EEF2FF] border-[1.5px] border-[#6366F1] text-[#4338CA]"
+                    : "bg-white border-[#E2E8F0] text-[#475569] hover:border-[#6366F1]/50 hover:bg-[#F8FAFF]"
                     }`}
                 >
                   <span>{option}</span>
                   {isSelected && (
-                    <div className="w-4 h-4 rounded-full bg-white text-[#6C63FF] flex items-center justify-center text-[10px] font-black">
+                    <div className="w-4 h-4 rounded-full bg-[#6366F1] text-white flex items-center justify-center text-[10px] font-black">
                       ✓
                     </div>
                   )}
@@ -400,17 +400,17 @@ function WeekQuizContent() {
               onChange={(e) => handleFreeTextChange(e.target.value)}
               placeholder="Write your answer here…"
               rows={7}
-              className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm text-white placeholder-gray-500 outline-none focus:ring-2 focus:ring-[#6C63FF] resize-none"
+              className="w-full bg-[#FAFBFF] border border-[#E2E8F0] rounded-xl p-4 text-sm text-[#161F4C] placeholder-[#94A3B8] outline-none focus:ring-2 focus:ring-violet-400 resize-none"
             />
           </div>
         )}
       </div>
 
-      <div className="flex items-center justify-between border-t border-white/10 pt-4 max-w-3xl w-full mx-auto">
+      <div className="flex items-center justify-between border-t border-[#E2E8F0] pt-4 max-w-3xl w-full mx-auto">
         <button
           onClick={() => setCurrentIdx(currentIdx - 1)}
           disabled={currentIdx === 0}
-          className="flex items-center gap-1.5 bg-white/5 hover:bg-white/10 text-white border border-white/10 px-5 py-3 rounded-xl text-xs font-bold disabled:opacity-30 disabled:cursor-not-allowed"
+          className="flex items-center justify-center gap-1.5 bg-white hover:bg-[#F8FAFF] text-[#475569] border border-[#E2E8F0] h-11 px-5 rounded-[10px] text-xs font-semibold disabled:opacity-40 disabled:cursor-not-allowed"
         >
           <ArrowLeft size={14} /> Previous
         </button>
@@ -419,7 +419,7 @@ function WeekQuizContent() {
           <button
             onClick={() => setCurrentIdx(currentIdx + 1)}
             disabled={!isAnswered(currentIdx)}
-            className="flex items-center gap-1.5 bg-[#6C63FF] hover:bg-[#6C63FF]/90 text-white px-6 py-3 rounded-xl text-xs font-bold disabled:opacity-50"
+            className="flex items-center justify-center gap-1.5 bg-[#161F4C] hover:bg-[#252F6B] text-white h-11 px-6 rounded-[10px] text-xs font-semibold disabled:bg-[#E2E8F0] disabled:text-[#64748B] disabled:cursor-not-allowed"
           >
             Next <ArrowRight size={14} />
           </button>
@@ -427,7 +427,7 @@ function WeekQuizContent() {
           <button
             onClick={handleSubmit}
             disabled={answeredCount < questions.length}
-            className="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-xl text-xs font-black shadow-md disabled:opacity-50 transition-all"
+            className="bg-emerald-600 hover:bg-emerald-700 text-white h-11 px-6 rounded-[10px] text-xs font-semibold shadow-sm disabled:bg-[#E2E8F0] disabled:text-[#64748B] disabled:cursor-not-allowed transition-all"
           >
             Submit Exam ({answeredCount}/{questions.length})
           </button>
@@ -442,7 +442,7 @@ export default function WeekQuizPage() {
   return (
     <Suspense
       fallback={
-        <div className="p-6 text-center text-gray-500 bg-[#1E1B4B] min-h-screen text-white">
+        <div className="p-6 text-center text-[#64748B] bg-[#F5F7FB] min-h-screen">
           Loading exam viewport...
         </div>
       }

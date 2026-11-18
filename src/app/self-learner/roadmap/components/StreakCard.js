@@ -47,7 +47,7 @@ export default function StreakCard({ streakDays = 0, completedLevelsCount = 0, a
             <Flame size={18} fill="#FF6584" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-[#1E1B4B]">
+            <h3 className="text-sm font-bold text-[#161F4C]">
               Learning Streak
             </h3>
             <span className="text-[10px] font-bold text-gray-400 uppercase">
@@ -107,7 +107,7 @@ export default function StreakCard({ streakDays = 0, completedLevelsCount = 0, a
                 {badge.icon}
               </div>
               <div className="min-w-0 flex-1">
-                <h4 className={`text-xs font-bold ${badge.unlocked ? "text-[#1E1B4B]" : "text-gray-400"}`}>
+                <h4 className={`text-xs font-bold ${badge.unlocked ? "text-[#161F4C]" : "text-gray-400"}`}>
                   {badge.title}
                 </h4>
                 <p className="text-[10px] font-semibold text-gray-400 leading-snug">
