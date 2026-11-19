@@ -1,4 +1,5 @@
 import React from "react";
+import Reveal from "./Reveal";
 
 function VideoSection() {
     return (
@@ -10,6 +11,7 @@ function VideoSection() {
 
            <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 lg:px-20 grid lg:grid-cols-2 gap-24 items-center">
                {/* Left Side — Dual Videos */}
+<Reveal>
 <div className="relative h-[550px]  flex items-center mt-24 justify-center">
 
     {/* Top Left Video */}
@@ -91,16 +93,19 @@ function VideoSection() {
 
 </div>
 
+</Reveal>
                 {/* Right Side — Text */}
                 <div className="flex flex-col gap-7 text-center lg:text-left">
 
                     {/* Heading */}
+                    <Reveal delay={0.1}>
                     <h2 className="text-4xl md:text-5xl font-extrabold text-white leading-tight">
                         Built for Responsible AI
                         <span className="block text-orange-200">
                             in Higher Education
                         </span>
                     </h2>
+                    </Reveal>
 
                     {/* Points */}
                     <div className="flex flex-col gap-5 pt-2 text-left">
@@ -110,8 +115,8 @@ function VideoSection() {
                             { title: "Auditability", desc: "Every evaluation action can be traced." },
                             { title: "Role-based access", desc: "COE, faculty, moderators and administrators see only what they are authorised to access." },
                             { title: "Institutional control", desc: "Rubrics, marking schemes and evaluation workflows remain institution-defined." },
-                        ].map(({ title, desc }) => (
-                            <React.Fragment key={title}>
+                        ].map(({ title, desc }, idx) => (
+                            <Reveal key={title} delay={0.15 + idx * 0.12}>
                                 <div className="flex items-start gap-4 p-4 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/10">
                                     <div className="min-w-[40px] h-10 rounded-xl bg-orange-400 flex items-center justify-center text-white font-bold shadow-lg">
                                         ✓
@@ -121,7 +126,7 @@ function VideoSection() {
                                         <p className="text-white/80 text-sm mt-1">{desc}</p>
                                     </div>
                                 </div>
-                            </React.Fragment>
+                            </Reveal>
                         ))}
                     </div>
 

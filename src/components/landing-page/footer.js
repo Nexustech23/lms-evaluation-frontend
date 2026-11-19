@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import Reveal from "./Reveal";
 import {
   FaFacebookF,
   FaInstagram,
@@ -24,7 +25,7 @@ function Footer() {
         {/* Top Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.55fr_1.15fr_0.85fr_0.85fr] gap-10 border-b border-white/20 pb-12">
           {/* Logo + Description */}
-          <div className="flex flex-col">
+          <Reveal delay={0.0} className="h-full">          <div className="flex flex-col">
             <div className="inline-flex self-start items-center rounded-xl bg-white px-[18px] py-3 mb-5 shadow-[0_6px_20px_rgba(10,29,78,0.12)]">
               <Image
                 src="/pics/Logo7.png"
@@ -57,10 +58,10 @@ function Footer() {
                 <span>India</span>
               </div>
             </div>
-          </div>
+          </div></Reveal>
 
           {/* Features */}
-          <div className="flex flex-col">
+          <Reveal delay={0.1} className="h-full">          <div className="flex flex-col">
             <h2 className="text-[16px] font-bold text-white mb-[18px]">Features & Tools</h2>
 
             <div className="flex flex-col text-[14.5px] leading-[1.4] text-white/90">
@@ -115,10 +116,10 @@ function Footer() {
                 </a>
               </div>
             </div>
-          </div>
+          </div></Reveal>
 
           {/* Resources */}
-          <div className="flex flex-col gap-3 text-[14.5px] leading-[1.4]">
+          <Reveal delay={0.2} className="h-full">          <div className="flex flex-col gap-3 text-[14.5px] leading-[1.4]">
             <h2 className="text-[16px] font-bold text-white mb-[6px]">Resources</h2>
 
             <Link
@@ -148,10 +149,10 @@ function Footer() {
             >
               FAQs
             </Link>
-          </div>
+          </div></Reveal>
 
           {/* Legal */}
-          <div className="flex flex-col gap-3 text-[14.5px] leading-[1.4]">
+          <Reveal delay={0.30000000000000004} className="h-full">          <div className="flex flex-col gap-3 text-[14.5px] leading-[1.4]">
             <h2 className="text-[16px] font-bold text-white mb-[6px]">Legal</h2>
 
             <Link
@@ -167,11 +168,11 @@ function Footer() {
             >
               Privacy Policy
             </Link>
-          </div>
+          </div></Reveal>
         </div>
 
         {/* Bottom Section */}
-        <div className="flex flex-col md:flex-row justify-between items-center gap-6 pt-8">
+        <Reveal><div className="flex flex-col md:flex-row justify-between items-center gap-6 pt-8">
           {/* Copyright */}
           <p className="text-sm text-white/80 text-center md:text-left">
             © 2026 grAdelytics. All rights reserved.
@@ -207,7 +208,7 @@ function Footer() {
               <FaTwitter size={16} />
             </Link>
           </div>
-        </div>
+        </div></Reveal>
       </div>
     </footer>
   );

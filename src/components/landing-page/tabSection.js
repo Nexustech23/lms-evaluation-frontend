@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Reveal from "./Reveal";
 import { FileText, ClipboardCheck, Users, BarChart3 } from "lucide-react";
 
 function TabSection() {
@@ -80,6 +81,7 @@ function TabSection() {
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 lg:px-16">
         {/* Heading */}
+        <Reveal>
         <div className="text-center mb-16">
           <div
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full 
@@ -94,9 +96,12 @@ function TabSection() {
           </h2>
         </div>
 
+        </Reveal>
+
         {/* Content Layout */}
         <div className="grid lg:grid-cols-2 gap-20 items-center">
           {/* Left Image */}
+          <Reveal>
           <div className="relative">
             {/* Floating Badge */}
             <div
@@ -125,7 +130,10 @@ function TabSection() {
             </div>
           </div>
 
+          </Reveal>
+
           {/* Right Content */}
+          <Reveal delay={0.15}>
           <div>
             <h2 className="text-5xl font-extrabold text-gray-900 leading-tight">
               {tabData[activeTab].title}
@@ -138,6 +146,7 @@ function TabSection() {
             {/* Features */}
             <div className="grid sm:grid-cols-2 gap-5 mt-10">
               {tabData[activeTab].features.map((feature, index) => (
+                <Reveal key={index} delay={0.1 * index} className="h-full">
                 <div
                   key={index}
                   className="p-5 rounded-3xl bg-white border border-gray-200 
@@ -158,6 +167,7 @@ function TabSection() {
                     {feature.desc}
                   </p>
                 </div>
+                </Reveal>
               ))}
             </div>
 
@@ -175,11 +185,14 @@ function TabSection() {
               </div>
             )}
           </div>
+          </Reveal>
         </div>
         {/* Why institutions choose grAdelytIcs */}
+        <Reveal>
         <h3 className="text-gray-900 text-3xl md:text-4xl font-extrabold text-center mt-24 mb-10">
           Why institutions choose grAdelytIcs
         </h3>
+        </Reveal>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {[
             { title: "Faster Evaluation", desc: "Reduce repetitive evaluation effort and accelerate result processing." },
@@ -189,14 +202,15 @@ function TabSection() {
             { title: "Academic Intelligence", desc: "Move beyond marks to question-, course- and programme-level insights." },
             { title: "Outcome-Based", desc: "Connect assessment to CO/PO attainment and academic improvement." },
             { title: "Accreditation Ready", desc: "Turn assessment data into evidence for OBE, NBA, NAAC and other accreditations." },
-          ].map(({ title, desc }) => (
+          ].map(({ title, desc }, idx) => (
+            <Reveal key={title} delay={(idx % 3) * 0.12} className="h-full">
             <div
-              key={title}
-              className="p-6 rounded-3xl bg-white border border-gray-200 shadow-lg hover:-translate-y-2 hover:shadow-2xl transition-all duration-300"
+              className="h-full p-6 rounded-3xl bg-white border border-gray-200 shadow-lg hover:-translate-y-2 hover:shadow-2xl transition-all duration-300"
             >
               <h3 className="text-gray-900 font-bold text-lg">{title}</h3>
               <p className="text-gray-600 text-sm leading-relaxed mt-3">{desc}</p>
             </div>
+            </Reveal>
           ))}
         </div>
       </div>

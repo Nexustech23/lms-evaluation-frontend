@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
+import Reveal from "./Reveal";
 import dashboardImg from "../../../public/pics/dashbord2.png";
 
 function HeroPage() {
@@ -52,13 +53,13 @@ function HeroPage() {
             <div className="relative z-10 w-full max-w-5xl mx-auto flex flex-col items-center text-center px-6 pt-40 pb-12">
 
                 {/* Eyebrow pill */}
-                <div className="inline-flex items-center gap-2.5 bg-orange-50 border border-orange-200 text-orange-600 px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-widest mb-8">
+                <Reveal immediate delay={0}><div className="inline-flex items-center gap-2.5 bg-orange-50 border border-orange-200 text-orange-600 px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-widest mb-8">
                     <span className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse" />
                     AI-Powered Education Management System
-                </div>
+                </div></Reveal>
 
                 {/* Main headline */}
-                <h1 className="text-6xl sm:text-7xl md:text-8xl font-black text-gray-900 leading-[0.88] tracking-tight mb-6">
+                <Reveal immediate delay={0.12}><h1 className="text-6xl sm:text-7xl md:text-8xl font-black text-gray-900 leading-[0.88] tracking-tight mb-6">
                     Smarter
                     <br />
                     <span
@@ -69,15 +70,15 @@ function HeroPage() {
                     </span>
                     <br />
                     Better Results.
-                </h1>
+                </h1></Reveal>
 
                 {/* Sub-headline */}
-                <p className="text-gray-900 text-xl md:text-2xl font-bold leading-snug max-w-3xl mb-2">
+                <Reveal immediate delay={0.24}><p className="text-gray-900 text-xl md:text-2xl font-bold leading-snug max-w-3xl mb-2">
                     From Answer Sheets to Academic Intelligence
-                </p>
-                <p className="text-gray-600 text-lg md:text-xl leading-relaxed max-w-3xl mb-8">
+                </p></Reveal>
+                <Reveal immediate delay={0.32}><p className="text-gray-600 text-lg md:text-xl leading-relaxed max-w-3xl mb-8">
                     AI-powered evaluation for faster results, better academic decisions and measurable learning outcomes.
-                </p>
+                </p></Reveal>
 
                 {/* Key points */}
                 <div className="grid gap-5 sm:grid-cols-3 max-w-4xl w-full text-left mb-10">
@@ -85,16 +86,16 @@ function HeroPage() {
                         { title: "Evaluate faster.", desc: "AI-assisted handwritten answer evaluation." },
                         { title: "Validate with confidence.", desc: "Faculty remain in control with AI scores, rubrics and confidence indicators." },
                         { title: "Turn marks into insight.", desc: "CO-PO attainment, learning gaps, analytics and accreditation-ready evidence." },
-                    ].map(({ title, desc }) => (
-                        <div key={title} className="rounded-2xl bg-white/70 backdrop-blur border border-orange-100 px-5 py-4 shadow-sm hover:-translate-y-2 hover:shadow-2xl transition-all duration-300">
+                    ].map(({ title, desc }, idx) => (
+                        <Reveal key={title} immediate delay={0.42 + idx * 0.12} className="h-full"><div className="h-full rounded-2xl bg-white/70 backdrop-blur border border-orange-100 px-5 py-4 shadow-sm hover:-translate-y-2 hover:shadow-2xl transition-all duration-300">
                             <h3 className="text-gray-900 font-bold text-base">{title}</h3>
                             <p className="text-gray-600 text-sm leading-relaxed mt-1.5">{desc}</p>
-                        </div>
+                        </div></Reveal>
                     ))}
                 </div>
 
                 {/* CTA button */}
-                <div className="flex items-center justify-center mb-16">
+                <Reveal immediate delay={0.8}><div className="flex items-center justify-center mb-16">
                     <Link
                         href="/get-a-demo"
                         className="px-9 py-4 rounded-2xl text-white font-bold text-sm bg-gradient-to-r from-orange-600 to-amber-500
@@ -103,11 +104,11 @@ function HeroPage() {
                     >
                         Request a Live Demo
                     </Link>
-                </div>
+                </div></Reveal>
             </div>
 
             {/* === Product screenshot mockup === */}
-            <div className="relative z-10 w-full max-w-5xl mx-auto px-6 pb-20">
+            <Reveal immediate delay={1} y={40} className="w-full"><div className="relative z-10 w-full max-w-5xl mx-auto px-6 pb-20">
 
                 {/* Ambient glow beneath the card */}
                 <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-2/3 h-24 bg-orange-600/25 blur-3xl pointer-events-none" />
@@ -186,7 +187,7 @@ function HeroPage() {
                         Deep Insights
                     </div>
                 </div>
-            </div>
+            </div></Reveal>
         </section>
     );
 }
