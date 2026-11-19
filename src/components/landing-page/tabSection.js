@@ -1,40 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
-import {
-  Building2,
-  MonitorPlay,
-  Brain,
-  ClipboardCheck,
-  FileText,
-  Users,
-  BarChart3,
-  Clock3,
-  Route,
-  BookOpenCheck,
-} from "lucide-react";
+import { FileText, ClipboardCheck, Users, BarChart3 } from "lucide-react";
 
 function TabSection() {
-  const [activeTab, setActiveTab] = useState("institutes");
-
-  const Tabs = [
-    {
-      id: "institutes",
-      label: "Institutes",
-      icon: <Building2 size={18} />,
-    },
-    // {
-    //   id: "Faculty",
-    //   label: "Faculty",
-    //   icon: <MonitorPlay size={18} />,
-    // },
-    {
-      id: "MyCareerGuru",
-      label: "MyCareerGuru",
-      icon: <Brain size={18} />,
-    },
-  ];
+  const activeTab = "institutes";
 
   const tabData = {
     institutes: {
@@ -100,39 +70,6 @@ function TabSection() {
     //     },
     //   ],
     // },
-
-    MyCareerGuru: {
-      title: "AI Powered Learning Platform for Students",
-      description:
-        "Boost productivity and exam preparation with Pomodoro learning, AI roadmaps, homework help, and smart practice tools.",
-      ctaLink: "https://antarpath.com/mycareerguru",
-      ctaLabel: "Explore MyCareerGuru →",
-
-      image: "/pics/student.png",
-
-      features: [
-        {
-          icon: <Clock3 size={22} />,
-          title: "Pomodoro Learning",
-          desc: "Stay focused and productive with AI-powered Pomodoro study sessions.",
-        },
-        {
-          icon: <Route size={22} />,
-          title: "Personalized Roadmap",
-          desc: "Get customized learning paths based on your goals and performance.",
-        },
-        {
-          icon: <BookOpenCheck size={22} />,
-          title: "Best for Exam Preparation",
-          desc: "Practice smartly with mock tests, AI revision, and preparation strategies.",
-        },
-        {
-          icon: <Brain size={22} />,
-          title: "Homework & Practice Help",
-          desc: "Solve doubts, practice questions, and improve understanding instantly.",
-        },
-      ],
-    },
   };
 
   return (
@@ -148,39 +85,13 @@ function TabSection() {
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full 
             bg-orange-100 border border-orange-200 text-orange-600 text-sm font-medium"
           >
-            ✨ One Platform For Everyone
+            One Platform for Examinations to Academic Intelligence
           </div>
 
           <h2 className="text-5xl md:text-6xl font-extrabold text-gray-900 mt-6 leading-tight">
             Built For
             <span className="block text-orange-500">Modern Education</span>
           </h2>
-
-          <p className="text-gray-600 text-lg mt-6 max-w-3xl mx-auto leading-relaxed">
-            Whether you are an institute, tutor, or a MyCareerGuru learner, grAdelytics
-            provides AI-powered tools to simplify teaching, evaluation, and
-            learning.
-          </p>
-        </div>
-
-        {/* Tabs */}
-        <div className="flex flex-wrap justify-center gap-5 mb-10">
-          {Tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-3 px-7 py-4 rounded-2xl text-sm font-semibold transition-all duration-300
-                            
-                    ${
-                      activeTab === tab.id
-                        ? "bg-orange-500 text-white shadow-2xl scale-105"
-                        : "bg-white border border-gray-200 text-gray-700 hover:bg-orange-50 hover:border-orange-200"
-                    }`}
-            >
-              {tab.icon}
-              {tab.label}
-            </button>
-          ))}
         </div>
 
         {/* Content Layout */}
@@ -264,6 +175,29 @@ function TabSection() {
               </div>
             )}
           </div>
+        </div>
+        {/* Why institutions choose grAdelytIcs */}
+        <h3 className="text-gray-900 text-3xl md:text-4xl font-extrabold text-center mt-24 mb-10">
+          Why institutions choose grAdelytIcs
+        </h3>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {[
+            { title: "Faster Evaluation", desc: "Reduce repetitive evaluation effort and accelerate result processing." },
+            { title: "Consistent Evaluation", desc: "Evaluate against faculty-defined rubrics and marking schemes." },
+            { title: "Faculty in Control", desc: "AI assists; faculty review, modify and approve." },
+            { title: "Transparent and Auditable", desc: "Maintain an evaluation trail from script to final marks." },
+            { title: "Academic Intelligence", desc: "Move beyond marks to question-, course- and programme-level insights." },
+            { title: "Outcome-Based", desc: "Connect assessment to CO/PO attainment and academic improvement." },
+            { title: "Accreditation Ready", desc: "Turn assessment data into evidence for OBE, NBA, NAAC and other accreditations." },
+          ].map(({ title, desc }) => (
+            <div
+              key={title}
+              className="p-6 rounded-3xl bg-white border border-gray-200 shadow-lg hover:-translate-y-2 hover:shadow-2xl transition-all duration-300"
+            >
+              <h3 className="text-gray-900 font-bold text-lg">{title}</h3>
+              <p className="text-gray-600 text-sm leading-relaxed mt-3">{desc}</p>
+            </div>
+          ))}
         </div>
       </div>
     </section>

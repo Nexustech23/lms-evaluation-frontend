@@ -72,47 +72,37 @@ function HeroPage() {
                 </h1>
 
                 {/* Sub-headline */}
-                <p className="text-gray-500 text-lg md:text-xl leading-relaxed max-w-2xl mb-10">
-                    grAdelytIcs is an enabler of academic excellence and institutional transformation
+                <p className="text-gray-900 text-xl md:text-2xl font-bold leading-snug max-w-3xl mb-2">
+                    From Answer Sheets to Academic Intelligence
+                </p>
+                <p className="text-gray-600 text-lg md:text-xl leading-relaxed max-w-3xl mb-8">
+                    AI-powered evaluation for faster results, better academic decisions and measurable learning outcomes.
                 </p>
 
+                {/* Key points */}
+                <div className="grid gap-5 sm:grid-cols-3 max-w-4xl w-full text-left mb-10">
+                    {[
+                        { title: "Evaluate faster.", desc: "AI-assisted handwritten answer evaluation." },
+                        { title: "Validate with confidence.", desc: "Faculty remain in control with AI scores, rubrics and confidence indicators." },
+                        { title: "Turn marks into insight.", desc: "CO-PO attainment, learning gaps, analytics and accreditation-ready evidence." },
+                    ].map(({ title, desc }) => (
+                        <div key={title} className="rounded-2xl bg-white/70 backdrop-blur border border-orange-100 px-5 py-4 shadow-sm hover:-translate-y-2 hover:shadow-2xl transition-all duration-300">
+                            <h3 className="text-gray-900 font-bold text-base">{title}</h3>
+                            <p className="text-gray-600 text-sm leading-relaxed mt-1.5">{desc}</p>
+                        </div>
+                    ))}
+                </div>
 
-                {/* CTA buttons */}
-                <div className="flex flex-col sm:flex-row items-center gap-4 mb-14">
-                    <button
-                        onClick={() => {
-                            const section = document.getElementById("signup");
-                            if (section) section.scrollIntoView({ behavior: "smooth", block: "start" });
-                        }}
+                {/* CTA button */}
+                <div className="flex items-center justify-center mb-16">
+                    <Link
+                        href="/get-a-demo"
                         className="px-9 py-4 rounded-2xl text-white font-bold text-sm bg-gradient-to-r from-orange-600 to-amber-500
                             shadow-[0_0_40px_rgba(234,88,12,0.4)] hover:shadow-[0_0_60px_rgba(234,88,12,0.65)]
                             hover:scale-105 transition-all duration-300"
                     >
-                        Get Started Free
-                    </button>
-                    <Link
-                        href="/get-a-demo"
-                        className="px-9 py-4 rounded-2xl text-gray-700 font-semibold text-sm
-                            bg-white border border-gray-200
-                            hover:bg-gray-50 hover:border-gray-300 hover:text-gray-900
-                            transition-all duration-300"
-                    >
-                        Watch Demo →
+                        Request a Live Demo
                     </Link>
-                </div>
-
-                {/* Stats row */}
-                <div className="flex flex-wrap justify-center gap-10 mb-16">
-                    {[
-                        { val: "10K+", label: "Assessments Conducted" },
-                        { val: "95%", label: "Evaluation Accuracy" },
-                        { val: "500+", label: "Institutes Onboarded" },
-                    ].map(({ val, label }) => (
-                        <div key={label} className="text-center">
-                            <div className="text-3xl font-black text-gray-900">{val}</div>
-                            <div className="text-[11px] text-gray-500 uppercase tracking-widest mt-1.5 font-medium">{label}</div>
-                        </div>
-                    ))}
                 </div>
             </div>
 
