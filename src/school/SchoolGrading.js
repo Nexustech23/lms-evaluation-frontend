@@ -102,7 +102,7 @@ export default function SchoolGrading() {
 
       <div className="mx-auto max-w-3xl px-4 py-6">
         <div className="min-h-[400px] rounded-2xl bg-white p-4 shadow-sm sm:p-6">
-          <div className="mb-2 flex flex-wrap items-center gap-3">
+          <div className="mb-6 flex flex-wrap items-center gap-3">
             <div className="h-7 w-1.5 rounded-full" style={{ backgroundColor: color }} />
             <h2 className="text-lg font-bold text-gray-800">Grading</h2>
             {!loading && (
@@ -115,11 +115,6 @@ export default function SchoolGrading() {
               </span>
             )}
           </div>
-          <p className="mb-6 ml-4 text-sm text-gray-500">
-            Each student gets a grade from their own percentage, so a grade never depends on how the rest of the class did.
-            The CBSE nine-point scale is used until you change it.
-          </p>
-
           {loading ? (
             <div className="flex justify-center py-16"><Spinner /></div>
           ) : (
