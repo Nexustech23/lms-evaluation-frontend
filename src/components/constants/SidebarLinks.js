@@ -148,6 +148,16 @@ export const getSidebarLinks = (role, user, t) => {
           href: "/admin/enroll",
           icon: <IconUserPlus />,
         },
+        // Updating existing students from a file is built for colleges only (not for a school).
+        ...(isSchool(user)
+          ? []
+          : [
+            {
+              label: "Bulk Update",
+              href: "/admin/bulk-update",
+              icon: <IconFileUpload />,
+            },
+          ]),
         {
           label: "Activity Logs",
           href: "/admin/activity-logs",
