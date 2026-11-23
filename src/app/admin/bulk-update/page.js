@@ -153,7 +153,7 @@ export default function BulkUpdatePage() {
 
   return (
     <>
-      <Navbar />
+      <Navbar title="Bulk Update" />
 
       <div className="mb-4 mx-6">
         <button
@@ -173,7 +173,7 @@ export default function BulkUpdatePage() {
             <div className="px-6 py-4 border-b flex flex-wrap items-center justify-between gap-3">
               <div>
                 <h3 className="font-bold text-gray-800 text-lg">Bulk Update Students</h3>
-                <p className="text-gray-400 text-sm mt-0.5">
+                <p className="text-gray-600 text-sm mt-0.5">
                   Update details of students who are already enrolled. First you see a preview; nothing changes until you apply it.
                 </p>
               </div>
@@ -207,8 +207,19 @@ export default function BulkUpdatePage() {
                   type="file"
                   accept=".xlsx,.csv"
                   onChange={pickFile}
-                  className="text-sm"
+                  className="hidden"
                 />
+                <button
+                  type="button"
+                  onClick={() => fileInput.current?.click()}
+                  disabled={loading}
+                  className="px-4 py-2.5 rounded-lg text-sm font-semibold border border-orange-300 text-orange-700 bg-orange-50 hover:bg-orange-100 disabled:opacity-50"
+                >
+                  {file ? "Change file" : "Choose file"}
+                </button>
+                <span className="text-sm text-gray-700 break-all max-w-xs">
+                  {file ? file.name : "No file chosen"}
+                </span>
                 <button
                   type="button"
                   onClick={runPreview}
@@ -228,6 +239,9 @@ export default function BulkUpdatePage() {
                   </button>
                 )}
               </div>
+              {!file && (
+                <p className="text-xs text-gray-500">Choose an .xlsx or .csv file first, then click Preview.</p>
+              )}
             </div>
           </div>
 
@@ -236,7 +250,7 @@ export default function BulkUpdatePage() {
             <div className="bg-white rounded-3xl shadow-2xl border border-orange-100 overflow-hidden">
               <div className="px-6 py-4 border-b">
                 <h3 className="font-bold text-gray-800 text-lg">Preview</h3>
-                <p className="text-gray-400 text-sm mt-0.5">
+                <p className="text-gray-600 text-sm mt-0.5">
                   {preview.file_name} · valid until {formatTime(preview.expires_at)}
                 </p>
               </div>

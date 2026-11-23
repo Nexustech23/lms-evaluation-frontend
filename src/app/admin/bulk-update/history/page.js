@@ -157,7 +157,7 @@ export default function BulkUpdateHistoryPage() {
 
   return (
     <>
-      <Navbar />
+      <Navbar title="Bulk Update History" />
 
       <div className="mb-4 mx-6">
         <button
@@ -175,7 +175,7 @@ export default function BulkUpdateHistoryPage() {
           <div className="px-6 py-4 border-b flex flex-wrap items-center justify-between gap-3">
             <div>
               <h3 className="font-bold text-gray-800 text-lg">Bulk Update History</h3>
-              <p className="text-gray-400 text-sm mt-0.5">
+              <p className="text-gray-600 text-sm mt-0.5">
                 Every bulk update of your students, newest first. An applied update can be undone for 7 days.
               </p>
             </div>
