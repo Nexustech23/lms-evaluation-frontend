@@ -298,6 +298,19 @@ export default function Enroll() {
                         </p>
                     </div>
 
+                    <div className="flex flex-wrap items-center gap-3">
+                        {/* Updating existing students from a file is built for colleges only. */}
+                        {!isSchool && (
+                            <button
+                                onClick={() =>
+                                    router.push("/admin/bulk-update")
+                                }
+                                className="bg-white/20 text-white border border-white/60 py-3 px-8 w-fit h-fit text-md font-bold rounded-xl mb-1 transition hover:bg-white/30"
+                            >
+                                Bulk Update
+                            </button>
+                        )}
+
                     <button
                         onClick={() =>
                             router.push(
@@ -326,6 +339,7 @@ export default function Enroll() {
                     >
                         Enroll Student
                     </button>
+                    </div>
                 </div>
 
                 {/* ================================================= */}
