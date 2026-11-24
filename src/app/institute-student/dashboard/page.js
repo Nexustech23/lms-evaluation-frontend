@@ -2,7 +2,8 @@
 
 import Navbar from "@/components/ui/Navbar";
 import { useTranslations } from "next-intl";
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
+import axios from "axios";
 import dynamic from "next/dynamic";
 
 // recharts (~150KB) is only needed once this dashboard renders its chart —
@@ -27,14 +28,6 @@ import {
 import { AuthContext } from "@/app/AuthContext";
 import useInstitute from "@/institute/useInstitute";
 
-const data = [
-  { name: "Electronics", value: 72 },
-  { name: "Mathematics", value: 61 },
-  { name: "Network", value: 88 },
-  { name: "EM Theory", value: 45 },
-  { name: "AIML", value: 91 },
-];
-
 const Dashboard = () => {
   const t = useTranslations("dashboard");
 
@@ -43,43 +36,39 @@ const Dashboard = () => {
 
   const [showNotifications, setShowNotifications] = useState(false);
 
-  const [notifications, setNotifications] = useState([
-    {
-      id: 1,
-      type: "success",
-      title: "Assignment Submitted",
-      message: "Your assignment has been successfully submitted.",
-      time: "2 hours ago",
-      read: false,
-    },
-    {
-      id: 2,
-      type: "alert",
-      title: "Upcoming Exam",
-      message: "Computer Science exam on Friday at 2 PM.",
-      time: "5 hours ago",
-      read: false,
-    },
-    {
-      id: 3,
-      type: "info",
-      title: "Grades Released",
-      message: "Your midterm grades are available now.",
-      time: "1 day ago",
-      read: true,
-    },
-  ]);
+  // The student's own real values. Until they load, or if they cannot be loaded, the screen shows "-".
+  const [dash, setDash] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    axios
+      .get("/api/student/dashboard", { withCredentials: true })
+      .then((res) => {
+        if (!cancelled) setDash(res.data);
+      })
+      .catch(() => {
+        if (!cancelled) setDash(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // The app does not store notifications yet, so there are none to show.
+  const [notifications, setNotifications] = useState([]);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
-  const semesters = [
-    "Semester 1",
-    "Semester 2",
-    "Semester 3",
-    "Semester 4",
-    "Semester 5",
-    "Semester 6",
-  ];
+  const semesterNumbers = dash
+    ? dash.total_semesters
+      ? Array.from({ length: dash.total_semesters }, (_, i) => i + 1)
+      : dash.semesters || []
+    : [];
+  const semesters = semesterNumbers.map((n) => `Semester ${n}`);
+
+  const chartData = (dash?.scores || [])
+    .filter((item) => typeof item.marks === "number")
+    .map((item) => ({ name: item.subject, value: item.marks }));
 
   const subjectColors = {
     Mathematics: "from-blue-500 to-indigo-500",
@@ -90,79 +79,20 @@ const Dashboard = () => {
     "Data Structures": "from-cyan-500 to-sky-500",
   };
 
-  const timetable = [
-    {
-      time: "09:00 - 10:00",
-      monday: {
-        subject: "Mathematics",
-        faculty: "Dr. Sharma",
-        room: "A-101",
-      },
-      tuesday: {
-        subject: "Physics",
-        faculty: "Prof. Verma",
-        room: "B-204",
-      },
-      wednesday: null,
-      thursday: {
-        subject: "Chemistry",
-        faculty: "Dr. Singh",
-        room: "Lab 2",
-      },
-      friday: null,
-      saturday: {
-        subject: "English",
-        faculty: "Ms. Joshi",
-        room: "C-110",
-      },
-    },
-    {
-      time: "10:00 - 11:00",
-      monday: {
-        subject: "Computer Science",
-        faculty: "Mr. Mehta",
-        room: "Lab 1",
-      },
-      tuesday: null,
-      wednesday: {
-        subject: "Mathematics",
-        faculty: "Dr. Sharma",
-        room: "A-101",
-      },
-      thursday: null,
-      friday: {
-        subject: "Physics",
-        faculty: "Prof. Verma",
-        room: "B-204",
-      },
-      saturday: null,
-    },
-    {
-      time: "11:00 - 11:30",
-      isBreak: true,
-    },
-    {
-      time: "11:30 - 12:30",
-      monday: null,
-      tuesday: {
-        subject: "Data Structures",
-        faculty: "Ms. Kapoor",
-        room: "A-203",
-      },
-      wednesday: null,
-      thursday: {
-        subject: "Computer Science",
-        faculty: "Mr. Mehta",
-        room: "Lab 1",
-      },
-      friday: {
-        subject: "English",
-        faculty: "Ms. Joshi",
-        room: "C-110",
-      },
-      saturday: null,
-    },
-  ];
+  // The app does not store a timetable yet: one row of "-" keeps the same grid.
+  const timetable = dash?.timetable?.length
+    ? dash.timetable
+    : [
+        {
+          time: "-",
+          monday: null,
+          tuesday: null,
+          wednesday: null,
+          thursday: null,
+          friday: null,
+          saturday: null,
+        },
+      ];
 
   const days = [
     "monday",
@@ -235,7 +165,7 @@ const Dashboard = () => {
           <div className="relative z-10 flex flex-col lg:flex-row justify-between items-center gap-6">
             <div>
               <p className="text-white/80 text-sm mb-2">
-                Welcome back 👋
+                Welcome back{dash?.name ? `, ${dash.name}` : ""} 👋
               </p>
 
               <h1 className="text-4xl font-bold text-white tracking-tight">
@@ -269,22 +199,22 @@ const Dashboard = () => {
           {[
             {
               title: "Attendance",
-              value: "92%",
+              value: dash?.attendance != null ? `${dash.attendance}%` : "-",
               icon: <TrendingUp />,
             },
             {
               title: "Assignments",
-              value: "14",
+              value: dash?.assignments != null ? String(dash.assignments) : "-",
               icon: <ClipboardList />,
             },
             {
               title: "CGPA",
-              value: "8.7",
+              value: dash?.cgpa != null ? dash.cgpa.toFixed(2) : "-",
               icon: <GraduationCap />,
             },
             {
               title: "Subjects",
-              value: "6",
+              value: dash ? String(dash.subjects_count) : "-",
               icon: <BookOpen />,
             },
           ].map((item, i) => (
@@ -339,6 +269,10 @@ const Dashboard = () => {
                   Your Semesters
                 </h2>
               </div>
+
+              {semesters.length === 0 && (
+                <p className="text-gray-500 text-sm">-</p>
+              )}
 
               <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
                 {semesters.map((semester, i) => (
@@ -464,7 +398,7 @@ const Dashboard = () => {
                                   </div>
                                 ) : (
                                   <div className="text-gray-800 text-xs italic">
-                                    Free Slot
+                                    -
                                   </div>
                                 )}
                               </td>
@@ -495,7 +429,7 @@ const Dashboard = () => {
               </div>
 
               <div className="h-[350px]">
-                <PerformanceBarChart data={data} barColor={user?.color || "#6366f1"} />
+                <PerformanceBarChart data={chartData} barColor={user?.color || "#6366f1"} />
               </div>
             </div>
 
@@ -525,6 +459,9 @@ const Dashboard = () => {
               </div>
 
               <div className="divide-y divide-gray-100">
+                {notifications.length === 0 && (
+                  <div className="p-5 text-gray-500 text-sm">-</div>
+                )}
                 {notifications.map((notif) => (
                   <div
                     key={notif.id}

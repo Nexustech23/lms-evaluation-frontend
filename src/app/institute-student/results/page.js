@@ -1,293 +1,179 @@
 "use client";
 
-import { useState, useContext } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import axios from "axios";
-import toast from "react-hot-toast";
-import { useTranslations } from "next-intl";
 import { AuthContext } from "@/app/AuthContext";
-import useInstitute from "@/institute/useInstitute";
 import { withAlpha } from "@/lib/question-paper/colorHelpers";
 import Navbar from "@/components/ui/Navbar";
-import { IconTrash, IconEdit, IconEye, IconPercentage, IconScoreboard } from "@tabler/icons-react";
-import { Eye, Download, Search, Settings, MoreVertical, ChevronLeft, ChevronRight, Upload } from "lucide-react";
+
+// The student's own real results, from GET /api/student/results. A value the app does not have is shown as "-".
+function show(value) {
+  return value === null || value === undefined || value === "" ? "-" : String(value);
+}
+
+function number(value, digits = 2) {
+  return typeof value === "number" && Number.isFinite(value) ? value.toFixed(digits).replace(/\.?0+$/, "") : "-";
+}
+
 export default function ResultPage() {
   const { user } = useContext(AuthContext);
-  const { isSchool } = useInstitute();      // a school has classes, not semesters
   const color = user?.color || "#ff7f10";
-  const t = useTranslations("faculty");
 
-  const [activeTab, setActiveTab] = useState("Internal Exam");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [results, setResults] = useState(null);
+  const [selected, setSelected] = useState(null);
 
-  const internalSubjectsData = [
-    {
-      _id: "1",
-      semester: 1,
-      subject_code: "CS101",
-      subject_name: "Programming Fundamentals",
-      subject_type: "Theory",
-      credits: 4,
-      faculty_assigned: "Dr. Sharma",
-    },
-    {
-      _id: "2",
-      semester: 1,
-      subject_code: "CS102",
-      subject_name: "Data Structures",
-      subject_type: "Theory + Lab",
-      credits: 4,
-      faculty_assigned: "Prof. Mehta",
-    },
-    {
-      _id: "3",
-      semester: 1,
-      subject_code: "MA101",
-      subject_name: "Engineering Mathematics",
-      subject_type: "Theory",
-      credits: 3,
-      faculty_assigned: "Dr. Verma",
-    },
-  ];
+  useEffect(() => {
+    let cancelled = false;
+    axios
+      .get("/api/student/results", { withCredentials: true })
+      .then((res) => {
+        if (cancelled) return;
+        setResults(res.data);
+        const list = res.data?.semesters || [];
+        setSelected(list.length ? list[list.length - 1].semester : null);
+      })
+      .catch(() => {
+        if (!cancelled) setError(true);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
-  const externalSubjectsData = [
-    {
-      _id: "4",
-      semester: 2,
-      subject_code: "CS201",
-      subject_name: "Object Oriented Programming",
-      subject_type: "Theory + Lab",
-      credits: 4,
-      faculty_assigned: "Ms. Kapoor",
-    },
-    {
-      _id: "5",
-      semester: 2,
-      subject_code: "EC202",
-      subject_name: "Digital Electronics",
-      subject_type: "Theory",
-      credits: 3,
-      faculty_assigned: "Mr. Mehta",
-    },
-  ];
-
-  const [internalAvailable, setInternalAvailable] = useState(internalSubjectsData);
-  const [externalAvailable, setExternalAvailable] = useState(externalSubjectsData);
-  const availableSubjects = activeTab === "Internal Exam" ? internalAvailable : externalAvailable;
-
-  const handleViewBtn = () => {
-    alert("View Btn click")
-  }
-
-  const handleScoreBtn = () => {
-    alert("Score Btn Click")
-  }
-
-  const handlePercentageBtn = () => {
-    alert("Percentage Btn Click")
-  }
-
-  const renderTable = (subjects, showRemove = false) => (
-    <div className="mt-6 overflow-hidden rounded-2xl bg-white shadow-md">
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[1200px] text-sm">
-          <thead>
-            <tr style={{ backgroundColor: `${color}20` }} className="text-left">
-              <th className="px-4 py-4 font-bold text-black">S.No</th>
-              {!isSchool && (
-<th className="px-4 py-4 font-bold text-black">Semester</th>
-)}
-              <th className="px-4 py-4 font-bold text-black">Subject Code</th>
-              <th className="px-4 py-4 font-bold text-black">Subject Name</th>
-              <th className="px-4 py-4 font-bold text-black">Subject Type</th>
-              <th className="px-4 py-4 font-bold text-black">Credits</th>
-              <th className="px-4 py-4 font-bold text-black">Faculty Assigned</th>
-              <th className="px-4 py-4 text-center font-bold text-black">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {subjects.map((sub, index) => (
-              <tr key={sub._id} className="border-t border-gray-200 transition hover:bg-gray-50">
-                <td className="px-4 py-5 text-gray-400">{index + 1}</td>
-                {!isSchool && (
-<td className="px-4 py-5">
-                  <span className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-medium text-blue-600">
-                    {sub.semester}
-                  </span>
-                </td>
-)}
-                <td className="px-4 py-5">
-                  <span
-                    className="rounded-full px-3 py-1 text-xs font-semibold"
-                    style={{
-                      backgroundColor: `${color}20`,
-                      color,
-                      border: `1px solid ${color}55`,
-                    }}
-                  >
-                    {sub.subject_code}
-                  </span>
-                </td>
-                <td className="whitespace-nowrap px-4 py-5 font-semibold text-gray-800">{sub.subject_name}</td>
-                <td className="whitespace-nowrap px-4 py-5 text-gray-600">{sub.subject_type}</td>
-                <td className="px-4 py-5 text-gray-600">{sub.credits}</td>
-                <td className="whitespace-nowrap px-4 py-5 text-gray-600">{sub.faculty_assigned}</td>
-                <td className="px-4 py-4">
-                  <div className="flex items-center justify-center gap-3">
-                    <div className="relative group">
-                      <button
-                        className="p-2 hover:bg-blue-100 rounded-xl transition"
-                        style={{ color: color }}
-                        onClick={() => handleViewBtn()}
-                      >
-                        <IconEye size={20} />
-                      </button>
-
-                      <div className="absolute -top-11 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 group-hover:-translate-y-1 transition-all duration-200 ease-in-out pointer-events-none">
-
-                        <div className="px-3 py-1.5 text-xs text-white bg-black/80 backdrop-blur-md rounded-md shadow-lg whitespace-nowrap">
-                          View
-                        </div>
-
-                        <div className="w-2 h-2 bg-black/80 rotate-45 mx-auto -mt-1"></div>
-                      </div>
-                    </div>
-                    <div className="relative group">
-                      <button
-                        className="p-2 text-orange-600 hover:bg-blue-100 rounded-xl transition"
-                        style={{ color: color }}
-                        onClick={() => handleScoreBtn()}
-                      >
-                        <IconScoreboard />
-                      </button>
-
-                      <div className="absolute -top-11 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 group-hover:-translate-y-1 transition-all duration-200 ease-in-out pointer-events-none">
-
-                        <div className="px-3 py-1.5 text-xs text-white bg-black/80 backdrop-blur-md rounded-md shadow-lg whitespace-nowrap">
-                          Score
-                        </div>
-
-                        <div className="w-2 h-2 bg-black/80 rotate-45 mx-auto -mt-1"></div>
-                      </div>
-                    </div>
-                    <div className="relative group">
-                      <button
-                        className="p-2 text-red-600 hover:bg-blue-100 rounded-xl transition disabled:opacity-50"
-                        style={{ color: color }}
-                        onClick={() => handlePercentageBtn()}
-                      >
-                        <IconPercentage size={20} />
-                      </button>
-
-                      <div className="absolute -top-11 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 group-hover:-translate-y-1 transition-all duration-200 ease-in-out pointer-events-none">
-
-                        <div className="px-3 py-1.5 text-xs text-white bg-black/80 backdrop-blur-md rounded-md shadow-lg whitespace-nowrap">
-                          Percentage
-                        </div>
-
-                        <div className="w-2 h-2 bg-black/80 rotate-45 mx-auto -mt-1"></div>
-                      </div>
-                    </div>
-
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-  const themeColor = user?.color || "#ff7f10";
-
-  const [selectedSubject, setSelectedSubject] = useState("intro");
-  const [tabStart, setTabStart] = useState(0);
-
- 
-
-
-
-  const tabs = ["Intro", "Arithmetic (Foundation)", "Arithmetic (Selection)", "Advance (Foundation)", "Advance (Selection)", "English", "Piyush"];
-
-  const visibleTabs = tabs.slice(tabStart, tabStart + 4);
+  const semesters = useMemo(() => results?.semesters || [], [results]);
+  const current = semesters.find((s) => s.semester === selected) || null;
 
   return (
     <div className="flex flex-col min-h-screen" style={{ backgroundColor: withAlpha(color) }}>
       <Navbar title={"Result"} />
 
-      <div className="bg-white min-h-screen p-4 mx-2 mb-6 rounded-xl" style={{ backgroundColor: color }}>
-        <div className="flex justify-center mb-10">
-          <div className="bg-white border border-orange-100 rounded-2xl p-2 flex gap-2 shadow-lg">
-            {["Internal Exam", "External Exam"].map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-6 py-3 rounded-xl font-semibold capitalize transition-all duration-300 ${activeTab === tab ? "text-white shadow-lg" : "text-[#0d3b4a] hover:bg-blue-50"
-                  }`}
-                style={{ backgroundColor: activeTab === tab ? color : "" }}
-              >
-                {tab}
-              </button>
-            ))}
-          </div>
-        </div>
-    <div className="flex flex-row gap-2 items-center">
-                <button
-                  className="p-2 rounded-full transition flex-shrink-0"
-                  style={{
-                    "--hover-color": `${themeColor}20`,
-                  }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.backgroundColor = e.currentTarget.style.getPropertyValue("--hover-color"))
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.backgroundColor = "transparent")
-                  }
-                  onClick={() => setTabStart((prev) => Math.max(prev - 1, 0))}
-                >
-                  <ChevronLeft className="w-5 h-5 text-gray-600" />
-                </button>
+      <div className="min-h-screen p-4 mx-2 mb-6 rounded-xl" style={{ backgroundColor: color }}>
+        <div className="max-w-6xl mx-auto space-y-6">
+          {loading && (
+            <div className="bg-white rounded-3xl shadow-xl p-10 text-center text-gray-600">Loading your results...</div>
+          )}
 
-                <div className="flex gap-3 overflow-x-auto flex-1 pb-2">
-                  {visibleTabs.map((tab, index) => {
-                    const tabValue = tab.toLowerCase().replace(/\s+/g, "-");
+          {!loading && error && (
+            <div className="bg-white rounded-3xl shadow-xl p-10 text-center">
+              <p className="font-semibold text-gray-900">Your results could not be loaded</p>
+              <p className="text-sm text-gray-600 mt-1">-</p>
+            </div>
+          )}
 
-                    return (
-                      <button
-                        key={index}
-                        onClick={() => setSelectedSubject(tabValue)}
-                        className="text-sm font-semibold px-4 py-2 rounded-xl transition-all duration-200 bg-white shadow-sm hover:shadow-md"
-                        style={{
-                          borderBottom: selectedSubject === tabValue
-                            ? `3px solid ${themeColor}`
-                            : "3px solid transparent",
-                          color: selectedSubject === tabValue ? themeColor : "#374151",
-                          backgroundColor: selectedSubject === tabValue ? `${themeColor}12` : "white",
-                        }}
-                      >
-                        {tab}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <button
-                  className="p-2 rounded-full transition flex-shrink-0"
-                  style={{
-                    "--hover-color": `${themeColor}20`,
-                  }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.backgroundColor = e.currentTarget.style.getPropertyValue("--hover-color"))
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.backgroundColor = "transparent")
-                  }
-                  onClick={() => setTabStart((prev) => Math.min(prev + 1, tabs.length - 4))}
-                >
-                  <ChevronRight className="w-5 h-5 text-gray-600" />
-                </button>
+          {!loading && !error && results && (
+            <>
+              {/* ---------- Summary ---------- */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                {[
+                  { title: "Student", value: show(results.name) },
+                  { title: "Enrollment No", value: show(results.enrollment_no) },
+                  { title: "Programme", value: show(results.programme_name) },
+                  { title: "CGPA", value: number(results.cgpa) },
+                ].map((item) => (
+                  <div key={item.title} className="bg-white rounded-3xl p-6 shadow-xl">
+                    <p className="text-gray-500 text-sm">{item.title}</p>
+                    <h2 className="text-2xl font-bold text-gray-900 mt-2 break-words">{item.value}</h2>
+                  </div>
+                ))}
               </div>
-        {availableSubjects.length > 0 && renderTable(availableSubjects)}
 
+              {results.results_stale && (
+                <div className="rounded-2xl bg-amber-50 border border-amber-200 p-4 text-sm text-amber-900">
+                  Some of your results are being updated and are not shown yet.
+                </div>
+              )}
+
+              {/* ---------- Semesters ---------- */}
+              {semesters.length === 0 ? (
+                <div className="bg-white rounded-3xl shadow-xl p-10 text-center">
+                  <p className="font-semibold text-gray-900">No results yet</p>
+                  <p className="text-sm text-gray-600 mt-1">-</p>
+                </div>
+              ) : (
+                <>
+                  <div className="flex justify-center">
+                    <div className="bg-white border border-orange-100 rounded-2xl p-2 flex flex-wrap gap-2 shadow-lg">
+                      {semesters.map((s) => (
+                        <button
+                          key={s.semester}
+                          onClick={() => setSelected(s.semester)}
+                          className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
+                            selected === s.semester ? "text-white shadow-lg" : "text-[#0d3b4a] hover:bg-blue-50"
+                          }`}
+                          style={{ backgroundColor: selected === s.semester ? color : "" }}
+                        >
+                          {show(s.label || `Semester ${s.semester}`)}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {current && (
+                    <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
+                      <div className="p-6 border-b border-gray-100 grid grid-cols-2 lg:grid-cols-4 gap-4">
+                        {[
+                          { title: "TGPA", value: number(current.tgpa) },
+                          { title: "Total credits", value: number(current.total_credits) },
+                          { title: "Credit points", value: number(current.total_credit_points) },
+                          { title: "Total marks", value: number(current.overall_total) },
+                        ].map((item) => (
+                          <div key={item.title}>
+                            <p className="text-gray-500 text-sm">{item.title}</p>
+                            <p className="text-2xl font-bold text-gray-900 mt-1">{item.value}</p>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="overflow-x-auto">
+                        <table className="w-full min-w-[640px]">
+                          <thead className="bg-gray-50">
+                            <tr className="text-left text-gray-600 font-semibold text-sm">
+                              <th className="p-4">Subject</th>
+                              <th className="p-4">Credits</th>
+                              <th className="p-4">Marks</th>
+                              <th className="p-4">Grade</th>
+                              <th className="p-4">Grade point</th>
+                              <th className="p-4">Credit points</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {current.subjects.length === 0 && (
+                              <tr>
+                                <td className="p-4 text-gray-500" colSpan={6}>-</td>
+                              </tr>
+                            )}
+                            {current.subjects.map((row, i) => (
+                              <tr key={`${row.subject}-${i}`} className="border-t border-gray-100 hover:bg-gray-50">
+                                <td className="p-4 font-medium text-gray-900">{show(row.subject)}</td>
+                                <td className="p-4 text-gray-700">{number(row.credits)}</td>
+                                <td className="p-4 text-gray-700">{number(row.marks)}</td>
+                                <td className="p-4">
+                                  <span
+                                    className="px-3 py-1 rounded-full text-sm font-semibold"
+                                    style={{ backgroundColor: `${color}1f`, color: "#111827" }}
+                                  >
+                                    {show(row.grade)}
+                                  </span>
+                                </td>
+                                <td className="p-4 text-gray-700">{number(row.grade_point)}</td>
+                                <td className="p-4 text-gray-700">{number(row.credit_points)}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
