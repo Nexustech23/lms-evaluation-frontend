@@ -23,13 +23,14 @@ import {
 import { AuthContext } from "@/app/AuthContext";
 import { darkenColor } from "@/lib/question-paper/colorHelpers";
 import Navbar from "@/components/ui/Navbar";
-
-const FIELD_LABELS = {
-  name: "Name",
-  father_name: "Father Name",
-  dob: "Date of Birth",
-  contact_no: "Contact No",
-};
+import {
+  FIELD_LABELS,
+  Modal,
+  conflictRows,
+  errorText,
+  formatTime,
+  show,
+} from "./bulkUpdateUi";
 
 const COLUMNS = [
   { label: "Enrollment No", required: true, hint: "Finds the student" },
@@ -44,32 +45,6 @@ const STEPS = ["Upload file", "Review changes", "Apply"];
 const SAMPLE_CSV =
   "Enrollment No,Name,Father Name,DOB,Contact No\n" +
   "EN2024001,Asha Rao,Mohan Rao,2004-05-06,9876543210\n";
-
-// The backend answers errors as {detail: "text"} or {detail: {message, rows}}.
-function errorText(err, fallback) {
-  const data = err?.response?.data;
-  const detail = data?.detail;
-  if (typeof detail === "string") return detail;
-  if (detail?.message) return detail.message;
-  if (Array.isArray(detail)) return detail.map((d) => d?.msg).filter(Boolean).join(" ") || fallback;
-  return data?.error || data?.message || fallback;
-}
-
-// A 409 carries {message, rows}: the rows are the students that stopped the update.
-function conflictRows(err) {
-  const rows = err?.response?.data?.detail?.rows;
-  return Array.isArray(rows) ? rows : [];
-}
-
-function show(value) {
-  return value === null || value === undefined || value === "" ? "—" : String(value);
-}
-
-function formatTime(value) {
-  if (!value) return "";
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString();
-}
 
 function formatSize(bytes) {
   if (!bytes && bytes !== 0) return "";
@@ -203,7 +178,7 @@ export default function BulkUpdatePage() {
   const toChange = counts.to_update || 0;
 
   // 0 = upload, 1 = review, 2 = apply (the result is shown)
-  const step = !preview ? 0 : result ? 2 : 1;
+  const step = !preview ? 0 : result ? 3 : 1;
 
   return (
     <>
@@ -481,101 +456,118 @@ export default function BulkUpdatePage() {
                 )}
 
                 {/* ---------- Apply ---------- */}
-                <div className="border-t pt-4 space-y-3">
+                <div className="border-t border-gray-100 pt-8 space-y-4">
+                  <h3 className="text-lg font-bold text-gray-900">Apply</h3>
+
                   {result ? (
-                    <div className="rounded-lg bg-green-50 border border-green-200 p-4 text-sm text-green-800 space-y-1">
-                      <p className="font-semibold">
+                    <div className="rounded-2xl border border-green-200 bg-green-50 p-8 text-center space-y-3">
+                      <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-500 text-2xl text-white">
+                        <FaCheck />
+                      </span>
+                      <h4 className="text-xl font-bold text-green-900">
                         {result.already_applied
-                          ? "This update was already applied earlier. Nothing more was changed."
-                          : `Done. ${result.applied_count ?? toChange} student(s) updated.`}
+                          ? "This update was already applied"
+                          : `${result.applied_count ?? toChange} student(s) updated`}
+                      </h4>
+                      <p className="text-sm text-green-800">
+                        {result.already_applied
+                          ? "Nothing more was changed."
+                          : "Their login accounts were updated too."}
                       </p>
                       {!result.already_applied && (result.skipped_count || 0) > 0 && (
-                        <p>{result.skipped_count} problem row(s) were skipped.</p>
+                        <p className="text-sm text-green-800">{result.skipped_count} problem row(s) were skipped.</p>
                       )}
                       {result.can_undo && (
-                        <p>You can undo this until {formatTime(result.undo_until)} from the update history.</p>
+                        <p className="text-sm text-green-800">
+                          You can undo this until <b>{formatTime(result.undo_until)}</b>.
+                        </p>
                       )}
+                      <div className="flex flex-wrap justify-center gap-3 pt-2">
+                        <Link
+                          href="/admin/bulk-update/history"
+                          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-[#ff7f10] hover:bg-[#e8700a]"
+                        >
+                          <FaHistory />
+                          View history
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={reset}
+                          className="px-5 py-2.5 rounded-xl text-sm font-semibold border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+                        >
+                          Update more
+                        </button>
+                      </div>
                     </div>
                   ) : preview.status !== "previewed" ? (
-                    <p className="text-sm text-amber-700">
+                    <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
                       This preview can no longer be applied (it is {preview.status}). Upload the file again to make a new preview.
-                    </p>
+                    </div>
                   ) : !preview.can_apply ? (
-                    <p className="text-sm text-gray-600">Nothing to apply: no student would change.</p>
+                    <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-700">
+                      Nothing to apply: no student would change.
+                    </div>
                   ) : (
-                    <>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <div className="rounded-2xl border border-gray-200 bg-gray-50/60 p-5 grid grid-cols-1 lg:grid-cols-3 gap-5">
+                      <div className="lg:col-span-2">
+                        <label className="block text-sm font-semibold text-gray-800 mb-1.5">
                           Reason for this update <span className="text-red-500">*</span>
                         </label>
                         <textarea
                           value={reason}
                           onChange={(e) => setReason(e.target.value)}
                           maxLength={500}
-                          rows={2}
+                          rows={3}
                           placeholder="For example: Corrected names after checking admission records"
-                          className="w-full p-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
+                          className="w-full rounded-xl border border-gray-300 bg-white p-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
                         />
-                        <p className="text-xs text-gray-500 mt-0.5">3 to 500 characters. It is saved in the update history.</p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          3 to 500 characters. It is saved in the update history.
+                          {reason.trim().length > 0 && !reasonOk && (
+                            <span className="text-red-600"> Add a little more detail.</span>
+                          )}
+                        </p>
                       </div>
 
-                      {needsSkip && (
-                        <label className="flex items-start gap-2 text-sm text-gray-700">
-                          <input
-                            type="checkbox"
-                            checked={skipRejected}
-                            onChange={(e) => setSkipRejected(e.target.checked)}
-                            className="mt-1"
-                          />
-                          <span>
-                            Skip the {counts.rejected} problem row(s) and apply only the {toChange} good one(s).
-                          </span>
-                        </label>
-                      )}
-
-                      {!confirming ? (
+                      <div className="flex flex-col justify-between gap-4">
+                        {needsSkip ? (
+                          <label className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50/60 p-3 text-sm text-gray-800">
+                            <input
+                              type="checkbox"
+                              checked={skipRejected}
+                              onChange={(e) => setSkipRejected(e.target.checked)}
+                              className="mt-1 h-4 w-4"
+                            />
+                            <span>
+                              Skip the <b>{counts.rejected}</b> problem row(s) and apply only the <b>{toChange}</b> good one(s).
+                            </span>
+                          </label>
+                        ) : (
+                          <p className="text-sm text-gray-600">
+                            <b>{toChange}</b> student(s) will be updated. You can undo it for 7 days.
+                          </p>
+                        )}
                         <button
                           type="button"
                           onClick={() => setConfirming(true)}
                           disabled={!canSubmit || applying}
-                          className="px-5 py-2.5 rounded-lg text-white text-sm font-semibold bg-[#ff7f10] disabled:opacity-50"
+                          className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-white text-sm font-bold bg-[#ff7f10] hover:bg-[#e8700a] shadow disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           Apply update
+                          <FaArrowRight />
                         </button>
-                      ) : (
-                        <div className="rounded-lg border border-orange-300 bg-orange-50 p-3 space-y-2">
-                          <p className="text-sm text-gray-800">
-                            This will change <b>{toChange}</b> student(s) and their login accounts, all together or none.
-                            You can undo it for 7 days. Continue?
-                          </p>
-                          <div className="flex gap-2">
-                            <button
-                              type="button"
-                              onClick={runApply}
-                              disabled={applying}
-                              className="px-4 py-2 rounded-lg text-white text-sm font-semibold bg-[#ff7f10] disabled:opacity-50"
-                            >
-                              {applying ? "Applying..." : "Yes, apply"}
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setConfirming(false)}
-                              disabled={applying}
-                              className="px-4 py-2 rounded-lg text-sm border text-gray-700 disabled:opacity-50"
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                    </>
+                      </div>
+                    </div>
                   )}
 
                   {problem && (
-                    <div className="rounded-lg bg-red-50 border border-red-200 p-3 text-sm text-red-800 space-y-2">
-                      <p className="font-semibold">{problem.message}</p>
+                    <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800 space-y-2">
+                      <p className="flex items-center gap-2 font-semibold">
+                        <FaExclamationTriangle />
+                        {problem.message}
+                      </p>
                       {problem.rows.length > 0 && (
-                        <ul className="list-disc ml-5 space-y-0.5">
+                        <ul className="list-disc ml-6 space-y-0.5">
                           {problem.rows.map((r, i) => (
                             <li key={i}>
                               Row {show(r.row)}
@@ -584,10 +576,49 @@ export default function BulkUpdatePage() {
                           ))}
                         </ul>
                       )}
-                      <p className="text-xs">Nothing was changed. Fix the cause and use Remove file to preview again.</p>
+                      <p className="text-xs">Nothing was changed. Fix the cause, remove the file and preview again.</p>
                     </div>
                   )}
                 </div>
+
+                {confirming && (
+                  <Modal
+                    title="Apply this update?"
+                    busy={applying}
+                    onClose={() => setConfirming(false)}
+                    footer={
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => setConfirming(false)}
+                          disabled={applying}
+                          className="px-5 py-2.5 rounded-xl text-sm font-semibold border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          onClick={runApply}
+                          disabled={applying}
+                          className="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-[#ff7f10] hover:bg-[#e8700a] disabled:opacity-50"
+                        >
+                          {applying ? "Applying..." : "Yes, apply"}
+                        </button>
+                      </>
+                    }
+                  >
+                    <p>
+                      This will change <b>{toChange}</b> student(s) and their login accounts. All of them are updated
+                      together, or none.
+                    </p>
+                    <p>You can undo it from the history for 7 days.</p>
+                    <p className="rounded-lg bg-gray-50 border border-gray-200 p-3 text-gray-800">
+                      <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Reason</span>
+                      <br />
+                      {reason.trim()}
+                    </p>
+                  </Modal>
+                )}
               </section>
             )}
           </div>
