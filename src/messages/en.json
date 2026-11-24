@@ -668,5 +668,97 @@
   "locale": {
     "switchLanguage": "Switch Language",
     "currentLanguage": "Current Language"
+  },
+  "reports": {
+    "title": "Reports",
+    "asOf": "As of {date}",
+    "noDate": "Data date not available",
+    "jumpOverview": "Overview",
+    "jumpAttention": "Needs attention",
+    "filters": {
+      "programme": "Programme",
+      "batch": "Batch",
+      "semester": "Semester",
+      "all": "All",
+      "latest": "latest",
+      "reset": "Reset to latest"
+    },
+    "scope": "Showing: {semester} · {programme} · {batch}",
+    "coverage": "{withResults} of {students} students have results",
+    "overview": "Overview",
+    "groupReadiness": "Is the data ready?",
+    "groupResults": "What do the results say?",
+    "tile": {
+      "students": "Students",
+      "exams": "Exams",
+      "evaluation": "Evaluation",
+      "dataChecks": "Data checks",
+      "passPercent": "Pass %",
+      "averageCgpa": "Average CGPA",
+      "backlogs": "Backlogs",
+      "atRisk": "At-risk students"
+    },
+    "sub": {
+      "studentsResults": "{n} have results",
+      "exams": "in this semester",
+      "evaluation": "{done} of {total} answer sheets done",
+      "evaluationPending": "{n} pending",
+      "dataChecks": "{courses} courses, {exams} exams, {stale} results",
+      "pass": "of {n} students who appeared",
+      "backlogs": "{papers} failed papers",
+      "atRisk": "of {n} students with results"
+    },
+    "compare": {
+      "pass": "{value}% last semester",
+      "cgpa": "{value} last semester",
+      "up": "Up",
+      "down": "Down",
+      "same": "No change"
+    },
+    "reason": {
+      "no_results": "No results yet",
+      "no_answers": "No answer sheets yet",
+      "nothing_to_check": "Nothing to check yet"
+    },
+    "chart": {
+      "passTrend": "Pass % by semester",
+      "passTrendBatch": "Batch: {batch}",
+      "passTrendNote": "All semesters of one batch",
+      "grades": "Grade distribution",
+      "gradesSemester": "Semester {n}",
+      "viewData": "View data",
+      "hideData": "Hide data",
+      "empty": "No results yet for this selection.",
+      "semester": "Semester",
+      "passPercent": "Pass %",
+      "appeared": "Appeared",
+      "grade": "Grade",
+      "students": "Students",
+      "share": "Share"
+    },
+    "attention": {
+      "title": "Needs attention",
+      "allClear": "Nothing needs attention right now.",
+      "no_co_mapping": "{count} of {of} courses have no CO-PO mapping",
+      "exams_without_cos": "{count} of {of} exams have no CO tags",
+      "stale_results": "{count} results need regenerating and are left out",
+      "evaluation_pending": "{count} of {of} answer sheets still need review",
+      "low_pass_programmes": "{count} programmes have a pass % under {target}%: {names}",
+      "at_risk": "{count} students meet the at-risk rule"
+    },
+    "definitions": {
+      "title": "How the overview is calculated",
+      "pass": "Pass % = students with no failed subject ÷ students who appeared, for the semester shown.",
+      "cgpa": "Average CGPA = the mean cumulative CGPA of students with results in the semester shown.",
+      "backlogs": "Backlog = a subject with grade {grades} in any semester. Attempt history is not stored, so a cleared backlog is not removed.",
+      "atRisk": "At risk = {papers} or more failed subjects, or a latest CGPA under {cgpa}.",
+      "stale": "Results marked as needing regeneration are left out of every number."
+    },
+    "state": {
+      "loading": "Loading the overview...",
+      "error": "The overview could not be loaded.",
+      "retry": "Retry",
+      "collegeOnly": "Reports are available for colleges only."
+    }
   }
 }

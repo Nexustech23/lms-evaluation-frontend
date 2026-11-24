@@ -657,5 +657,97 @@
   "locale": {
     "switchLanguage": "भाषा बदलें",
     "currentLanguage": "वर्तमान भाषा"
+  },
+  "reports": {
+    "title": "रिपोर्ट",
+    "asOf": "{date} तक",
+    "noDate": "डेटा की तारीख उपलब्ध नहीं",
+    "jumpOverview": "सारांश",
+    "jumpAttention": "ध्यान देने योग्य",
+    "filters": {
+      "programme": "प्रोग्राम",
+      "batch": "बैच",
+      "semester": "सेमेस्टर",
+      "all": "सभी",
+      "latest": "नवीनतम",
+      "reset": "नवीनतम पर रीसेट करें"
+    },
+    "scope": "दिखा रहे हैं: {semester} · {programme} · {batch}",
+    "coverage": "{students} में से {withResults} छात्रों के परिणाम उपलब्ध हैं",
+    "overview": "सारांश",
+    "groupReadiness": "क्या डेटा तैयार है?",
+    "groupResults": "परिणाम क्या कहते हैं?",
+    "tile": {
+      "students": "छात्र",
+      "exams": "परीक्षाएँ",
+      "evaluation": "मूल्यांकन",
+      "dataChecks": "डेटा जाँच",
+      "passPercent": "उत्तीर्ण %",
+      "averageCgpa": "औसत CGPA",
+      "backlogs": "बैकलॉग",
+      "atRisk": "जोखिम वाले छात्र"
+    },
+    "sub": {
+      "studentsResults": "{n} के परिणाम उपलब्ध",
+      "exams": "इस सेमेस्टर में",
+      "evaluation": "{total} में से {done} उत्तर पुस्तिकाएँ पूरी",
+      "evaluationPending": "{n} बाकी",
+      "dataChecks": "{courses} कोर्स, {exams} परीक्षाएँ, {stale} परिणाम",
+      "pass": "उपस्थित {n} छात्रों में से",
+      "backlogs": "{papers} अनुत्तीर्ण विषय",
+      "atRisk": "परिणाम वाले {n} छात्रों में से"
+    },
+    "compare": {
+      "pass": "पिछले सेमेस्टर में {value}%",
+      "cgpa": "पिछले सेमेस्टर में {value}",
+      "up": "बढ़ा",
+      "down": "घटा",
+      "same": "कोई बदलाव नहीं"
+    },
+    "reason": {
+      "no_results": "अभी कोई परिणाम नहीं",
+      "no_answers": "अभी कोई उत्तर पुस्तिका नहीं",
+      "nothing_to_check": "अभी जाँचने के लिए कुछ नहीं"
+    },
+    "chart": {
+      "passTrend": "सेमेस्टर के अनुसार उत्तीर्ण %",
+      "passTrendBatch": "बैच: {batch}",
+      "passTrendNote": "एक बैच के सभी सेमेस्टर",
+      "grades": "ग्रेड वितरण",
+      "gradesSemester": "सेमेस्टर {n}",
+      "viewData": "डेटा देखें",
+      "hideData": "डेटा छिपाएँ",
+      "empty": "इस चयन के लिए अभी कोई परिणाम नहीं।",
+      "semester": "सेमेस्टर",
+      "passPercent": "उत्तीर्ण %",
+      "appeared": "उपस्थित",
+      "grade": "ग्रेड",
+      "students": "छात्र",
+      "share": "हिस्सा"
+    },
+    "attention": {
+      "title": "ध्यान देने योग्य",
+      "allClear": "अभी किसी बात पर ध्यान देने की ज़रूरत नहीं।",
+      "no_co_mapping": "{of} में से {count} कोर्स में CO-PO मैपिंग नहीं है",
+      "exams_without_cos": "{of} में से {count} परीक्षाओं में CO टैग नहीं हैं",
+      "stale_results": "{count} परिणामों को दोबारा बनाना है और उन्हें शामिल नहीं किया गया",
+      "evaluation_pending": "{of} में से {count} उत्तर पुस्तिकाओं की समीक्षा बाकी है",
+      "low_pass_programmes": "{count} प्रोग्राम में उत्तीर्ण % {target}% से कम है: {names}",
+      "at_risk": "{count} छात्र जोखिम नियम में आते हैं"
+    },
+    "definitions": {
+      "title": "सारांश की गणना कैसे होती है",
+      "pass": "उत्तीर्ण % = कोई विषय अनुत्तीर्ण न होने वाले छात्र ÷ उपस्थित छात्र, दिखाए गए सेमेस्टर के लिए।",
+      "cgpa": "औसत CGPA = दिखाए गए सेमेस्टर में परिणाम वाले छात्रों का औसत संचयी CGPA।",
+      "backlogs": "बैकलॉग = किसी भी सेमेस्टर में ग्रेड {grades} वाला विषय। प्रयासों का इतिहास सुरक्षित नहीं है, इसलिए पास किया गया बैकलॉग हटता नहीं।",
+      "atRisk": "जोखिम = {papers} या अधिक अनुत्तीर्ण विषय, या नवीनतम CGPA {cgpa} से कम।",
+      "stale": "जिन परिणामों को दोबारा बनाना है, उन्हें किसी भी संख्या में शामिल नहीं किया जाता।"
+    },
+    "state": {
+      "loading": "सारांश लोड हो रहा है...",
+      "error": "सारांश लोड नहीं हो सका।",
+      "retry": "पुनः प्रयास करें",
+      "collegeOnly": "रिपोर्ट केवल कॉलेजों के लिए उपलब्ध हैं।"
+    }
   }
 }
