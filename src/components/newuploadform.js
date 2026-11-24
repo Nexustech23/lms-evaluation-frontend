@@ -48,6 +48,8 @@ const EMPTY_FORM = {
   examdate: "",
   weightage: "",
   is_course_exit_summary: false,
+  is_mandatory: false,
+  min_clear_percent: "",
 };
 
 /* ─────────────────────────────────────────────────────
@@ -432,6 +434,8 @@ export function ExamDetailsForm() {
         examdate: examDateTimeInput(folder.exam_date),
         weightage: folder.weightage ?? "",
         is_course_exit_summary: folder.is_course_exit_summary ?? false,
+        is_mandatory: folder.is_mandatory ?? false,
+        min_clear_percent: folder.min_clear_percent ?? "",
       });
     };
     init();
@@ -475,6 +479,10 @@ export function ExamDetailsForm() {
     });
     if (formData.weightage !== "" && (!Number.isFinite(Number(formData.weightage)) || Number(formData.weightage) < 0 || Number(formData.weightage) > 100)) {
       errors.weightage = "Weightage must be between 0 and 100";
+    }
+    if (formData.is_mandatory && formData.min_clear_percent !== "" &&
+        (!Number.isFinite(Number(formData.min_clear_percent)) || Number(formData.min_clear_percent) < 0 || Number(formData.min_clear_percent) > 100)) {
+      errors.min_clear_percent = "Minimum must be between 0 and 100";
     }
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
@@ -827,6 +835,52 @@ export function ExamDetailsForm() {
                         <p className="text-xs text-gray-400">{t("courseExitNote")}</p>
                       </LabelInputContainer>
                     )}
+
+                    <LabelInputContainer>
+                      <Label>Mandatory exam</Label>
+                      <div
+                        className="flex items-center gap-3 mt-1 cursor-pointer select-none w-fit"
+                        onClick={() =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            is_mandatory: !prev.is_mandatory,
+                            min_clear_percent: prev.is_mandatory ? "" : prev.min_clear_percent,
+                          }))
+                        }
+                      >
+                        <div
+                          className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${formData.is_mandatory ? "bg-[#ff7f10]" : "bg-gray-300"}`}
+                        >
+                          <div
+                            className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${formData.is_mandatory ? "translate-x-5" : "translate-x-0"}`}
+                          />
+                        </div>
+                        <span className={`text-sm font-medium ${formData.is_mandatory ? "text-[#ff7f10]" : "text-gray-400"}`}>
+                          {formData.is_mandatory ? "Yes" : "No"}
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-400">
+                        Students who are absent, caught in malpractice, or below the minimum have not cleared it.
+                      </p>
+                    </LabelInputContainer>
+
+                    {formData.is_mandatory && (
+                      <LabelInputContainer error={fieldErrors.min_clear_percent} touched={touchedFields.min_clear_percent}>
+                        <Label htmlFor="min_clear_percent">Minimum % to clear (optional)</Label>
+                        <Input
+                          id="min_clear_percent"
+                          placeholder="e.g. 40"
+                          type="number"
+                          min="0"
+                          max="100"
+                          step="any"
+                          value={formData.min_clear_percent}
+                          onChange={handleInputChange}
+                          className={`${fieldErrors.min_clear_percent ? "border-red-500" : "border-gray-300"} bg-white`}
+                        />
+                        {fieldErrors.min_clear_percent && <p className="text-sm text-red-500 mt-1">{fieldErrors.min_clear_percent}</p>}
+                      </LabelInputContainer>
+                    )}
                   </div>
 
                   {/* Right 1/3: Covered COs */}
@@ -911,6 +965,12 @@ export function ExamDetailsForm() {
                 <p><strong>{t("coveredCO")}:</strong> {coveredCO.length > 0 ? coveredCO.join(", ") : "None"}</p>
               )}
               {formData.weightage && <p><strong>{t("weightage")}:</strong> {formData.weightage}%</p>}
+              {formData.is_mandatory && (
+                <p>
+                  <strong>Mandatory exam:</strong> Yes
+                  {formData.min_clear_percent !== "" ? ` (minimum ${formData.min_clear_percent}%)` : ""}
+                </p>
+              )}
               {user?.hasCOAccess && (
                 <p>
                   <strong>{t("courseExit")}:</strong>{" "}

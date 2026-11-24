@@ -10,10 +10,26 @@ import Spinner from "@/components/ui/Spinner";
 import toast from "react-hot-toast";
 import { AuthContext } from "@/app/AuthContext";
 
-const emptyFallbackRow = () => ({ student_id: "", marks: "" });
+// status: present (marks are typed) | absent | malpractice (no marks; the server stores 0)
+const STATUS_OPTIONS = [
+  { value: "present", label: "Present" },
+  { value: "absent", label: "Absent" },
+  { value: "malpractice", label: "Malpractice" },
+];
+
+const emptyFallbackRow = () => ({ student_id: "", marks: "", status: "present", note: "" });
 const emptyRubricRow = (questionCount) => ({
   student_id: "",
   qmarks: Array.from({ length: questionCount }, () => ""),
+  status: "present",
+  note: "",
+});
+
+// An absent / malpractice student is sent with no marks, only the status and note.
+const statusEntry = (row, student_id) => ({
+  student_id,
+  attendance_status: row.status,
+  ...(row.note.trim() ? { status_note: row.note.trim() } : {}),
 });
 
 export default function ManualMarksEntryPage() {
@@ -111,6 +127,11 @@ export default function ManualMarksEntryPage() {
       const student_id = row.student_id.trim();
       if (!student_id) continue;
 
+      if (row.status !== "present") {
+        entries.push(statusEntry(row, student_id));
+        continue;
+      }
+
       const question_marks = rubricQuestions.map((q, qIndex) => ({
         question_no: qIndex + 1,
         marks: Number(row.qmarks[qIndex]),
@@ -132,7 +153,7 @@ export default function ManualMarksEntryPage() {
     }
 
     if (!entries.length) {
-      toast.error("Please add at least one student with marks");
+      toast.error("Please add at least one student with marks or an attendance status");
       return;
     }
 
@@ -160,18 +181,23 @@ export default function ManualMarksEntryPage() {
     }
 
     const entries = rows
-      .map((row) => ({
-        student_id: row.student_id.trim(),
-        marks: Number(row.marks),
-      }))
-      .filter((row) => row.student_id && !Number.isNaN(row.marks));
+      .map((row) =>
+        row.status !== "present"
+          ? statusEntry(row, row.student_id.trim())
+          : { student_id: row.student_id.trim(), marks: Number(row.marks) }
+      )
+      .filter(
+        (row) => row.student_id && (row.attendance_status || !Number.isNaN(row.marks))
+      );
 
     if (!entries.length) {
-      toast.error("Please add at least one student with marks");
+      toast.error("Please add at least one student with marks or an attendance status");
       return;
     }
 
-    const invalid = entries.find((row) => row.marks < 0 || row.marks > parsedMax);
+    const invalid = entries.find(
+      (row) => !row.attendance_status && (row.marks < 0 || row.marks > parsedMax)
+    );
     if (invalid) {
       toast.error(`Marks for ${invalid.student_id} must be between 0 and ${parsedMax}`);
       return;
@@ -256,6 +282,7 @@ export default function ManualMarksEntryPage() {
                   <thead className="bg-gray-50 text-left text-gray-600">
                     <tr>
                       <th className="px-4 py-3 w-56">Student ID</th>
+                      <th className="px-4 py-3 w-48">Attendance</th>
                       {isRubricMode ? (
                         <>
                           {rubricQuestions.map((q, qIndex) => (
@@ -283,6 +310,29 @@ export default function ManualMarksEntryPage() {
                             className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
                           />
                         </td>
+                        <td className="px-4 py-2">
+                          <select
+                            value={row.status}
+                            onChange={(e) => updateRow(index, "status", e.target.value)}
+                            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                          >
+                            {STATUS_OPTIONS.map((option) => (
+                              <option key={option.value} value={option.value}>
+                                {option.label}
+                              </option>
+                            ))}
+                          </select>
+                          {row.status !== "present" && (
+                            <input
+                              type="text"
+                              maxLength={500}
+                              value={row.note}
+                              onChange={(e) => updateRow(index, "note", e.target.value)}
+                              placeholder="Note (optional)"
+                              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-1.5 text-xs"
+                            />
+                          )}
+                        </td>
                         {isRubricMode ? (
                           <>
                             {rubricQuestions.map((q, qIndex) => (
@@ -291,25 +341,27 @@ export default function ManualMarksEntryPage() {
                                   type="number"
                                   min="0"
                                   max={q.maxMarks}
-                                  value={row.qmarks[qIndex]}
+                                  value={row.status === "present" ? row.qmarks[qIndex] : ""}
+                                  disabled={row.status !== "present"}
                                   onChange={(e) => updateQMark(index, qIndex, e.target.value)}
                                   placeholder="0"
-                                  className="w-20 rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                                  className="w-20 rounded-lg border border-gray-300 px-3 py-2 text-sm disabled:bg-gray-100"
                                 />
                               </td>
                             ))}
                             <td className="px-4 py-2 text-center font-semibold text-gray-700">
-                              {rowTotal(row)}
+                              {row.status === "present" ? rowTotal(row) : "-"}
                             </td>
                           </>
                         ) : (
                           <td className="px-4 py-2">
                             <input
                               type="number"
-                              value={row.marks}
+                              value={row.status === "present" ? row.marks : ""}
+                              disabled={row.status !== "present"}
                               onChange={(e) => updateRow(index, "marks", e.target.value)}
                               placeholder="0"
-                              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm disabled:bg-gray-100"
                             />
                           </td>
                         )}

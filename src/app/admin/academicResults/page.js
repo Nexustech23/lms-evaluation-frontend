@@ -303,6 +303,29 @@ function MarksBadge({ result }) {
     );
   }
 
+  // Not cleared: a mandatory exam that is absent, malpractice or below its minimum.
+  const notCleared = result.not_cleared ? (
+    <span className="text-[10px] font-bold text-red-600">Not cleared</span>
+  ) : null;
+
+  if (result.status === "absent" || result.status === "malpractice") {
+    const absent = result.status === "absent";
+    return (
+      <div className="flex flex-col items-center gap-0.5" title={result.status_note || undefined}>
+        <span
+          className="inline-block px-2 py-1 rounded-lg text-xs font-bold"
+          style={{
+            backgroundColor: absent ? "rgba(107,114,128,0.15)" : "rgba(239,68,68,0.15)",
+            color: absent ? "#4b5563" : "#b91c1c",
+          }}
+        >
+          {absent ? "Absent" : "Malpractice"}
+        </span>
+        {notCleared}
+      </div>
+    );
+  }
+
   if (result.status === "pending" || result.percentage == null) {
     return <span className="text-xs font-medium text-amber-700">Pending evaluation</span>;
   }
@@ -320,6 +343,7 @@ function MarksBadge({ result }) {
         {fmt2(result.final_marks)}/{fmt2(result.max_marks)}
       </span>
       <span className="text-[10px] text-gray-400">{fmt2(pct)}%</span>
+      {notCleared}
     </div>
   );
 }
@@ -600,8 +624,9 @@ function StudentResultsGrid({ data, color, loading }) {
               </td>
 
               {exams.map((exam) => {
+                // Absent students did not sit the exam, so they are not "appeared" and do not pull the average down.
                 const appeared = students.filter(
-                  (s) => s.results[exam.exam_id] !== null
+                  (s) => s.results[exam.exam_id] !== null && s.results[exam.exam_id]?.status !== "absent"
                 );
                 const avg = appeared.length
                   ? fmt2(
