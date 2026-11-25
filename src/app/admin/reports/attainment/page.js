@@ -4,8 +4,7 @@
 // by batch, with every course listed. The CO numbers are worked out the same way as the per-course Excel report. A course
 // that cannot be worked out is listed with the reason and left out of the roll-ups, never counted as zero. No student is named.
 
-import { Suspense, useContext, useMemo, useState } from "react";
-import axios from "axios";
+import { Suspense, useContext, useMemo } from "react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 
@@ -13,7 +12,7 @@ import { AuthContext } from "@/app/AuthContext";
 import { COLLEGE, instituteTypeOf } from "@/institute/instituteKind";
 import Navbar from "@/components/ui/Navbar";
 import { Skeleton, Tile } from "../reportsUi";
-import { ScopeBar, useReportData, useScope } from "../scope";
+import { ScopeBar, scopeParams, useDownload, useReportData, useScope } from "../scope";
 
 const dash = (value) => (value === null || value === undefined || value === "" ? "-" : value);
 // A darker cell is a higher level; the number and the level are always printed, so colour is never the only cue.
@@ -81,32 +80,8 @@ function Attainment() {
   const { data, failed, refreshing, retry } = useReportData("/api/reports/attainment", scope, isCollege);
   const nf = useMemo(() => new Intl.NumberFormat(locale, { maximumFractionDigits: 2 }), [locale]);
 
-  const [busy, setBusy] = useState(false);
-  const [exportFailed, setExportFailed] = useState(false);
-
-  const download = async () => {
-    setBusy(true);
-    setExportFailed(false);
-    try {
-      const params = {};
-      if (scope.programme) params.programme = scope.programme;
-      if (scope.batch) params.batch = scope.batch;
-      if (scope.semester) params.semester = scope.semester;
-      const res = await axios.get("/api/reports/attainment/export", { params, responseType: "blob", withCredentials: true });
-      const url = URL.createObjectURL(res.data);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = /filename="?([^";]+)"?/.exec(res.headers["content-disposition"] || "")?.[1] || "co-po-attainment.xlsx";
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      URL.revokeObjectURL(url);
-    } catch {
-      setExportFailed(true);
-    } finally {
-      setBusy(false);
-    }
-  };
+  const { busy, failed: exportFailed, run } = useDownload();
+  const download = (kind) => run(kind, `/api/reports/attainment/${kind === "pdf" ? "pdf" : "export"}`, scopeParams(scope), kind === "pdf" ? "co-po-attainment.pdf" : "co-po-attainment.xlsx");
 
   const shell = (children) => (
     <div className="min-h-screen" style={{ backgroundColor: user?.color || "#ff7f10" }}>
@@ -165,12 +140,16 @@ function Attainment() {
 
       <div className="flex flex-wrap items-center justify-end gap-3 text-sm text-white">
         <span>{a("export.note")}</span>
-        <button type="button" onClick={download} disabled={busy || !computed}
-          className="rounded-lg bg-white px-4 py-2 font-semibold text-gray-900 shadow hover:bg-gray-100 disabled:opacity-60">
-          {busy ? a("export.busy") : a("export.button")}
-        </button>
+        <button type="button" onClick={() => download("excel")} disabled={busy !== "" || !computed}
+            className="rounded-lg bg-white px-4 py-2 font-semibold text-gray-900 shadow hover:bg-gray-100 disabled:opacity-60">
+            {busy === "excel" ? a("export.busy") : a("export.button")}
+          </button>
+          <button type="button" onClick={() => download("pdf")} disabled={busy !== "" || !computed}
+            className="rounded-lg bg-white px-4 py-2 font-semibold text-gray-900 shadow hover:bg-gray-100 disabled:opacity-60">
+            {busy === "pdf" ? t("pdf.busy") : t("pdf.button")}
+          </button>
       </div>
-      {exportFailed && <p role="alert" className="rounded-2xl bg-white p-3 text-sm text-red-700 shadow-lg">{a("export.failed")}</p>}
+      {exportFailed && <p role="alert" className="rounded-2xl bg-white p-3 text-sm text-red-700 shadow-lg">{t("pdf.failed")}</p>}
 
       <div className={refreshing ? "opacity-70 transition-opacity" : "transition-opacity"} aria-busy={refreshing}>
         {failed === "error" && (

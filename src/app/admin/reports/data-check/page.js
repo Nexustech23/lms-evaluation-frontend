@@ -12,7 +12,7 @@ import { AuthContext } from "@/app/AuthContext";
 import { COLLEGE, instituteTypeOf } from "@/institute/instituteKind";
 import Navbar from "@/components/ui/Navbar";
 import { Skeleton, Tile } from "../reportsUi";
-import { ScopeBar, useReportData, useScope } from "../scope";
+import { ScopeBar, scopeParams, useDownload, useReportData, useScope } from "../scope";
 
 const dash = (value) => (value === null || value === undefined || value === "" ? "-" : value);
 
@@ -82,6 +82,7 @@ function DataCheck() {
   const isCollege = instituteTypeOf(user) === COLLEGE;
   const { data, failed, refreshing, retry } = useReportData("/api/reports/data-check", scope, isCollege);
   const nf = useMemo(() => new Intl.NumberFormat(locale, { maximumFractionDigits: 2 }), [locale]);
+  const { busy, failed: pdfFailed, run } = useDownload();
 
   const shell = (children) => (
     <div className="min-h-screen" style={{ backgroundColor: user?.color || "#ff7f10" }}>
@@ -137,6 +138,15 @@ function DataCheck() {
 
       <ScopeBar filters={data.filters} scope={data.scope} programme={scope.programme} batch={scope.batch}
         semester={scope.semester} update={scope.update} />
+
+      <div className="flex flex-wrap items-center justify-end gap-3 text-sm text-white">
+        <button type="button" onClick={() => run("pdf", "/api/reports/data-check/pdf", scopeParams(scope), "data-check.pdf")}
+          disabled={busy !== "" || !data.checks_ran}
+          className="rounded-lg bg-white px-4 py-2 font-semibold text-gray-900 shadow hover:bg-gray-100 disabled:opacity-60">
+          {busy === "pdf" ? t("pdf.busy") : t("pdf.button")}
+        </button>
+      </div>
+      {pdfFailed && <p role="alert" className="rounded-2xl bg-white p-3 text-sm text-red-700 shadow-lg">{t("pdf.failed")}</p>}
 
       <div className={refreshing ? "opacity-70 transition-opacity" : "transition-opacity"} aria-busy={refreshing}>
         {failed === "error" && (

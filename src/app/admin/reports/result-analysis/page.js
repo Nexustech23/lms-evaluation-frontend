@@ -3,8 +3,7 @@
 // Result Analysis: how a semester's results turned out, by programme, subject and grade, with an Excel download.
 // The same scope bar as the Reports dashboard; the pass % equals the dashboard's. No student is named on this page.
 
-import { Suspense, useContext, useMemo, useState } from "react";
-import axios from "axios";
+import { Suspense, useContext, useMemo } from "react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import {
@@ -24,7 +23,7 @@ import { AuthContext } from "@/app/AuthContext";
 import { COLLEGE, instituteTypeOf } from "@/institute/instituteKind";
 import Navbar from "@/components/ui/Navbar";
 import { ANCHOR, ChartCard, FAIL, Skeleton, Tile } from "../reportsUi";
-import { ScopeBar, useReportData, useScope } from "../scope";
+import { ScopeBar, scopeParams, useDownload, useReportData, useScope } from "../scope";
 
 const VIEWS = ["overview", "programmes", "subjects", "grades"];
 const dash = (value) => (value === null || value === undefined || value === "" ? "-" : value);
@@ -74,35 +73,10 @@ function ResultAnalysis() {
   const pct = (v) => (v === null || v === undefined ? null : `${nf.format(v)}%`);
   const num = (v) => (v === null || v === undefined ? null : nf.format(v));
 
-  const [busy, setBusy] = useState(false);
-  const [exportFailed, setExportFailed] = useState(false);
-
   const view = VIEWS.includes(scope.view) ? scope.view : "overview";
   const setView = (next) => scope.update({ view: next === "overview" ? "" : next });
-
-  const download = async () => {
-    setBusy(true);
-    setExportFailed(false);
-    try {
-      const params = {};
-      if (scope.programme) params.programme = scope.programme;
-      if (scope.batch) params.batch = scope.batch;
-      if (scope.semester) params.semester = scope.semester;
-      const res = await axios.get("/api/reports/result-analysis/export", { params, responseType: "blob", withCredentials: true });
-      const url = URL.createObjectURL(res.data);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = /filename="?([^";]+)"?/.exec(res.headers["content-disposition"] || "")?.[1] || "result-analysis.xlsx";
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      URL.revokeObjectURL(url);
-    } catch {
-      setExportFailed(true);
-    } finally {
-      setBusy(false);
-    }
-  };
+  const { busy, failed: exportFailed, run } = useDownload();
+  const download = (kind) => run(kind, `/api/reports/result-analysis/${kind === "pdf" ? "pdf" : "export"}`, scopeParams(scope), kind === "pdf" ? "result-analysis.pdf" : "result-analysis.xlsx");
 
   const shell = (children) => (
     <div className="min-h-screen" style={{ backgroundColor: user?.color || "#ff7f10" }}>
@@ -189,13 +163,17 @@ function ResultAnalysis() {
         {tabs}
         <div className="flex flex-wrap items-center gap-3 text-sm text-white">
           <span>{r("export.note", { subjects: nf.format(data.subjects.length), programmes: nf.format(data.programmes.length) })}</span>
-          <button type="button" onClick={download} disabled={busy || empty}
+          <button type="button" onClick={() => download("excel")} disabled={busy !== "" || empty}
             className="rounded-lg bg-white px-4 py-2 font-semibold text-gray-900 shadow hover:bg-gray-100 disabled:opacity-60">
-            {busy ? r("export.busy") : r("export.button")}
+            {busy === "excel" ? r("export.busy") : r("export.button")}
+          </button>
+          <button type="button" onClick={() => download("pdf")} disabled={busy !== "" || empty}
+            className="rounded-lg bg-white px-4 py-2 font-semibold text-gray-900 shadow hover:bg-gray-100 disabled:opacity-60">
+            {busy === "pdf" ? t("pdf.busy") : t("pdf.button")}
           </button>
         </div>
       </div>
-      {exportFailed && <p role="alert" className="rounded-2xl bg-white p-3 text-sm text-red-700 shadow-lg">{r("export.failed")}</p>}
+      {exportFailed && <p role="alert" className="rounded-2xl bg-white p-3 text-sm text-red-700 shadow-lg">{t("pdf.failed")}</p>}
 
       <div className={refreshing ? "opacity-70 transition-opacity" : "transition-opacity"} aria-busy={refreshing}>
         {failed === "error" && (

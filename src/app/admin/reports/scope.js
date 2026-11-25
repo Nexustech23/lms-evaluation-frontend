@@ -39,6 +39,42 @@ export function useScope() {
   return { programme, batch, semester, view, segment, update, query: scopeQuery({ programme, batch, semester }) };
 }
 
+// The scope as request parameters.
+export function scopeParams({ programme, batch, semester, segment }) {
+  const params = {};
+  if (programme) params.programme = programme;
+  if (batch) params.batch = batch;
+  if (semester) params.semester = semester;
+  if (segment) params.segment = segment;
+  return params;
+}
+
+// Downloads a file the server builds for the scope (Excel or PDF). `busy` holds which kind is being prepared.
+export function useDownload() {
+  const [busy, setBusy] = useState("");
+  const [failed, setFailed] = useState(false);
+  const run = async (kind, path, params, fallbackName) => {
+    setBusy(kind);
+    setFailed(false);
+    try {
+      const res = await axios.get(path, { params, responseType: "blob", withCredentials: true });
+      const url = URL.createObjectURL(res.data);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = /filename="?([^";]+)"?/.exec(res.headers["content-disposition"] || "")?.[1] || fallbackName;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    } catch {
+      setFailed(true);
+    } finally {
+      setBusy("");
+    }
+  };
+  return { busy, failed, run };
+}
+
 // Loads one report for the scope. `failed` is "college" when the API says reports are for colleges only, else "error".
 // The last answer stays on screen while a new scope loads, so the page does not jump.
 export function useReportData(path, { programme, batch, semester, segment }, enabled = true) {

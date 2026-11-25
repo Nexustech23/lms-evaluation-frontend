@@ -1023,6 +1023,11 @@
         "left": "Absent and malpractice students are left out. A course with no answer sheets, a pending review, or no programme level bands is listed with its reason and left out of the roll-ups, never counted as zero.",
         "limits": "The app stores no PO target, so PO values are shown without one. No student is named in this report."
       }
+    },
+    "pdf": {
+      "button": "Download PDF",
+      "busy": "Preparing...",
+      "failed": "The file could not be created."
     }
   }
 }
