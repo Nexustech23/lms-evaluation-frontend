@@ -737,6 +737,7 @@
       "share": "Share"
     },
     "attention": {
+      "view": "View",
       "title": "Needs attention",
       "allClear": "Nothing needs attention right now.",
       "no_co_mapping": "{count} of {of} courses have no CO-PO mapping",
@@ -759,6 +760,69 @@
       "error": "The overview could not be loaded.",
       "retry": "Retry",
       "collegeOnly": "Reports are available for colleges only."
+    },
+    "catalogue": {
+      "title": "Report catalogue",
+      "forAdmin": "For: Institute Admin",
+      "aggregates": "Shows aggregates",
+      "dataCheckName": "Data Check",
+      "dataCheckQuestion": "Is the data ready? Which courses, exams and results are incomplete?",
+      "statusFix": "{n} to fix",
+      "statusClear": "All clear",
+      "statusNone": "No data yet"
+    },
+    "dataCheck": {
+      "question": "Is the data ready? Which courses, exams and results are incomplete?",
+      "back": "Back to Reports",
+      "generated": "Generated {date}",
+      "allClear": "Everything checked is complete.",
+      "noChecks": "Nothing to check yet: there are no courses or exams in this scope.",
+      "allFine": "Nothing to fix here.",
+      "truncated": "Showing the first {shown} of {total}.",
+      "summary": {
+        "courses": "Courses without CO-PO mapping",
+        "exams": "Exams without CO tags",
+        "evaluation": "Answer sheets waiting for review",
+        "stale": "Results to regenerate",
+        "of": "of {n}"
+      },
+      "section": {
+        "courses": "Courses without CO-PO mapping",
+        "exams": "Exams without CO tags",
+        "evaluation": "Answer sheets waiting for review",
+        "stale": "Results to regenerate"
+      },
+      "col": {
+        "course": "Course",
+        "code": "Code",
+        "programme": "Programme",
+        "batch": "Batch",
+        "semester": "Semester",
+        "exam": "Exam",
+        "subject": "Subject",
+        "faculty": "Faculty",
+        "pending": "Pending",
+        "total": "Total",
+        "students": "Students"
+      },
+      "fix": {
+        "courses": "Add the CO-PO matrix for each course.",
+        "exams": "Ask the faculty to set the covered COs on the exam.",
+        "evaluation": "Ask the faculty to review these answer sheets.",
+        "stale": "Regenerate these transcripts so they count again."
+      },
+      "link": {
+        "courses": "Open Course Outcome",
+        "stale": "Open Academic Transcript"
+      },
+      "definitions": {
+        "title": "What each check means",
+        "courses": "A course has no CO-PO matrix saved, so CO and PO attainment cannot be worked out for it.",
+        "exams": "An exam has no covered COs, so its marks cannot count towards CO attainment. Archived exams are not checked.",
+        "evaluation": "An answer sheet is waiting for review when marking is not final yet.",
+        "stale": "A result is marked as needing regeneration, so it is left out of every number until it is regenerated.",
+        "scope": "The same programme, batch and semester as the overview. Exams follow the semester; courses and results follow the programme and batch."
+      }
     }
   }
 }

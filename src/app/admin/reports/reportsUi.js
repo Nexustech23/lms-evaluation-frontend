@@ -4,7 +4,8 @@
 // A number the app cannot work out is shown as "-" with the reason underneath, never as 0.
 
 import { useState } from "react";
-import { FaArrowDown, FaArrowUp, FaMinus } from "react-icons/fa";
+import Link from "next/link";
+import { FaArrowDown, FaArrowUp, FaCheckCircle, FaExclamationTriangle, FaMinus } from "react-icons/fa";
 
 export const ANCHOR = "#1d4ed8"; // one anchor colour for chart marks; a failing grade uses the contrasting FAIL colour
 export const FAIL = "#dc2626";
@@ -35,10 +36,16 @@ function Comparison({ compare }) {
   );
 }
 
-export function Tile({ label, value, lines = [], reason, compare, progress }) {
+const CARD = "min-w-0 rounded-2xl bg-white p-4 shadow-lg";
+const LINKED =
+  "block transition hover:shadow-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700";
+
+// A number tile. With `href` the whole tile is one link to the report behind the number.
+export function Tile({ label, value, lines = [], reason, compare, progress, href }) {
   const missing = value === null || value === undefined;
+  const Shell = href ? Link : "div";
   return (
-    <div className="min-w-0 rounded-2xl bg-white p-4 shadow-lg">
+    <Shell {...(href ? { href } : {})} className={href ? `${CARD} ${LINKED}` : CARD}>
       <p className="text-sm font-medium text-gray-600">{label}</p>
       <p className={`mt-1 text-3xl font-bold ${missing ? "text-gray-400" : "text-gray-900"}`}>{missing ? "-" : value}</p>
       {missing && reason && <p className="mt-1 text-xs text-gray-500">{reason}</p>}
@@ -54,7 +61,31 @@ export function Tile({ label, value, lines = [], reason, compare, progress }) {
             {line}
           </p>
         ))}
-    </div>
+    </Shell>
+  );
+}
+
+// A card in the report catalogue: what the report answers, who it is for, and whether its data is ready.
+export function CatalogueCard({ step, href, name, question, status, meta = [] }) {
+  const Icon = status.tone === "fix" ? FaExclamationTriangle : status.tone === "ok" ? FaCheckCircle : FaMinus;
+  const color = status.tone === "fix" ? "text-amber-700" : status.tone === "ok" ? "text-green-700" : "text-gray-500";
+  return (
+    <Link href={href} className={`${CARD} ${LINKED}`}>
+      <div className="flex items-start justify-between gap-2">
+        <p className="text-base font-semibold text-gray-900">
+          <span className="mr-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-blue-50 text-xs font-bold text-blue-800">
+            {step}
+          </span>
+          {name}
+        </p>
+        <span className={`inline-flex shrink-0 items-center gap-1 text-xs font-medium ${color}`}>
+          <Icon aria-hidden="true" size={12} />
+          {status.text}
+        </span>
+      </div>
+      <p className="mt-2 text-sm text-gray-700">{question}</p>
+      <p className="mt-3 text-xs text-gray-500">{meta.join(" · ")}</p>
+    </Link>
   );
 }
 

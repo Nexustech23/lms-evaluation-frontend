@@ -5,7 +5,7 @@
 
 import { Suspense, useContext, useEffect, useMemo, useState } from "react";
 import axios from "axios";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { FaCheckCircle, FaExclamationTriangle } from "react-icons/fa";
 import {
@@ -26,23 +26,19 @@ import {
 import { AuthContext } from "@/app/AuthContext";
 import { COLLEGE, instituteTypeOf } from "@/institute/instituteKind";
 import Navbar from "@/components/ui/Navbar";
-import { ANCHOR, ChartCard, FAIL, SectionTitle, Skeleton, Tile } from "./reportsUi";
+import { ANCHOR, CatalogueCard, ChartCard, FAIL, SectionTitle, Skeleton, Tile } from "./reportsUi";
+import { ScopeBar, useScope } from "./scope";
 
-const selectClass =
-  "w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700";
+// The reports that exist, by the name the API gives them. A tile or a row links only to a report that is built.
+const REPORT_PATHS = { "data-check": "/admin/reports/data-check" };
 
 function ReportsHome() {
   const t = useTranslations("reports");
   const locale = useLocale();
   const { user } = useContext(AuthContext);
-  const router = useRouter();
-  const pathname = usePathname();
-  const search = useSearchParams();
 
   // The scope lives in the address, so a link or a refresh shows the same numbers.
-  const programme = search.get("programme") || "";
-  const batch = search.get("batch") || "";
-  const semester = search.get("semester") || "";
+  const { programme, batch, semester, update, query } = useScope();
 
   const isCollege = instituteTypeOf(user) === COLLEGE;
   const [data, setData] = useState(null);
@@ -77,13 +73,6 @@ function ReportsHome() {
 
   const nf = useMemo(() => new Intl.NumberFormat(locale, { maximumFractionDigits: 2 }), [locale]);
   const pct = (v) => `${nf.format(v)}%`;
-
-  const update = (changes) => {
-    const next = new URLSearchParams(search.toString());
-    Object.entries(changes).forEach(([key, value]) => (value ? next.set(key, value) : next.delete(key)));
-    const qs = next.toString();
-    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
-  };
 
   const bg = { backgroundColor: user?.color || "#ff7f10" };
   const shell = (children) => (
@@ -128,9 +117,6 @@ function ReportsHome() {
   }
 
   const { tiles, filters, scope, rules } = data;
-  const batchesForProgramme = filters.batches.filter((b) => !programme || b.programme_id === programme);
-  const programmeName = filters.programmes.find((p) => p.id === programme)?.name;
-  const batchName = filters.batches.find((b) => b.id === batch)?.name;
   const reason = (tile) => (tile.reason ? t(`reason.${tile.reason}`) : undefined);
   const date = data.as_of
     ? new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" }).format(new Date(data.as_of))
@@ -152,10 +138,11 @@ function ReportsHome() {
       lines={scope.semester ? [t("sub.exams")] : []} />,
     <Tile key="evaluation" label={t("tile.evaluation")}
       value={evaluation.value === null ? null : pct(evaluation.of ? Math.round((evaluation.value / evaluation.of) * 100) : 0)}
-      reason={reason(evaluation)} lines={evaluationLines}
+      reason={reason(evaluation)} lines={evaluationLines} href={`${REPORT_PATHS["data-check"]}${query}`}
       progress={evaluation.of ? Math.round((evaluation.value / evaluation.of) * 100) : undefined} />,
     <Tile key="checks" label={t("tile.dataChecks")}
       value={tiles.data_checks.value === null ? null : nf.format(tiles.data_checks.value)} reason={reason(tiles.data_checks)}
+      href={`${REPORT_PATHS["data-check"]}${query}`}
       lines={[t("sub.dataChecks", { courses: tiles.data_checks.courses, exams: tiles.data_checks.exams, stale: tiles.data_checks.stale })]} />,
   ];
   const results = [
@@ -189,55 +176,15 @@ function ReportsHome() {
       </div>
 
       {/* ---- scope bar ---- */}
-      <section className="rounded-2xl bg-white p-4 shadow-lg" aria-label={t("overview")}>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <label className="text-sm font-medium text-gray-700">
-            {t("filters.programme")}
-            <select className={`${selectClass} mt-1`} value={programme}
-              onChange={(e) => {
-                const next = e.target.value;
-                const keep = filters.batches.some((b) => b.id === batch && (!next || b.programme_id === next));
-                update({ programme: next, batch: keep ? batch : "" });
-              }}>
-              <option value="">{t("filters.all")}</option>
-              {filters.programmes.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
-            </select>
-          </label>
-          <label className="text-sm font-medium text-gray-700">
-            {t("filters.batch")}
-            <select className={`${selectClass} mt-1`} value={batch} onChange={(e) => update({ batch: e.target.value })}>
-              <option value="">{t("filters.all")}</option>
-              {batchesForProgramme.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
-            </select>
-          </label>
-          <label className="text-sm font-medium text-gray-700">
-            {t("filters.semester")}
-            <select className={`${selectClass} mt-1`} value={semester} onChange={(e) => update({ semester: e.target.value })}>
-              <option value="">
-                {scope.semester ? `${t("filters.semester")} ${scope.semester} (${t("filters.latest")})` : t("filters.latest")}
-              </option>
-              {filters.semesters.map((n) => <option key={n} value={n}>{`${t("filters.semester")} ${n}`}</option>)}
-            </select>
-          </label>
-        </div>
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-sm text-gray-700" role="status" aria-live="polite">
-          <p>
-            {t("scope", {
-              semester: scope.semester ? `${t("filters.semester")} ${scope.semester}` : "-",
-              programme: programmeName || t("filters.all"),
-              batch: batchName || t("filters.all"),
-            })}
-            {" · "}
-            {t("coverage", { withResults: nf.format(data.coverage.with_results), students: nf.format(data.coverage.students) })}
-          </p>
-          {(programme || batch || semester) && (
-            <button type="button" onClick={() => update({ programme: "", batch: "", semester: "" })}
-              className="rounded px-1 font-medium text-blue-700 underline-offset-2 hover:underline">
-              {t("filters.reset")}
-            </button>
-          )}
-        </div>
-      </section>
+      <ScopeBar
+        filters={filters}
+        scope={scope}
+        programme={programme}
+        batch={batch}
+        semester={semester}
+        update={update}
+        coverage={t("coverage", { withResults: nf.format(data.coverage.with_results), students: nf.format(data.coverage.students) })}
+      />
 
       <div className={refreshing ? "opacity-70 transition-opacity" : "transition-opacity"} aria-busy={refreshing}>
         {failed === "error" && (
@@ -311,6 +258,12 @@ function ReportsHome() {
                     names: (item.names || []).join(", "),
                   })}
                 </span>
+                {REPORT_PATHS[item.report] && (
+                  <Link href={`${REPORT_PATHS[item.report]}${query}`}
+                    className="ml-auto shrink-0 font-medium text-blue-700 underline-offset-2 hover:underline">
+                    {t("attention.view")}
+                  </Link>
+                )}
               </li>
             ))}
             {!attention.items.length && (
@@ -326,6 +279,27 @@ function ReportsHome() {
               </li>
             )}
           </ul>
+        </div>
+
+        {/* ---- the reports that exist ---- */}
+        <div className="mt-5">
+          <SectionTitle id="catalogue">{t("catalogue.title")}</SectionTitle>
+          <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <CatalogueCard
+              step={1}
+              href={`${REPORT_PATHS["data-check"]}${query}`}
+              name={t("catalogue.dataCheckName")}
+              question={t("catalogue.dataCheckQuestion")}
+              status={
+                tiles.data_checks.value === null
+                  ? { tone: "none", text: t("catalogue.statusNone") }
+                  : tiles.data_checks.value + (tiles.evaluation.pending || 0) > 0
+                    ? { tone: "fix", text: t("catalogue.statusFix", { n: nf.format(tiles.data_checks.value + (tiles.evaluation.pending || 0)) }) }
+                    : { tone: "ok", text: t("catalogue.statusClear") }
+              }
+              meta={[t("catalogue.forAdmin"), t("catalogue.aggregates")]}
+            />
+          </div>
         </div>
 
         {/* ---- how the numbers are worked out ---- */}
