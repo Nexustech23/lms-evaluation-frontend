@@ -28,6 +28,7 @@ export function useScope() {
   const batch = search.get("batch") || "";
   const semester = search.get("semester") || "";
   const view = search.get("view") || ""; // which part of a report is open; not part of the scope other reports share
+  const segment = search.get("segment") || ""; // which group a list shows; likewise not part of the shared scope
 
   const update = (changes) => {
     const next = new URLSearchParams(search.toString());
@@ -35,12 +36,12 @@ export function useScope() {
     const text = next.toString();
     router.replace(text ? `${pathname}?${text}` : pathname, { scroll: false });
   };
-  return { programme, batch, semester, view, update, query: scopeQuery({ programme, batch, semester }) };
+  return { programme, batch, semester, view, segment, update, query: scopeQuery({ programme, batch, semester }) };
 }
 
 // Loads one report for the scope. `failed` is "college" when the API says reports are for colleges only, else "error".
 // The last answer stays on screen while a new scope loads, so the page does not jump.
-export function useReportData(path, { programme, batch, semester }, enabled = true) {
+export function useReportData(path, { programme, batch, semester, segment }, enabled = true) {
   const [data, setData] = useState(null);
   const [failed, setFailed] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
@@ -55,6 +56,7 @@ export function useReportData(path, { programme, batch, semester }, enabled = tr
     if (programme) params.programme = programme;
     if (batch) params.batch = batch;
     if (semester) params.semester = semester;
+    if (segment) params.segment = segment;
     axios
       .get(path, { params, withCredentials: true })
       .then((res) => {
@@ -69,7 +71,7 @@ export function useReportData(path, { programme, batch, semester }, enabled = tr
     return () => {
       cancelled = true;
     };
-  }, [enabled, path, programme, batch, semester, attempt]);
+  }, [enabled, path, programme, batch, semester, segment, attempt]);
 
   return { data, failed, refreshing, retry: () => setAttempt((n) => n + 1) };
 }

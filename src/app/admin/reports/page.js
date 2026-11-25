@@ -33,9 +33,10 @@ import { ScopeBar, useScope } from "./scope";
 const REPORT_PATHS = {
   "data-check": "/admin/reports/data-check",
   "result-analysis": "/admin/reports/result-analysis",
+  "backlog-at-risk": "/admin/reports/backlog-at-risk",
 };
 // A row can open a report on a particular part of it.
-const ATTENTION_VIEW = { low_pass_programmes: "programmes" };
+const ATTENTION_PARAM = { low_pass_programmes: "view=programmes", at_risk: "segment=at-risk" };
 
 function ReportsHome() {
   const t = useTranslations("reports");
@@ -162,9 +163,11 @@ function ReportsHome() {
       reason={reason(tiles.average_cgpa)}
       compare={compare(tiles.average_cgpa.value, tiles.average_cgpa.previous,
         tiles.average_cgpa.previous === null ? "" : t("compare.cgpa", { value: nf.format(tiles.average_cgpa.previous ?? 0) }))} />,
-    <Tile key="backlogs" label={t("tile.backlogs")} value={tiles.backlogs.value === null ? null : nf.format(tiles.backlogs.value)}
+    <Tile key="backlogs" label={data.labels?.backlog && data.labels.backlog !== "Backlog" ? data.labels.backlog : t("tile.backlogs")}
+      href={`${REPORT_PATHS["backlog-at-risk"]}${query}${query ? "&" : "?"}segment=backlog`} value={tiles.backlogs.value === null ? null : nf.format(tiles.backlogs.value)}
       reason={reason(tiles.backlogs)} lines={[t("sub.backlogs", { papers: nf.format(tiles.backlogs.papers ?? 0) })]} />,
-    <Tile key="risk" label={t("tile.atRisk")} value={tiles.at_risk.value === null ? null : nf.format(tiles.at_risk.value)}
+    <Tile key="risk" label={t("tile.atRisk")}
+      href={`${REPORT_PATHS["backlog-at-risk"]}${query}${query ? "&" : "?"}segment=at-risk`} value={tiles.at_risk.value === null ? null : nf.format(tiles.at_risk.value)}
       reason={reason(tiles.at_risk)} lines={[t("sub.atRisk", { n: nf.format(tiles.at_risk.of ?? 0) })]} />,
   ];
 
@@ -267,7 +270,7 @@ function ReportsHome() {
                   })}
                 </span>
                 {REPORT_PATHS[item.report] && (
-                  <Link href={`${REPORT_PATHS[item.report]}${query}${ATTENTION_VIEW[item.key] ? `${query ? "&" : "?"}view=${ATTENTION_VIEW[item.key]}` : ""}`}
+                  <Link href={`${REPORT_PATHS[item.report]}${query}${ATTENTION_PARAM[item.key] ? `${query ? "&" : "?"}${ATTENTION_PARAM[item.key]}` : ""}`}
                     className="ml-auto shrink-0 font-medium text-blue-700 underline-offset-2 hover:underline">
                     {t("attention.view")}
                   </Link>
@@ -318,6 +321,19 @@ function ReportsHome() {
                   : { tone: "info", text: `${t("tile.passPercent")} ${pct(tiles.pass_percent.value)}` }
               }
               meta={[t("catalogue.forAdmin"), t("catalogue.aggregates")]}
+            />
+            <CatalogueCard
+              step={3}
+              href={`${REPORT_PATHS["backlog-at-risk"]}${query}`}
+              name={t("backlog.title", { label: data.labels?.backlog || "Backlog" })}
+              question={t("catalogue.backlogQuestion")}
+              status={
+                tiles.backlogs.value === null
+                  ? { tone: "none", text: t("catalogue.statusNone") }
+                  : { tone: tiles.at_risk.value > 0 ? "fix" : "ok", text: tiles.at_risk.value > 0
+                      ? t("catalogue.statusFollow", { n: nf.format(tiles.at_risk.value) }) : t("catalogue.statusClear") }
+              }
+              meta={[t("catalogue.forAdmin"), t("catalogue.names")]}
             />
           </div>
         </div>
