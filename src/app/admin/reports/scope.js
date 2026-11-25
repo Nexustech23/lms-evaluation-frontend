@@ -77,7 +77,7 @@ export function useReportData(path, { programme, batch, semester, segment }, ena
 }
 
 // The scope bar: three choices, the scope in words, and a way back to the latest. `filters` and `scope` come from the API.
-export function ScopeBar({ filters, scope, programme, batch, semester, update, coverage }) {
+export function ScopeBar({ filters, scope, programme, batch, semester, update, coverage, allSemesters = false }) {
   const t = useTranslations("reports");
   const batchesForProgramme = filters.batches.filter((b) => !programme || b.programme_id === programme);
   const programmeName = filters.programmes.find((p) => p.id === programme)?.name;
@@ -119,7 +119,11 @@ export function ScopeBar({ filters, scope, programme, batch, semester, update, c
           {t("filters.semester")}
           <select className={`${selectClass} mt-1`} value={semester} onChange={(e) => update({ semester: e.target.value })}>
             <option value="">
-              {scope.semester ? `${t("filters.semester")} ${scope.semester} (${t("filters.latest")})` : t("filters.latest")}
+              {allSemesters
+                ? t("attainment.semesterAll")
+                : scope.semester
+                  ? `${t("filters.semester")} ${scope.semester} (${t("filters.latest")})`
+                  : t("filters.latest")}
             </option>
             {filters.semesters.map((n) => (
               <option key={n} value={n}>{`${t("filters.semester")} ${n}`}</option>
@@ -134,7 +138,7 @@ export function ScopeBar({ filters, scope, programme, batch, semester, update, c
       >
         <p>
           {t("scope", {
-            semester: scope.semester ? `${t("filters.semester")} ${scope.semester}` : "-",
+            semester: scope.semester ? `${t("filters.semester")} ${scope.semester}` : allSemesters ? t("attainment.semesterAll") : "-",
             programme: programmeName || t("filters.all"),
             batch: batchName || t("filters.all"),
           })}

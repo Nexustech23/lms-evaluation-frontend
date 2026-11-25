@@ -774,7 +774,10 @@
       "resultAnalysisQuestion": "How did the semester's results turn out, and where did they go wrong?",
       "backlogQuestion": "Which students need follow-up, and why? Who has not cleared a mandatory exam?",
       "names": "Shows student names",
-      "statusFollow": "{n} to follow up"
+      "statusFollow": "{n} to follow up",
+      "attainmentName": "CO / PO Attainment",
+      "attainmentQuestion": "Are the course outcomes and programme outcomes being met?",
+      "statusCompute": "Worked out when opened"
     },
     "dataCheck": {
       "question": "Is the data ready? Which courses, exams and results are incomplete?",
@@ -953,6 +956,72 @@
         "notCleared": "A mandatory exam is not cleared when the student was absent, caught in malpractice, or below the minimum %. Only students with a saved answer sheet can be listed.",
         "matching": "A transcript id is matched to a student by enrollment number, or by roll number inside the same batch. If no student matches, the name shows as - and the id is still shown.",
         "left": "Results marked as needing regeneration are left out."
+      }
+    },
+    "attainment": {
+      "question": "Are the course outcomes and programme outcomes being met?",
+      "tooMany": "This scope has {n} courses, more than the {limit} that can be worked out at once. Choose a programme, a batch or a semester.",
+      "empty": "No course in this scope has answer sheets to work out.",
+      "semesterAll": "All semesters",
+      "summary": {
+        "inScope": "Courses in scope",
+        "computed": "Courses worked out",
+        "cos": "Course outcomes attained",
+        "leftOut": "Courses left out",
+        "ofN": "of {n}",
+        "coLine": "{attained} of {total} course outcomes",
+        "withPo": "{n} with PO values"
+      },
+      "section": {
+        "programmes": "By programme",
+        "batches": "By batch",
+        "courses": "Courses"
+      },
+      "col": {
+        "programme": "Programme",
+        "batch": "Batch",
+        "course": "Course",
+        "code": "Code",
+        "semester": "Semester",
+        "status": "Status",
+        "cos": "Course outcomes (score / target)",
+        "courses": "Courses counted",
+        "attained": "COs attained"
+      },
+      "status": {
+        "ok": "Worked out",
+        "no_matrix": "No CO-PO matrix",
+        "no_data": "No answer sheets",
+        "pending_review": "Review pending",
+        "no_targets": "No programme level bands"
+      },
+      "fix": {
+        "no_matrix": "Add the CO-PO matrix for this course. Its COs are counted; its POs are not.",
+        "no_data": "Marks have not been entered or evaluated yet.",
+        "pending_review": "The faculty must finish reviewing the answer sheets.",
+        "no_targets": "Set the level bands on the programme."
+      },
+      "co": {
+        "attained": "attained",
+        "notAttained": "not attained"
+      },
+      "heat": {
+        "note": "Each cell shows the PO % and its level from 0 to 3. A darker cell is a higher level.",
+        "level": "level {value}"
+      },
+      "export": {
+        "button": "Download Excel",
+        "busy": "Preparing...",
+        "note": "Excel: roll-ups and every course, for the scope above",
+        "failed": "The file could not be downloaded."
+      },
+      "definitions": {
+        "title": "How this report is calculated",
+        "co": "A course's CO scores are worked out the same way as the per-course Excel report: each exam's level comes from the share of students at or above the threshold (level bands set on the programme), weighted by the exam weight, with the course-exit (indirect) part added by weight. A CO is attained when its final score reaches the CO target.",
+        "po": "PO % = the CO-PO weights of the attained COs ÷ all the CO-PO weights for that PO × 100. The level is the PO % on a scale of 0 to 3.",
+        "rollup": "A programme's or batch's PO % is the mean over its courses that address that PO.",
+        "left": "Absent and malpractice students are left out. A course with no answer sheets, a pending review, or no programme level bands is listed with its reason and left out of the roll-ups, never counted as zero.",
+        "limits": "The app stores no PO target, so PO values are shown without one. No student is named in this report."
       }
     }
   }

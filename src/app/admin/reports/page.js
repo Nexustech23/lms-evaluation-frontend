@@ -34,6 +34,7 @@ const REPORT_PATHS = {
   "data-check": "/admin/reports/data-check",
   "result-analysis": "/admin/reports/result-analysis",
   "backlog-at-risk": "/admin/reports/backlog-at-risk",
+  attainment: "/admin/reports/attainment",
 };
 // A row can open a report on a particular part of it.
 const ATTENTION_PARAM = { low_pass_programmes: "view=programmes", at_risk: "segment=at-risk" };
@@ -334,6 +335,14 @@ function ReportsHome() {
                       ? t("catalogue.statusFollow", { n: nf.format(tiles.at_risk.value) }) : t("catalogue.statusClear") }
               }
               meta={[t("catalogue.forAdmin"), t("catalogue.names")]}
+            />
+            <CatalogueCard
+              step={4}
+              href={`${REPORT_PATHS.attainment}${query}`}
+              name={t("catalogue.attainmentName")}
+              question={t("catalogue.attainmentQuestion")}
+              status={{ tone: "info", text: t("catalogue.statusCompute") }}
+              meta={[t("catalogue.forAdmin"), t("catalogue.aggregates")]}
             />
           </div>
         </div>
