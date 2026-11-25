@@ -769,7 +769,9 @@
       "dataCheckQuestion": "Is the data ready? Which courses, exams and results are incomplete?",
       "statusFix": "{n} to fix",
       "statusClear": "All clear",
-      "statusNone": "No data yet"
+      "statusNone": "No data yet",
+      "resultAnalysisName": "Result Analysis",
+      "resultAnalysisQuestion": "How did the semester's results turn out, and where did they go wrong?"
     },
     "dataCheck": {
       "question": "Is the data ready? Which courses, exams and results are incomplete?",
@@ -822,6 +824,66 @@
         "evaluation": "An answer sheet is waiting for review when marking is not final yet.",
         "stale": "A result is marked as needing regeneration, so it is left out of every number until it is regenerated.",
         "scope": "The same programme, batch and semester as the overview. Exams follow the semester; courses and results follow the programme and batch."
+      }
+    },
+    "resultAnalysis": {
+      "question": "How did the semester's results turn out, and where did they go wrong?",
+      "tabs": {
+        "overview": "Overview",
+        "programmes": "Programmes",
+        "subjects": "Subjects",
+        "grades": "Grades"
+      },
+      "summary": {
+        "appeared": "Appeared",
+        "passPercent": "Pass %",
+        "averageCgpa": "Average CGPA",
+        "lowestSubject": "Lowest subject",
+        "passedFailed": "{passed} passed, {failed} failed",
+        "passedOf": "{passed} of {appeared} passed",
+        "highLow": "Highest {high}, lowest {low}",
+        "subjectLine": "{pct}% pass, {n} students"
+      },
+      "chart": {
+        "subjectPass": "Pass % by subject, lowest first",
+        "cgpaBands": "CGPA distribution",
+        "target": "Target {value}%",
+        "students": "Students",
+        "passPercent": "Pass %",
+        "band": "CGPA band"
+      },
+      "col": {
+        "programme": "Programme",
+        "subject": "Subject",
+        "appeared": "Appeared",
+        "passed": "Passed",
+        "passPercent": "Pass %",
+        "averageCgpa": "Average CGPA",
+        "mean": "Mean marks",
+        "median": "Median marks",
+        "highest": "Highest",
+        "lowest": "Lowest",
+        "allSubjects": "All subjects"
+      },
+      "note": {
+        "small": "Small group (under {n} students): read the percentage with care.",
+        "smallShort": "small group",
+        "belowTarget": "below target"
+      },
+      "empty": "No results yet for this selection.",
+      "export": {
+        "button": "Download Excel",
+        "busy": "Preparing...",
+        "note": "Excel: {subjects} subjects and {programmes} programmes, for the scope above",
+        "failed": "The file could not be downloaded."
+      },
+      "definitions": {
+        "title": "How this report is calculated",
+        "pass": "A student passes a semester when no subject has a failing grade ({grades}). Pass % = passed ÷ appeared.",
+        "subject": "Subject pass % = students with a non-failing grade ÷ students graded in that subject.",
+        "cgpa": "CGPA is each student's cumulative CGPA at the semester shown. Bands are from the lower value up to, but not including, the upper value; 10 is in the top band.",
+        "small": "Groups under {n} students are marked, because one student can move the percentage a lot.",
+        "left": "Results marked as needing regeneration, and subjects without a grade, are left out. No student is named in this report."
       }
     }
   }

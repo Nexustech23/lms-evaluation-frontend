@@ -27,6 +27,7 @@ export function useScope() {
   const programme = search.get("programme") || "";
   const batch = search.get("batch") || "";
   const semester = search.get("semester") || "";
+  const view = search.get("view") || ""; // which part of a report is open; not part of the scope other reports share
 
   const update = (changes) => {
     const next = new URLSearchParams(search.toString());
@@ -34,7 +35,7 @@ export function useScope() {
     const text = next.toString();
     router.replace(text ? `${pathname}?${text}` : pathname, { scroll: false });
   };
-  return { programme, batch, semester, update, query: scopeQuery({ programme, batch, semester }) };
+  return { programme, batch, semester, view, update, query: scopeQuery({ programme, batch, semester }) };
 }
 
 // Loads one report for the scope. `failed` is "college" when the API says reports are for colleges only, else "error".

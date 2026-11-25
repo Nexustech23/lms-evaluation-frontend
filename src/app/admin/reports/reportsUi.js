@@ -90,7 +90,7 @@ export function CatalogueCard({ step, href, name, question, status, meta = [] })
 }
 
 // A chart with a title, a note about what it covers, and a table of the same numbers for people who cannot see the chart.
-export function ChartCard({ title, note, empty, emptyText, viewLabel, hideLabel, columns, rows, children, className = "" }) {
+export function ChartCard({ title, note, empty, emptyText, viewLabel, hideLabel, columns, rows, children, className = "", height = 220 }) {
   const [open, setOpen] = useState(false);
   return (
     <figure className={`min-w-0 rounded-2xl bg-white p-4 shadow-lg ${className}`}>
@@ -99,10 +99,10 @@ export function ChartCard({ title, note, empty, emptyText, viewLabel, hideLabel,
         {note && <span className="block text-xs text-gray-500">{note}</span>}
       </figcaption>
       {empty ? (
-        <p className="flex h-[220px] items-center justify-center text-center text-sm text-gray-500">{emptyText}</p>
+        <p className="flex items-center justify-center text-center text-sm text-gray-500" style={{ height: 220 }}>{emptyText}</p>
       ) : (
         <>
-          <div className="h-[220px] w-full" role="img" aria-label={title}>
+          <div className="w-full" style={{ height }} role="img" aria-label={title}>
             {children}
           </div>
           <button

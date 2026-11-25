@@ -30,7 +30,12 @@ import { ANCHOR, CatalogueCard, ChartCard, FAIL, SectionTitle, Skeleton, Tile } 
 import { ScopeBar, useScope } from "./scope";
 
 // The reports that exist, by the name the API gives them. A tile or a row links only to a report that is built.
-const REPORT_PATHS = { "data-check": "/admin/reports/data-check" };
+const REPORT_PATHS = {
+  "data-check": "/admin/reports/data-check",
+  "result-analysis": "/admin/reports/result-analysis",
+};
+// A row can open a report on a particular part of it.
+const ATTENTION_VIEW = { low_pass_programmes: "programmes" };
 
 function ReportsHome() {
   const t = useTranslations("reports");
@@ -133,6 +138,7 @@ function ReportsHome() {
 
   const readiness = [
     <Tile key="students" label={t("tile.students")} value={nf.format(tiles.students.value)}
+      href={`${REPORT_PATHS["result-analysis"]}${query}`}
       lines={data.coverage.with_results ? [t("sub.studentsResults", { n: nf.format(data.coverage.with_results) })] : []} />,
     <Tile key="exams" label={t("tile.exams")} value={nf.format(tiles.exams.value)}
       lines={scope.semester ? [t("sub.exams")] : []} />,
@@ -147,10 +153,12 @@ function ReportsHome() {
   ];
   const results = [
     <Tile key="pass" label={t("tile.passPercent")} value={tiles.pass_percent.value === null ? null : pct(tiles.pass_percent.value)}
+      href={`${REPORT_PATHS["result-analysis"]}${query}`}
       reason={reason(tiles.pass_percent)} lines={[t("sub.pass", { n: nf.format(tiles.pass_percent.of ?? 0) })]}
       compare={compare(tiles.pass_percent.value, tiles.pass_percent.previous,
         tiles.pass_percent.previous === null ? "" : t("compare.pass", { value: nf.format(tiles.pass_percent.previous ?? 0) }))} />,
     <Tile key="cgpa" label={t("tile.averageCgpa")} value={tiles.average_cgpa.value === null ? null : nf.format(tiles.average_cgpa.value)}
+      href={`${REPORT_PATHS["result-analysis"]}${query}`}
       reason={reason(tiles.average_cgpa)}
       compare={compare(tiles.average_cgpa.value, tiles.average_cgpa.previous,
         tiles.average_cgpa.previous === null ? "" : t("compare.cgpa", { value: nf.format(tiles.average_cgpa.previous ?? 0) }))} />,
@@ -259,7 +267,7 @@ function ReportsHome() {
                   })}
                 </span>
                 {REPORT_PATHS[item.report] && (
-                  <Link href={`${REPORT_PATHS[item.report]}${query}`}
+                  <Link href={`${REPORT_PATHS[item.report]}${query}${ATTENTION_VIEW[item.key] ? `${query ? "&" : "?"}view=${ATTENTION_VIEW[item.key]}` : ""}`}
                     className="ml-auto shrink-0 font-medium text-blue-700 underline-offset-2 hover:underline">
                     {t("attention.view")}
                   </Link>
@@ -296,6 +304,18 @@ function ReportsHome() {
                   : tiles.data_checks.value + (tiles.evaluation.pending || 0) > 0
                     ? { tone: "fix", text: t("catalogue.statusFix", { n: nf.format(tiles.data_checks.value + (tiles.evaluation.pending || 0)) }) }
                     : { tone: "ok", text: t("catalogue.statusClear") }
+              }
+              meta={[t("catalogue.forAdmin"), t("catalogue.aggregates")]}
+            />
+            <CatalogueCard
+              step={2}
+              href={`${REPORT_PATHS["result-analysis"]}${query}`}
+              name={t("catalogue.resultAnalysisName")}
+              question={t("catalogue.resultAnalysisQuestion")}
+              status={
+                tiles.pass_percent.value === null
+                  ? { tone: "none", text: t("catalogue.statusNone") }
+                  : { tone: "info", text: `${t("tile.passPercent")} ${pct(tiles.pass_percent.value)}` }
               }
               meta={[t("catalogue.forAdmin"), t("catalogue.aggregates")]}
             />
