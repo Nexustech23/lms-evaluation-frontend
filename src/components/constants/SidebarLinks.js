@@ -1,5 +1,5 @@
 import React from "react";
-import { isSchool } from "@/institute/instituteKind";
+import { COLLEGE, instituteTypeOf, isSchool } from "@/institute/instituteKind";
 
 import {
   IconHome,
@@ -161,6 +161,16 @@ export const getSidebarLinks = (role, user, t) => {
               label: "Course Outcome",
               href: "/admin/co",
               icon: <IconChecklist />,
+            },
+          ]
+          : []),
+        // Result reports and the overview dashboard are for colleges; a school has no semesters or CGPA.
+        ...(instituteTypeOf(user) === COLLEGE
+          ? [
+            {
+              label: "Reports",
+              href: "/admin/reports",
+              icon: <IconFileAnalytics />,
             },
           ]
           : []),

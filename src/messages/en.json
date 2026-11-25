@@ -668,5 +668,366 @@
   "locale": {
     "switchLanguage": "Switch Language",
     "currentLanguage": "Current Language"
+  },
+  "reports": {
+    "title": "Reports",
+    "asOf": "As of {date}",
+    "noDate": "Data date not available",
+    "jumpOverview": "Overview",
+    "jumpAttention": "Needs attention",
+    "filters": {
+      "programme": "Programme",
+      "batch": "Batch",
+      "semester": "Semester",
+      "all": "All",
+      "latest": "latest",
+      "reset": "Reset to latest"
+    },
+    "scope": "Showing: {semester} · {programme} · {batch}",
+    "coverage": "{withResults} of {students} students have results",
+    "overview": "Overview",
+    "groupReadiness": "Is the data ready?",
+    "groupResults": "What do the results say?",
+    "tile": {
+      "students": "Students",
+      "exams": "Exams",
+      "evaluation": "Evaluation",
+      "dataChecks": "Data checks",
+      "passPercent": "Pass %",
+      "averageCgpa": "Average CGPA",
+      "backlogs": "Backlogs",
+      "atRisk": "At-risk students"
+    },
+    "sub": {
+      "studentsResults": "{n} have results",
+      "exams": "in this semester",
+      "evaluation": "{done} of {total} answer sheets done",
+      "evaluationPending": "{n} pending",
+      "dataChecks": "{courses} courses, {exams} exams, {stale} results",
+      "pass": "of {n} students who appeared",
+      "backlogs": "{papers} failed papers",
+      "atRisk": "of {n} students with results"
+    },
+    "compare": {
+      "pass": "{value}% last semester",
+      "cgpa": "{value} last semester",
+      "up": "Up",
+      "down": "Down",
+      "same": "No change"
+    },
+    "reason": {
+      "no_results": "No results yet",
+      "no_answers": "No answer sheets yet",
+      "nothing_to_check": "Nothing to check yet"
+    },
+    "chart": {
+      "passTrend": "Pass % by semester",
+      "passTrendBatch": "Batch: {batch}",
+      "passTrendNote": "All semesters of one batch",
+      "grades": "Grade distribution",
+      "gradesSemester": "Semester {n}",
+      "viewData": "View data",
+      "hideData": "Hide data",
+      "empty": "No results yet for this selection.",
+      "semester": "Semester",
+      "passPercent": "Pass %",
+      "appeared": "Appeared",
+      "grade": "Grade",
+      "students": "Students",
+      "share": "Share"
+    },
+    "attention": {
+      "view": "View",
+      "title": "Needs attention",
+      "allClear": "Nothing needs attention right now.",
+      "no_co_mapping": "{count} of {of} courses have no CO-PO mapping",
+      "exams_without_cos": "{count} of {of} exams have no CO tags",
+      "stale_results": "{count} results need regenerating and are left out",
+      "evaluation_pending": "{count} of {of} answer sheets still need review",
+      "low_pass_programmes": "{count} programmes have a pass % under {target}%: {names}",
+      "at_risk": "{count} students meet the at-risk rule"
+    },
+    "definitions": {
+      "title": "How the overview is calculated",
+      "pass": "Pass % = students with no failed subject ÷ students who appeared, for the semester shown.",
+      "cgpa": "Average CGPA = the mean cumulative CGPA of students with results in the semester shown.",
+      "backlogs": "Backlog = a subject with grade {grades} in any semester. Attempt history is not stored, so a cleared backlog is not removed.",
+      "atRisk": "At risk = {papers} or more failed subjects, or a latest CGPA under {cgpa}.",
+      "stale": "Results marked as needing regeneration are left out of every number."
+    },
+    "state": {
+      "loading": "Loading the overview...",
+      "error": "The overview could not be loaded.",
+      "retry": "Retry",
+      "collegeOnly": "Reports are available for colleges only."
+    },
+    "catalogue": {
+      "title": "Report catalogue",
+      "forAdmin": "For: Institute Admin",
+      "aggregates": "Shows aggregates",
+      "dataCheckName": "Data Check",
+      "dataCheckQuestion": "Is the data ready? Which courses, exams and results are incomplete?",
+      "statusFix": "{n} to fix",
+      "statusClear": "All clear",
+      "statusNone": "No data yet",
+      "resultAnalysisName": "Result Analysis",
+      "resultAnalysisQuestion": "How did the semester's results turn out, and where did they go wrong?",
+      "backlogQuestion": "Which students need follow-up, and why? Who has not cleared a mandatory exam?",
+      "names": "Shows student names",
+      "statusFollow": "{n} to follow up",
+      "attainmentName": "CO / PO Attainment",
+      "attainmentQuestion": "Are the course outcomes and programme outcomes being met?",
+      "statusCompute": "Worked out when opened"
+    },
+    "dataCheck": {
+      "question": "Is the data ready? Which courses, exams and results are incomplete?",
+      "back": "Back to Reports",
+      "generated": "Generated {date}",
+      "allClear": "Everything checked is complete.",
+      "noChecks": "Nothing to check yet: there are no courses or exams in this scope.",
+      "allFine": "Nothing to fix here.",
+      "truncated": "Showing the first {shown} of {total}.",
+      "summary": {
+        "courses": "Courses without CO-PO mapping",
+        "exams": "Exams without CO tags",
+        "evaluation": "Answer sheets waiting for review",
+        "stale": "Results to regenerate",
+        "of": "of {n}"
+      },
+      "section": {
+        "courses": "Courses without CO-PO mapping",
+        "exams": "Exams without CO tags",
+        "evaluation": "Answer sheets waiting for review",
+        "stale": "Results to regenerate"
+      },
+      "col": {
+        "course": "Course",
+        "code": "Code",
+        "programme": "Programme",
+        "batch": "Batch",
+        "semester": "Semester",
+        "exam": "Exam",
+        "subject": "Subject",
+        "faculty": "Faculty",
+        "pending": "Pending",
+        "total": "Total",
+        "students": "Students"
+      },
+      "fix": {
+        "courses": "Add the CO-PO matrix for each course.",
+        "exams": "Ask the faculty to set the covered COs on the exam.",
+        "evaluation": "Ask the faculty to review these answer sheets.",
+        "stale": "Regenerate these transcripts so they count again."
+      },
+      "link": {
+        "courses": "Open Course Outcome",
+        "stale": "Open Academic Transcript"
+      },
+      "definitions": {
+        "title": "What each check means",
+        "courses": "A course has no CO-PO matrix saved, so CO and PO attainment cannot be worked out for it.",
+        "exams": "An exam has no covered COs, so its marks cannot count towards CO attainment. Archived exams are not checked.",
+        "evaluation": "An answer sheet is waiting for review when marking is not final yet.",
+        "stale": "A result is marked as needing regeneration, so it is left out of every number until it is regenerated.",
+        "scope": "The same programme, batch and semester as the overview. Exams follow the semester; courses and results follow the programme and batch."
+      }
+    },
+    "resultAnalysis": {
+      "question": "How did the semester's results turn out, and where did they go wrong?",
+      "tabs": {
+        "overview": "Overview",
+        "programmes": "Programmes",
+        "subjects": "Subjects",
+        "grades": "Grades"
+      },
+      "summary": {
+        "appeared": "Appeared",
+        "passPercent": "Pass %",
+        "averageCgpa": "Average CGPA",
+        "lowestSubject": "Lowest subject",
+        "passedFailed": "{passed} passed, {failed} failed",
+        "passedOf": "{passed} of {appeared} passed",
+        "highLow": "Highest {high}, lowest {low}",
+        "subjectLine": "{pct}% pass, {n} students"
+      },
+      "chart": {
+        "subjectPass": "Pass % by subject, lowest first",
+        "cgpaBands": "CGPA distribution",
+        "target": "Target {value}%",
+        "students": "Students",
+        "passPercent": "Pass %",
+        "band": "CGPA band"
+      },
+      "col": {
+        "programme": "Programme",
+        "subject": "Subject",
+        "appeared": "Appeared",
+        "passed": "Passed",
+        "passPercent": "Pass %",
+        "averageCgpa": "Average CGPA",
+        "mean": "Mean marks",
+        "median": "Median marks",
+        "highest": "Highest",
+        "lowest": "Lowest",
+        "allSubjects": "All subjects"
+      },
+      "note": {
+        "small": "Small group (under {n} students): read the percentage with care.",
+        "smallShort": "small group",
+        "belowTarget": "below target"
+      },
+      "empty": "No results yet for this selection.",
+      "export": {
+        "button": "Download Excel",
+        "busy": "Preparing...",
+        "note": "Excel: {subjects} subjects and {programmes} programmes, for the scope above",
+        "failed": "The file could not be downloaded."
+      },
+      "definitions": {
+        "title": "How this report is calculated",
+        "pass": "A student passes a semester when no subject has a failing grade ({grades}). Pass % = passed ÷ appeared.",
+        "subject": "Subject pass % = students with a non-failing grade ÷ students graded in that subject.",
+        "cgpa": "CGPA is each student's cumulative CGPA at the semester shown. Bands are from the lower value up to, but not including, the upper value; 10 is in the top band.",
+        "small": "Groups under {n} students are marked, because one student can move the percentage a lot.",
+        "left": "Results marked as needing regeneration, and subjects without a grade, are left out. No student is named in this report."
+      }
+    },
+    "backlog": {
+      "title": "{label} and At-risk",
+      "question": "Which students need follow-up, and why? Who has not cleared a mandatory exam?",
+      "confidential": "This page shows student names. Every view and every export is recorded in an access log.",
+      "segment": {
+        "all": "Needing follow-up",
+        "backlog": "{label}",
+        "atRisk": "At risk"
+      },
+      "summary": {
+        "withResults": "Students with results",
+        "backlogStudents": "Students with a {label}",
+        "papers": "{n} failed subjects",
+        "atRisk": "At-risk students",
+        "notCleared": "Mandatory exams not cleared",
+        "of": "of {n}"
+      },
+      "listTitle": "Students needing follow-up",
+      "notClearedTitle": "Mandatory exams not cleared",
+      "col": {
+        "student": "Student",
+        "id": "Enrollment / roll no",
+        "programme": "Programme",
+        "batch": "Batch",
+        "failed": "Failed subjects",
+        "which": "Which subjects",
+        "cgpa": "Latest CGPA",
+        "reason": "Reason",
+        "exam": "Exam",
+        "subject": "Subject",
+        "semester": "Semester",
+        "marks": "Marks %",
+        "minimum": "Minimum %"
+      },
+      "reason": {
+        "failed_papers": "{n, plural, one {# failed subject} other {# failed subjects}}",
+        "low_cgpa": "CGPA {value}, below {min}",
+        "absent": "Absent",
+        "malpractice": "Malpractice",
+        "below_minimum": "Below the minimum"
+      },
+      "moreSubjects": "and {n} more",
+      "ruleLine": "At risk = {papers} or more failed subjects, or a latest CGPA under {cgpa}. {label} = a subject with grade {grades} in any semester.",
+      "empty": "No student needs follow-up in this scope.",
+      "emptyNotCleared": "No mandatory exam has a student who has not cleared it.",
+      "noResults": "No results yet for this scope, so no student can be listed.",
+      "notClearedNote": "Only students with a saved answer sheet can be listed.",
+      "export": {
+        "button": "Download Excel",
+        "busy": "Preparing...",
+        "note": "Contains student names. The download is recorded in the access log.",
+        "failed": "The file could not be downloaded."
+      },
+      "label": {
+        "title": "Call a failed subject",
+        "failed": "The setting could not be saved."
+      },
+      "definitions": {
+        "title": "How this report is worked out",
+        "atRisk": "A student is at risk with {papers} or more failed subjects, or a latest CGPA under {cgpa}. The reasons are shown on each row; there is no hidden model.",
+        "backlog": "A failed subject is one with grade {grades} in any semester. Attempt history is not stored, so a subject that was cleared later is not removed.",
+        "notCleared": "A mandatory exam is not cleared when the student was absent, caught in malpractice, or below the minimum %. Only students with a saved answer sheet can be listed.",
+        "matching": "A transcript id is matched to a student by enrollment number, or by roll number inside the same batch. If no student matches, the name shows as - and the id is still shown.",
+        "left": "Results marked as needing regeneration are left out."
+      }
+    },
+    "attainment": {
+      "question": "Are the course outcomes and programme outcomes being met?",
+      "tooMany": "This scope has {n} courses, more than the {limit} that can be worked out at once. Choose a programme, a batch or a semester.",
+      "empty": "No course in this scope has answer sheets to work out.",
+      "semesterAll": "All semesters",
+      "summary": {
+        "inScope": "Courses in scope",
+        "computed": "Courses worked out",
+        "cos": "Course outcomes attained",
+        "leftOut": "Courses left out",
+        "ofN": "of {n}",
+        "coLine": "{attained} of {total} course outcomes",
+        "withPo": "{n} with PO values"
+      },
+      "section": {
+        "programmes": "By programme",
+        "batches": "By batch",
+        "courses": "Courses"
+      },
+      "col": {
+        "programme": "Programme",
+        "batch": "Batch",
+        "course": "Course",
+        "code": "Code",
+        "semester": "Semester",
+        "status": "Status",
+        "cos": "Course outcomes (score / target)",
+        "courses": "Courses counted",
+        "attained": "COs attained"
+      },
+      "status": {
+        "ok": "Worked out",
+        "no_matrix": "No CO-PO matrix",
+        "no_data": "No answer sheets",
+        "pending_review": "Review pending",
+        "no_targets": "No programme level bands"
+      },
+      "fix": {
+        "no_matrix": "Add the CO-PO matrix for this course. Its COs are counted; its POs are not.",
+        "no_data": "Marks have not been entered or evaluated yet.",
+        "pending_review": "The faculty must finish reviewing the answer sheets.",
+        "no_targets": "Set the level bands on the programme."
+      },
+      "co": {
+        "attained": "attained",
+        "notAttained": "not attained"
+      },
+      "heat": {
+        "note": "Each cell shows the PO % and its level from 0 to 3. A darker cell is a higher level.",
+        "level": "level {value}"
+      },
+      "export": {
+        "button": "Download Excel",
+        "busy": "Preparing...",
+        "note": "Excel: roll-ups and every course, for the scope above",
+        "failed": "The file could not be downloaded."
+      },
+      "definitions": {
+        "title": "How this report is calculated",
+        "co": "A course's CO scores are worked out the same way as the per-course Excel report: each exam's level comes from the share of students at or above the threshold (level bands set on the programme), weighted by the exam weight, with the course-exit (indirect) part added by weight. A CO is attained when its final score reaches the CO target.",
+        "po": "PO % = the CO-PO weights of the attained COs ÷ all the CO-PO weights for that PO × 100. The level is the PO % on a scale of 0 to 3.",
+        "rollup": "A programme's or batch's PO % is the mean over its courses that address that PO.",
+        "left": "Absent and malpractice students are left out. A course with no answer sheets, a pending review, or no programme level bands is listed with its reason and left out of the roll-ups, never counted as zero.",
+        "limits": "The app stores no PO target, so PO values are shown without one. No student is named in this report."
+      }
+    },
+    "pdf": {
+      "button": "Download PDF",
+      "busy": "Preparing...",
+      "failed": "The file could not be created."
+    }
   }
 }
